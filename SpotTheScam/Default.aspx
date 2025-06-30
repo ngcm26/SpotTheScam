@@ -6,7 +6,7 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="text-center">
-        <h1 class="display-4">Welcome to SpotTheScam Testing 123</h1>
+        <h1 class="display-4">Welcome to SpotTheScam</h1>
         <p class="lead">Empowering you to detect scams and stay safe online.</p>
         <a class="btn btn-primary btn-lg" href="#" role="button">Get Started</a>
     </div>
