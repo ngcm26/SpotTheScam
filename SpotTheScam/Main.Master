@@ -1,50 +1,68 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Main.master.cs" Inherits="SpotTheScam.Main" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head runat="server">
     <title>SpotTheScam</title>
-    <!-- Bootstrap CSS CDN for quick styling -->
+    <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <asp:ContentPlaceHolder ID="head" runat="server" />
 </head>
-<body>
-    <form id="form1" runat="server">
-        <!-- Navigation Bar -->
+<body class="d-flex flex-column min-vh-100">
+    <form id="form1" runat="server" class="flex-grow-1 d-flex flex-column">
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">SpotTheScam</a>
+                <a class="navbar-brand" href="Default.aspx">SpotTheScam</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" href="Default.aspx">Home</a>
+                            <a class="nav-link" href="Default.aspx">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Features</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">About</a>
-                        </li>
+
+                        <!-- For GUESTS ONLY -->
+                        <asp:PlaceHolder ID="phGuest" runat="server" Visible="false">
+                            <li class="nav-item">
+                                <a class="nav-link" href="Register.aspx">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="Login.aspx">Login</a>
+                            </li>
+                        </asp:PlaceHolder>
+
+                        <!-- For LOGGED-IN USERS ONLY -->
+                        <asp:PlaceHolder ID="phUser" runat="server" Visible="false">
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="nav-link text-white fw-bold">
+                                    👋 Welcome, <asp:Label ID="lblUsername" runat="server" />
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-sm btn-danger text-white ms-2" href="Logout.aspx">
+                                    Logout
+                                </a>
+                            </li>
+                        </asp:PlaceHolder>
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <div class="container mt-4">
+        <!-- Page Content -->
+        <div class="container mt-4 flex-grow-1">
             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server" />
         </div>
 
         <!-- Footer -->
-        <footer class="bg-dark text-white text-center p-3 mt-4">
+        <footer class="bg-dark text-white text-center p-3 mt-auto">
             &copy; <%: DateTime.Now.Year %> SpotTheScam. All rights reserved.
         </footer>
     </form>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

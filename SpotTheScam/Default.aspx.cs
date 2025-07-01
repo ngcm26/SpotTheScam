@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace SpotTheScam
 {
@@ -11,7 +6,18 @@ namespace SpotTheScam
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["Username"] != null)
+            {
+                phWelcome.Visible = true;
+                phGuest.Visible = false;
 
+                lblName.Text = Session["Username"].ToString();
+            }
+            else
+            {
+                phWelcome.Visible = false;
+                phGuest.Visible = true;
+            }
         }
     }
 }
