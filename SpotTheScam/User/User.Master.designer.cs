@@ -11,7 +11,7 @@ namespace SpotTheScam.User
 {
 
 
-    public partial class User
+    public partial class UserMaster
     {
 
         /// <summary>

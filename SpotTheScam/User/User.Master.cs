@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace SpotTheScam.User
 {
-    public partial class User : System.Web.UI.MasterPage
+    public partial class UserMaster : System.Web.UI.MasterPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
