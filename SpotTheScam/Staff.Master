@@ -134,7 +134,7 @@
                             <a class="nav-link" href="-" style="margin: 0 15px; color: white; font-weight: 500;">Educational Quizzes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="-" style="margin: 0 15px; color: white; font-weight: 500;">Expert Webinar Sessions</a>
+                            <a class="nav-link" href="StaffExpertWebinar.aspx" style="margin: 0 15px; color: white; font-weight: 500;">Expert Webinar Sessions</a>
                         </li>
                     </ul>
 
