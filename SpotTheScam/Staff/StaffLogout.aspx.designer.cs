@@ -11,7 +11,11 @@ namespace SpotTheScam.Staff
 {
 
 
+<<<<<<<< HEAD:SpotTheScam/Staff/StaffLogout.aspx.designer.cs
     public partial class StaffLogout
+========
+    public partial class WebForm1
+>>>>>>>> 16d5c3224740bd90b5e14147468f61e05bb20cc5:SpotTheScam/WebForm1.aspx.designer.cs
     {
     }
 }
