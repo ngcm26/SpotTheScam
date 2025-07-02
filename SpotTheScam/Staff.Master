@@ -18,59 +18,86 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
+        .navbar-brand img {
+            height: 40px;
         }
         
         .nav-link {
             font-weight: 500;
             margin: 0 15px;
-            color: #333 !important;
+            color: white !important;
+            font-size: 16px;
         }
         
         .nav-link:hover {
-            color: #007bff !important;
+            color: #ffcc80 !important;
         }
         
         .user-profile {
             display: flex;
             align-items: center;
-            color: #333;
+            color: white;
         }
         
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             background-color: #333;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            margin-right: 10px;
+            margin-right: 8px;
+            font-size: 14px;
         }
         
         .user-name {
-            margin-right: 10px;
+            margin-right: 8px;
             font-weight: 500;
+            font-size: 16px;
+            color: white !important;
         }
         
-        .notification-icon {
+        .dropdown-toggle::after {
+            margin-left: 8px;
+        }
+        
+        .notification-bell {
             color: #ffc107;
-            font-size: 1.2rem;
+            font-size: 18px;
             margin-left: 15px;
+            cursor: pointer;
         }
         
         .navbar {
-            background-color: #f8f9fa !important;
+            background-color: #e67e22 !important;
             border-bottom: none !important;
-            padding: 1rem 0;
+            padding: 12px 0;
+            box-shadow: none;
         }
         
-        .navbar .container {
-            max-width: 100%;
+        .navbar .container-fluid {
             padding: 0 2rem;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-item {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-toggle {
+            color: white !important;
         }
     </style>
 </head>
@@ -81,55 +108,53 @@
         </asp:ScriptManager>
 
         <!-- Staff Navigation Bar -->
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e67e22; padding: 12px 0;">
+            <div class="container-fluid" style="padding: 0 2rem;">
                 <!-- Brand Logo -->
                 <a class="navbar-brand" href="Dashboard.aspx">
                     <img src="Images/logo.svg" alt="Spot The Scam" style="height: 40px;" />
                 </a>
 
-                <!-- Navbar Toggle for Mobile -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#staffNavbar">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Navigation Items -->
-                <div class="collapse navbar-collapse" id="staffNavbar">
-                    <ul class="navbar-nav me-auto">
+                <!-- Navigation Items - Always Visible -->
+                <div class="d-flex align-items-center w-100 justify-content-between">
+                    <ul class="navbar-nav d-flex flex-row">
                         <li class="nav-item">
-                            <a class="nav-link" href="ScamRecoverySupport.aspx">Scam recovery support</a>
+                            <a class="nav-link" href="ScamRecoverySupport.aspx" style="margin: 0 15px; color: white; font-weight: 500;">Scam recovery support</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="ProtectionAgainstScam.aspx">Protection against scam</a>
+                            <a class="nav-link" href="ProtectionAgainstScam.aspx" style="margin: 0 15px; color: white; font-weight: 500;">Protection against scam</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="BlogsForum.aspx">Blogs & Forum</a>
+                            <a class="nav-link" href="BlogsForum.aspx" style="margin: 0 15px; color: white; font-weight: 500;">Blogs & Forum</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="Dashboard.aspx">Dashboard</a>
+                            <a class="nav-link" href="Dashboard.aspx" style="margin: 0 15px; color: white; font-weight: 500;">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="-" style="margin: 0 15px; color: white; font-weight: 500;">Educational Quizzes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="-" style="margin: 0 15px; color: white; font-weight: 500;">Expert Webinar Sessions</a>
                         </li>
                     </ul>
 
                     <!-- User Profile Section -->
-                    <div class="user-profile">
-                        <div class="user-avatar">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 35px; height: 35px; background-color: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 8px;">
                             <i class="fas fa-user"></i>
                         </div>
-                        <span class="user-name">
-                            <asp:Label ID="lblUserName" runat="server" Text="Name Example"></asp:Label>
-                        </span>
                         <div class="dropdown">
-                            <button class="btn btn-link p-0" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-chevron-down"></i>
+                            <button class="btn btn-link dropdown-toggle text-decoration-none" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; color: white; font-weight: 500; padding: 0;">
+                                <asp:Label ID="lblUserName" runat="server" Text="User"></asp:Label>
                             </button>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="Profile.aspx">Profile</a></li>
                                 <li><a class="dropdown-item" href="Settings.aspx">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><asp:LinkButton ID="btnLogout" runat="server" CssClass="dropdown-item" OnClick="btnLogout_Click">Logout</asp:LinkButton></li>
                             </ul>
                         </div>
-                        <i class="fas fa-bell notification-icon"></i>
+                        <i class="fas fa-bell" style="color: #ffc107; font-size: 18px; margin-left: 15px; cursor: pointer;"></i>
                     </div>
                 </div>
             </div>

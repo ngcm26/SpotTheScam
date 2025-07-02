@@ -14,11 +14,15 @@ namespace SpotTheScam
             if (!IsPostBack)
             {
                 // Set user name from session or database
-                // For now, using default value set in the markup
-                // You can uncomment below to set from session:
+                // For now, using default value "Name Example"
+                // You can set from session like this:
                 // if (Session["UserName"] != null)
                 // {
                 //     lblUserName.Text = Session["UserName"].ToString();
+                // }
+                // else
+                // {
+                //     lblUserName.Text = "Name Example";
                 // }
             }
         }
