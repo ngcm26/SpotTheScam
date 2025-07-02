@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Login" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="SpotTheScam.Login" %>
+﻿<%@ Page Title="UserLogin" Language="C#" MasterPageFile="User.Master" AutoEventWireup="true" CodeBehind="UserLogin.aspx.cs" Inherits="SpotTheScam.Login" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server"></asp:Content>
 

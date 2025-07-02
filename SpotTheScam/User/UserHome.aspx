@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Home" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="SpotTheScam.Default" %>
+﻿<%@ Page Title="UserHome" Language="C#" MasterPageFile="User.master" AutoEventWireup="true" CodeBehind="UserHome.aspx.cs" Inherits="SpotTheScam.Default" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server"></asp:Content>
 
@@ -15,8 +15,8 @@
         <asp:PlaceHolder ID="phGuest" runat="server" Visible="false">
             <h1 class="display-4">Welcome to SpotTheScam</h1>
             <p class="lead">Join us to detect scams and stay safe online.</p>
-            <a class="btn btn-primary btn-lg me-2" href="Login.aspx">Login</a>
-            <a class="btn btn-outline-primary btn-lg" href="Register.aspx">Create an Account</a>
+            <a class="btn btn-primary btn-lg me-2" href="UserLogin.aspx">Login</a>
+            <a class="btn btn-outline-primary btn-lg" href="UserRegister.aspx">Create an Account</a>
         </asp:PlaceHolder>
     </div>
 </asp:Content>

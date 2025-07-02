@@ -26,7 +26,7 @@ namespace SpotTheScam
                     {
                         // ✅ Save username in Session
                         Session["Username"] = username;
-                        Response.Redirect("Default.aspx");
+                        Response.Redirect("UserHome.aspx");
                     }
                     else
                     {

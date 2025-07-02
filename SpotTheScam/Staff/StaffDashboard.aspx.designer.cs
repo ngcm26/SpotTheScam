@@ -7,38 +7,38 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SpotTheScam
+namespace SpotTheScam.Staff
 {
 
 
-    public partial class Staff
+    public partial class StaffDashboard
     {
 
         /// <summary>
-        /// lblUserName control.
+        /// phDashboard control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUserName;
+        protected global::System.Web.UI.WebControls.PlaceHolder phDashboard;
 
         /// <summary>
-        /// btnLogout control.
+        /// lblStaffName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnLogout;
+        protected global::System.Web.UI.WebControls.Label lblStaffName;
 
         /// <summary>
-        /// MainContent control.
+        /// phPleaseLogin control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.PlaceHolder phPleaseLogin;
     }
 }

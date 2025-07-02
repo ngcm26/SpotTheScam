@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SpotTheScam
+namespace SpotTheScam.User
 {
 
 
-    public partial class Main
+    public partial class User
     {
 
         /// <summary>

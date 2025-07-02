@@ -37,7 +37,7 @@ namespace SpotTheScam
                     cmd.Parameters.AddWithValue("@password", password);
                     cmd.ExecuteNonQuery();
                     lblMessage.ForeColor = System.Drawing.Color.Green;
-                    lblMessage.Text = "Account created successfully! <a href='Login.aspx'>Login here</a>";
+                    lblMessage.Text = "Account created successfully! <a href='UserLogin.aspx'>Login here</a>";
                 }
             }
         }
