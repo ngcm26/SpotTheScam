@@ -75,6 +75,7 @@
     <Content Include="Web.config" />
     <Content Include="WebForm1.aspx" />
     <Content Include="StaffExpertWebinar.aspx" />
+    <Content Include="StaffVideoCall.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Default.aspx.cs">
@@ -140,6 +141,13 @@
     </Compile>
     <Compile Include="StaffExpertWebinar.aspx.designer.cs">
       <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="StaffVideoCall.aspx.cs">
+      <DependentUpon>StaffVideoCall.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="StaffVideoCall.aspx.designer.cs">
+      <DependentUpon>StaffVideoCall.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
