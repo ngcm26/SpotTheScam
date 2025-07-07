@@ -1,4 +1,4 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="User.master.cs" Inherits="SpotTheScam.User.User" %>
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="User.master.cs" Inherits="SpotTheScam.User.UserMaster" %>
 
 <!DOCTYPE html>
 <html lang="en">

@@ -9,8 +9,6 @@
 
 namespace SpotTheScam.Staff
 {
-
-
     public partial class StaffLogout
     {
     }
