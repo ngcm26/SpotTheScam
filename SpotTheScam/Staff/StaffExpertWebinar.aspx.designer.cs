@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SpotTheScam
+namespace SpotTheScam.Staff
 {
 
 

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="~/Staff/Staff.Master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
+﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="~/Staff/Staff.Master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.Staff.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>

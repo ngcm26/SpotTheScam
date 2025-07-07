@@ -66,6 +66,7 @@
   <ItemGroup>
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
+    <Content Include="Staff\StaffExpertWebinar.aspx" />
     <Content Include="Staff\StaffLogin.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
     <Content Include="User\UserHome.aspx" />
@@ -75,7 +76,6 @@
     <Content Include="User\UserRegister.aspx" />
     <Content Include="Web.config" />
     <Content Include="WebForm1.aspx" />
-    <Content Include="Staff\StaffExpertWebinar.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Staff\ManageUsers.aspx.cs">
@@ -91,6 +91,13 @@
     </Compile>
     <Compile Include="Staff\StaffDashboard.aspx.designer.cs">
       <DependentUpon>StaffDashboard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\StaffExpertWebinar.aspx.cs">
+      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
+      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffLogin.aspx.cs">
       <DependentUpon>StaffLogin.aspx</DependentUpon>
@@ -149,10 +156,6 @@
     <Compile Include="User\User.Master.designer.cs">
       <DependentUpon>User.Master</DependentUpon>
     </Compile>
-    <Compile Include="Staff\StaffVideoCall.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Staff\StaffVideoCall.aspx.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Staff\Staff.Master" />
