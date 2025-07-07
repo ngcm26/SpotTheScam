@@ -1,8 +1,8 @@
-﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="~/Staff.Master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
+﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="~/Staff/Staff.Master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.Staff.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
-        .container {
+        .container-custom {
             max-width: 1200px;
             margin: 30px auto;
             background: white;
@@ -129,13 +129,9 @@
         .hidden {
             display: none;
         }
-        
-        body {
-            background-color: #f4f1e8;
-        }
     </style>
 
-    <div class="container">
+    <div class="container-custom">
         <h2>Manage Expert Webinar Sessions</h2>
         
         <!-- Add Time Slot Form -->

@@ -7,21 +7,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SpotTheScam
+namespace SpotTheScam.Staff
 {
 
 
-    public partial class StaffVideoCall
+    public partial class StaffExpertWebinar
     {
-
-        /// <summary>
-        /// JoinForm control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl JoinForm;
 
         /// <summary>
         /// AlertPanel control.
@@ -42,111 +33,75 @@ namespace SpotTheScam
         protected global::System.Web.UI.WebControls.Label AlertMessage;
 
         /// <summary>
-        /// SessionIdInput control.
+        /// SessionDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox SessionIdInput;
+        protected global::System.Web.UI.WebControls.TextBox SessionDate;
 
         /// <summary>
-        /// JoinSessionButton control.
+        /// DateValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button JoinSessionButton;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator DateValidator;
 
         /// <summary>
-        /// NoActiveSessionsPanel control.
+        /// StartTime control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel NoActiveSessionsPanel;
+        protected global::System.Web.UI.WebControls.TextBox StartTime;
 
         /// <summary>
-        /// ActiveSessionsRepeater control.
+        /// StartTimeValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater ActiveSessionsRepeater;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator StartTimeValidator;
 
         /// <summary>
-        /// VideoCallInterface control.
+        /// EndTime control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl VideoCallInterface;
+        protected global::System.Web.UI.WebControls.TextBox EndTime;
 
         /// <summary>
-        /// SessionIdLabel control.
+        /// EndTimeValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label SessionIdLabel;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator EndTimeValidator;
 
         /// <summary>
-        /// CustomerNameLabel control.
+        /// AddTimeSlotButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label CustomerNameLabel;
+        protected global::System.Web.UI.WebControls.Button AddTimeSlotButton;
 
         /// <summary>
-        /// CustomerPhoneLabel control.
+        /// SessionsGridView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label CustomerPhoneLabel;
-
-        /// <summary>
-        /// SessionDateLabel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label SessionDateLabel;
-
-        /// <summary>
-        /// SessionTimeLabel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label SessionTimeLabel;
-
-        /// <summary>
-        /// ScamConcernsLabel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label ScamConcernsLabel;
-
-        /// <summary>
-        /// EndCallButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button EndCallButton;
+        protected global::System.Web.UI.WebControls.GridView SessionsGridView;
     }
 }
