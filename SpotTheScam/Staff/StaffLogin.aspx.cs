@@ -12,7 +12,6 @@ namespace SpotTheScam.Staff
         {
             if (Session["StaffName"] != null)
             {
-                // Already logged in → go straight to dashboard
                 Response.Redirect("StaffDashboard.aspx");
             }
         }
@@ -24,17 +23,28 @@ namespace SpotTheScam.Staff
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT COUNT(*) FROM Staff WHERE LTRIM(RTRIM(Username)) = @Username AND LTRIM(RTRIM(Password)) = @Password";
+                string query = "SELECT Id, Role FROM Staff WHERE LTRIM(RTRIM(Username)) = @Username AND LTRIM(RTRIM(Password)) = @Password";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Username", username);
                 cmd.Parameters.AddWithValue("@Password", password);
 
                 conn.Open();
-                int count = (int)cmd.ExecuteScalar();
+                SqlDataReader reader = cmd.ExecuteReader();
 
-                if (count == 1)
+                if (reader.Read())
                 {
+                    // Found matching staff user
                     Session["StaffName"] = username;
+                    Session["StaffRole"] = reader["Role"].ToString();
+
+                    reader.Close();
+
+                    // Optional: Update LastLogin timestamp
+                    string updateQuery = "UPDATE Staff SET LastLogin = GETDATE() WHERE Username = @Username";
+                    SqlCommand updateCmd = new SqlCommand(updateQuery, conn);
+                    updateCmd.Parameters.AddWithValue("@Username", username);
+                    updateCmd.ExecuteNonQuery();
+
                     Response.Redirect("StaffDashboard.aspx");
                 }
                 else

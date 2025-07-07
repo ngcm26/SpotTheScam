@@ -6,13 +6,20 @@ namespace SpotTheScam.Staff
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // If staff is logged in, show nav options
             if (Session["StaffName"] != null)
             {
-                phNavOptions.Visible = true; // Show nav options when logged in
+                phNavOptions.Visible = true;
             }
             else
             {
-                phNavOptions.Visible = false; // Hide nav options if not logged in
+                phNavOptions.Visible = false;
+
+                // OPTIONAL: Force redirect if needed
+                // If you want to prevent access to pages without login,
+                // uncomment this:
+                //
+                // Response.Redirect("StaffLogin.aspx");
             }
         }
     }
