@@ -6,17 +6,22 @@ namespace SpotTheScam
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["Username"] != null)
+            if (!IsPostBack)
             {
-                phWelcome.Visible = true;
-                phGuest.Visible = false;
+                if (Session["Username"] != null)
+                {
+                    // User is logged in
+                    phWelcome.Visible = true;
+                    lblName.Text = Session["Username"].ToString();
 
-                lblName.Text = Session["Username"].ToString();
-            }
-            else
-            {
-                phWelcome.Visible = false;
-                phGuest.Visible = true;
+                    phHero.Visible = false;
+                }
+                else
+                {
+                    // User is NOT logged in
+                    phHero.Visible = true;
+                    phWelcome.Visible = false;
+                }
             }
         }
     }
