@@ -74,6 +74,8 @@
     <Content Include="User\UserLogout.aspx" />
     <Content Include="User\UserRegister.aspx" />
     <Content Include="Web.config" />
+    <Content Include="WebForm1.aspx" />
+    <Content Include="StaffExpertWebinar.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Staff\ManageUsers.aspx.cs">
@@ -146,6 +148,13 @@
     </Compile>
     <Compile Include="User\User.Master.designer.cs">
       <DependentUpon>User.Master</DependentUpon>
+    </Compile>
+    <Compile Include="StaffVideoCall.aspx.cs">
+      <DependentUpon>StaffVideoCall.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="StaffVideoCall.aspx.designer.cs">
+      <DependentUpon>StaffVideoCall.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
