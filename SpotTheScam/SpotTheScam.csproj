@@ -70,6 +70,7 @@
     <Content Include="Staff\StaffExpertWebinar.aspx" />
     <Content Include="Staff\StaffLogin.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
+    <Content Include="User\ScamChecker.aspx" />
     <Content Include="User\UserHome.aspx" />
     <Content Include="Images\logo.svg" />
     <Content Include="User\UserLogin.aspx" />
@@ -120,6 +121,13 @@
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.designer.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ScamChecker.aspx.cs">
+      <DependentUpon>ScamChecker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ScamChecker.aspx.designer.cs">
+      <DependentUpon>ScamChecker.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserHome.aspx.cs">
       <DependentUpon>UserHome.aspx</DependentUpon>
