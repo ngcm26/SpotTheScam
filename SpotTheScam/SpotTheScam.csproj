@@ -72,11 +72,13 @@
     <Content Include="Staff\StaffExpertWebinar.aspx" />
     <Content Include="Staff\StaffLogin.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
+    <Content Include="User\UserBankAccounts.aspx" />
     <Content Include="User\UserHome.aspx" />
     <Content Include="Images\logo.svg" />
     <Content Include="User\UserLogin.aspx" />
     <Content Include="User\UserLogout.aspx" />
     <Content Include="User\UserRegister.aspx" />
+    <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="Web.config" />
     <Content Include="WebForm1.aspx" />
   </ItemGroup>
@@ -137,6 +139,13 @@
     <Compile Include="Staff\StaffLogout.aspx.designer.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\UserBankAccounts.aspx.cs">
+      <DependentUpon>UserBankAccounts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserBankAccounts.aspx.designer.cs">
+      <DependentUpon>UserBankAccounts.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\UserHome.aspx.cs">
       <DependentUpon>UserHome.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -179,6 +188,13 @@
     </Compile>
     <Compile Include="User\User.Master.designer.cs">
       <DependentUpon>User.Master</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserTransactionLogs.aspx.cs">
+      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
+      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
