@@ -1,6 +1,6 @@
-﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="~/Staff/Staff.Master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.Staff.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
+﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="Staff.master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.Staff.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .container-custom {
             max-width: 1200px;
@@ -10,32 +10,32 @@
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
+
         .form-section {
             background-color: #f9f9f9;
             padding: 25px;
             border-radius: 8px;
             margin-bottom: 30px;
         }
-        
+
         .form-group {
             margin-bottom: 15px;
         }
-        
+
         label {
             display: inline-block;
             width: 120px;
             font-weight: bold;
             color: #333;
         }
-        
+
         input[type="date"], input[type="time"], .btn {
             padding: 8px 12px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
         }
-        
+
         .btn-add {
             background-color: #e67e22;
             color: white;
@@ -46,11 +46,11 @@
             font-size: 14px;
             margin-left: 10px;
         }
-        
+
         .btn-add:hover {
             background-color: #d35400;
         }
-        
+
         .btn-delete {
             background-color: #e74c3c;
             color: white;
@@ -60,89 +60,91 @@
             cursor: pointer;
             font-size: 12px;
         }
-        
+
         .btn-delete:hover {
             background-color: #c0392b;
         }
-        
+
         .sessions-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        
+
         .sessions-table th, .sessions-table td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
-        
+
         .sessions-table th {
             background-color: #f8f8f8;
             font-weight: bold;
         }
-        
+
         .sessions-table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        
+
         .status-available {
             color: #28a745;
             font-weight: bold;
         }
-        
+
         .status-booked {
             color: #007bff;
             font-weight: bold;
         }
-        
+
         .alert {
             padding: 15px;
             margin-bottom: 20px;
             border: 1px solid transparent;
             border-radius: 4px;
         }
-        
+
         .alert-success {
             color: #155724;
             background-color: #d4edda;
             border-color: #c3e6cb;
         }
-        
+
         .alert-error {
             color: #721c24;
             background-color: #f8d7da;
             border-color: #f5c6cb;
         }
-        
+
         h2 {
             color: #e67e22;
             border-bottom: 2px solid #e67e22;
             padding-bottom: 10px;
         }
-        
+
         h3 {
             color: #e67e22;
             margin-top: 0;
         }
-        
+
         .hidden {
             display: none;
         }
     </style>
+</asp:Content>
 
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="container-custom">
         <h2>Manage Expert Webinar Sessions</h2>
-        
+
         <!-- Add Time Slot Form -->
         <div class="form-section">
             <h3>Add Available Time Slots</h3>
-            
+
             <!-- Alert Panel -->
             <asp:Panel ID="AlertPanel" runat="server" CssClass="hidden">
                 <asp:Label ID="AlertMessage" runat="server"></asp:Label>
             </asp:Panel>
-            
+
             <div class="form-group">
                 <label for="SessionDate">Date:</label>
                 <asp:TextBox ID="SessionDate" runat="server" TextMode="Date" CssClass="form-control"></asp:TextBox>
@@ -153,7 +155,7 @@
                                             ValidationGroup="AddSession">
                 </asp:RequiredFieldValidator>
             </div>
-            
+
             <div class="form-group">
                 <label for="StartTime">Start Time:</label>
                 <asp:TextBox ID="StartTime" runat="server" TextMode="Time" CssClass="form-control"></asp:TextBox>
@@ -164,7 +166,7 @@
                                             ValidationGroup="AddSession">
                 </asp:RequiredFieldValidator>
             </div>
-            
+
             <div class="form-group">
                 <label for="EndTime">End Time:</label>
                 <asp:TextBox ID="EndTime" runat="server" TextMode="Time" CssClass="form-control"></asp:TextBox>
@@ -175,14 +177,14 @@
                                             ValidationGroup="AddSession">
                 </asp:RequiredFieldValidator>
             </div>
-            
+
             <asp:Button ID="AddTimeSlotButton" runat="server" 
                        Text="Add Time Slot" 
                        CssClass="btn-add" 
                        OnClick="AddTimeSlotButton_Click" 
                        ValidationGroup="AddSession" />
         </div>
-        
+
         <!-- Sessions Table -->
         <div>
             <h3>Available Time Slots</h3>
@@ -193,8 +195,8 @@
                          DataKeyNames="Id">
                 <Columns>
                     <asp:BoundField DataField="SessionDate" HeaderText="Date" DataFormatString="{0:dd/MM/yyyy}" />
-                    <asp:BoundField DataField="StartTime" HeaderText="Start Time" DataFormatString="{0:hh\:mm}" />
-                    <asp:BoundField DataField="EndTime" HeaderText="End Time" DataFormatString="{0:hh\:mm}" />
+                    <asp:BoundField DataField="StartTime" HeaderText="Start Time" DataFormatString="{0:hh\\:mm}" />
+                    <asp:BoundField DataField="EndTime" HeaderText="End Time" DataFormatString="{0:hh\\:mm}" />
                     <asp:TemplateField HeaderText="Status">
                         <ItemTemplate>
                             <span class='<%# Eval("Status").ToString() == "Available" ? "status-available" : "status-booked" %>'>
