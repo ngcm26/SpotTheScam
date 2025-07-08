@@ -6,20 +6,114 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Data;
 
 namespace SpotTheScam.User
 {
     public partial class UserWebinarRegistration : System.Web.UI.Page
     {
-        private int currentUserPoints = 75; // This should come from your user session/database
+        private int currentUserPoints = 0;
         private int sessionPointsRequired = 0;
+        private string connectionString;
+
+        public UserWebinarRegistration()
+        {
+            // Use the existing connection string name from web.config
+            var connStr = ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"];
+
+            if (connStr != null)
+            {
+                connectionString = connStr.ConnectionString;
+            }
+            else
+            {
+                throw new ConfigurationErrorsException("Connection string 'SpotTheScamConnectionString' not found in web.config");
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // For now, we'll skip authentication and use a default user
+            // You can enable this later when you have login functionality
+            /*
+            if (!IsUserLoggedIn())
+            {
+                string returnUrl = Server.UrlEncode(Request.Url.ToString());
+                Response.Redirect($"../Login.aspx?returnUrl={returnUrl}");
+                return;
+            }
+            */
+
             if (!IsPostBack)
             {
+                LoadUserPoints();
                 LoadSessionDetails();
                 ValidatePointsRequirement();
+                UpdatePointsDisplay();
+            }
+        }
+
+        private void UpdatePointsDisplay()
+        {
+            // Update the points display in the header
+            var pointsBadge = Page.Master.FindControl("ContentPlaceHolder1").FindControl("pointsBadge");
+            if (pointsBadge == null)
+            {
+                // If we can't find a control, we can inject the points via JavaScript
+                string script = $@"
+                    document.addEventListener('DOMContentLoaded', function() {{
+                        var pointsSpan = document.querySelector('.points-badge span:last-child');
+                        if (pointsSpan) {{
+                            pointsSpan.textContent = '{currentUserPoints} ⭐';
+                        }}
+                    }});
+                ";
+                ClientScript.RegisterStartupScript(this.GetType(), "UpdatePoints", script, true);
+            }
+        }
+
+        private bool IsUserLoggedIn()
+        {
+            return Session["UserId"] != null &&
+                   Session["UserId"].ToString() != "0" &&
+                   !string.IsNullOrEmpty(Session["UserId"].ToString());
+        }
+
+        private void LoadUserPoints()
+        {
+            try
+            {
+                int userId = GetCurrentUserId();
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    // Updated to use 'Id' column name to match your existing table
+                    string query = "SELECT Points FROM Users WHERE Id = @UserId";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        conn.Open();
+
+                        object result = cmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            currentUserPoints = Convert.ToInt32(result);
+                            // Update session with current points
+                            Session["UserPoints"] = currentUserPoints;
+                        }
+                        else
+                        {
+                            currentUserPoints = 0;
+                            ShowErrorMessage("User account not found. Please contact support.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading user points: {ex.Message}");
+                currentUserPoints = 0;
+                ShowErrorMessage("Error loading user information. Please try again.");
             }
         }
 
@@ -27,18 +121,16 @@ namespace SpotTheScam.User
         {
             try
             {
-                // Get session ID from query string
                 string sessionId = Request.QueryString["sessionId"];
 
                 if (!string.IsNullOrEmpty(sessionId))
                 {
-                    // Load session details based on ID
-                    LoadSessionById(sessionId);
+                    LoadSessionFromDatabase(sessionId);
                 }
                 else
                 {
-                    // Default session details (for demo)
-                    SetDefaultSessionDetails();
+                    ShowErrorMessage("Invalid session. Please select a session from the listings page.");
+                    Response.Redirect("UserWebinarSessionListing.aspx");
                 }
             }
             catch (Exception ex)
@@ -47,58 +139,127 @@ namespace SpotTheScam.User
             }
         }
 
-        private void LoadSessionById(string sessionId)
+        private void LoadSessionFromDatabase(string sessionId)
         {
-            // This would typically load from database
-            // For demo purposes, using hardcoded data based on sessionId
-            switch (sessionId)
+            try
             {
-                case "1":
-                    ltSessionTitle.Text = "Protecting Your Online Banking";
-                    ltSessionDescription.Text = "Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.";
-                    ltSessionDate.Text = "June 15, 2025";
-                    ltSessionTime.Text = "2:00 PM - 3:00 PM";
-                    ltParticipants.Text = "Up to 100 Participants";
-                    ltSessionType.Text = "Free Session";
-                    ltExpertName.Text = "Dr Harvey Blue";
-                    ltExpertTitle.Text = "Cybersecurity Specialist, 15+ years experience";
-                    imgExpert.ImageUrl = "/Images/expert2.jpg";
-                    btnRegister.Text = "Register Now - Free";
-                    sessionPointsRequired = 0;
-                    break;
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = @"
+                        SELECT 
+                            s.SessionId,
+                            s.Title,
+                            s.Description,
+                            s.SessionDate,
+                            s.StartTime,
+                            s.EndTime,
+                            s.MaxParticipants,
+                            s.PointsRequired,
+                            s.SessionType,
+                            e.ExpertName,
+                            e.ExpertTitle,
+                            e.ExpertImage,
+                            e.ExpertId,
+                            (SELECT COUNT(*) FROM WebinarRegistrations wr 
+                             WHERE wr.SessionId = s.SessionId AND wr.IsActive = 1) as CurrentRegistrations
+                        FROM WebinarSessions s
+                        INNER JOIN Experts e ON s.ExpertId = e.ExpertId
+                        WHERE s.SessionId = @SessionId AND s.IsActive = 1";
 
-                case "2":
-                    ltSessionTitle.Text = "Small Group: Latest Phone Scam Tactics";
-                    ltSessionDescription.Text = "Intimate session with max 10 participants. Deep dive into current phone scam methods with personalized Q&A time.";
-                    ltSessionDate.Text = "June 17, 2025";
-                    ltSessionTime.Text = "10:00 AM - 11:30 AM";
-                    ltParticipants.Text = "Max 10 Participants";
-                    ltSessionType.Text = "Premium Session - 50 Points";
-                    ltExpertName.Text = "Officer James Wilson";
-                    ltExpertTitle.Text = "Investigating phone and romance scams for 10+ years";
-                    imgExpert.ImageUrl = "/Images/expert3.jpg";
-                    btnRegister.Text = "Reserve Spot - 50 Points";
-                    sessionPointsRequired = 50;
-                    break;
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        conn.Open();
 
-                case "3":
-                    ltSessionTitle.Text = "VIP One-on-One Safety Consultation";
-                    ltSessionDescription.Text = "Private consultation to review your personal digital security, analyze any suspicious communications, and create a personalized safety plan.";
-                    ltSessionDate.Text = "June 19, 2025";
-                    ltSessionTime.Text = "3:00 PM - 4:00 PM";
-                    ltParticipants.Text = "One-on-one session";
-                    ltSessionType.Text = "VIP Premium - 100 Points";
-                    ltExpertName.Text = "Maria Rodriguez";
-                    ltExpertTitle.Text = "Digital Safety Educator, Senior Specialist";
-                    imgExpert.ImageUrl = "/Images/expert1.jpg";
-                    btnRegister.Text = "Reserve Spot - 100 Points";
-                    sessionPointsRequired = 100;
-                    break;
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                // Check if session is full
+                                int maxParticipants = Convert.ToInt32(reader["MaxParticipants"]);
+                                int currentRegistrations = Convert.ToInt32(reader["CurrentRegistrations"]);
 
-                default:
-                    SetDefaultSessionDetails();
-                    sessionPointsRequired = 0;
-                    break;
+                                if (currentRegistrations >= maxParticipants)
+                                {
+                                    ShowErrorMessage("This session is currently full. Please select another session.");
+                                    btnRegister.Enabled = false;
+                                    btnRegister.Text = "Session Full";
+                                    return;
+                                }
+
+                                // Check if session date has passed
+                                DateTime sessionDate = Convert.ToDateTime(reader["SessionDate"]);
+                                if (sessionDate.Date < DateTime.Now.Date)
+                                {
+                                    ShowErrorMessage("This session has already occurred. Please select an upcoming session.");
+                                    btnRegister.Enabled = false;
+                                    btnRegister.Text = "Session Ended";
+                                    return;
+                                }
+
+                                // Load session details from database
+                                ltSessionTitle.Text = reader["Title"].ToString();
+                                ltSessionDescription.Text = reader["Description"].ToString();
+                                ltSessionDate.Text = sessionDate.ToString("MMMM dd, yyyy");
+
+                                string startTime = reader["StartTime"].ToString();
+                                string endTime = reader["EndTime"].ToString();
+                                ltSessionTime.Text = $"{startTime} - {endTime}";
+
+                                if (maxParticipants == 1)
+                                {
+                                    ltParticipants.Text = "One-on-one session";
+                                }
+                                else if (maxParticipants <= 10)
+                                {
+                                    ltParticipants.Text = $"Max {maxParticipants} Participants ({maxParticipants - currentRegistrations} spots left)";
+                                }
+                                else
+                                {
+                                    ltParticipants.Text = $"Up to {maxParticipants} Participants ({maxParticipants - currentRegistrations} spots left)";
+                                }
+
+                                sessionPointsRequired = Convert.ToInt32(reader["PointsRequired"]);
+                                string sessionType = reader["SessionType"].ToString();
+
+                                if (sessionPointsRequired == 0)
+                                {
+                                    ltSessionType.Text = "Free Session";
+                                    btnRegister.Text = "Register Now - Free";
+                                }
+                                else
+                                {
+                                    ltSessionType.Text = $"{sessionType} - {sessionPointsRequired} Points";
+                                    btnRegister.Text = $"Reserve Spot - {sessionPointsRequired} Points";
+                                }
+
+                                // Load expert details
+                                ltExpertName.Text = reader["ExpertName"].ToString();
+                                ltExpertTitle.Text = reader["ExpertTitle"].ToString();
+
+                                string expertImagePath = reader["ExpertImage"].ToString();
+                                if (!string.IsNullOrEmpty(expertImagePath))
+                                {
+                                    imgExpert.ImageUrl = expertImagePath;
+                                }
+                                else
+                                {
+                                    imgExpert.ImageUrl = "/Images/default-expert.jpg";
+                                }
+                            }
+                            else
+                            {
+                                ShowErrorMessage("Session not found or no longer available.");
+                                Response.Redirect("UserWebinarSessionListing.aspx");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading session from database: {ex.Message}");
+                ShowErrorMessage("Error loading session details. Please try again.");
             }
         }
 
@@ -113,35 +274,40 @@ namespace SpotTheScam.User
 
                 // Show error message
                 ShowErrorMessage($"You need {sessionPointsRequired} points to register for this session. You currently have {currentUserPoints} points. You need {sessionPointsRequired - currentUserPoints} more points.");
-
-                // Optionally redirect back to listings page after a delay
-                // Response.Write("<script>setTimeout(function(){ window.location.href = 'UserWebinarSessionListing.aspx'; }, 3000);</script>");
             }
-        }
-
-        private void SetDefaultSessionDetails()
-        {
-            ltSessionTitle.Text = "Protecting Your Online Banking";
-            ltSessionDescription.Text = "Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.";
-            ltSessionDate.Text = "June 15, 2025";
-            ltSessionTime.Text = "2:00 PM - 3:00 PM";
-            ltParticipants.Text = "Up to 100 Participants";
-            ltSessionType.Text = "Free Session";
-            ltExpertName.Text = "Dr Harvey Blue";
-            ltExpertTitle.Text = "Cybersecurity Specialist, 15+ years experience";
-            imgExpert.ImageUrl = "/Images/expert2.jpg";
-            btnRegister.Text = "Register Now - Free";
-            sessionPointsRequired = 0;
         }
 
         protected void btnRegister_Click(object sender, EventArgs e)
         {
             try
             {
+                // DEBUG: Show what we're trying to process
+                string sessionId = Request.QueryString["sessionId"];
+
+                // For now, we'll skip authentication check
+                // You can enable this later when you have login functionality
+                /*
+                if (!IsUserLoggedIn())
+                {
+                    Response.Redirect("../Login.aspx");
+                    return;
+                }
+                */
+
+                // Reload user points to ensure they haven't changed
+                LoadUserPoints();
+
                 // Check points requirement first
                 if (sessionPointsRequired > currentUserPoints)
                 {
                     ShowErrorMessage($"Insufficient points. You need {sessionPointsRequired} points but only have {currentUserPoints}.");
+                    return;
+                }
+
+                // Check if session is still available
+                if (!IsSessionAvailable())
+                {
+                    ShowErrorMessage("This session is no longer available or is full.");
                     return;
                 }
 
@@ -156,12 +322,12 @@ namespace SpotTheScam.User
                             // Deduct points if it's a premium session
                             if (sessionPointsRequired > 0)
                             {
-                                DeductPoints(sessionPointsRequired);
+                                DeductUserPoints(sessionPointsRequired);
                             }
 
-                            // Redirect to success page with session details
-                            string sessionId = Request.QueryString["sessionId"] ?? "1";
-                            Response.Redirect($"WebinarRegistrationSuccess.aspx?sessionId={sessionId}&firstName={Server.UrlEncode(txtFirstName.Text)}&lastName={Server.UrlEncode(txtLastName.Text)}");
+                            // SUCCESS: Registration worked!
+                            ShowSuccessMessage($"SUCCESS! Registration completed for SessionId={sessionId}, UserId={GetCurrentUserId()}");
+                            return;
                         }
                         else
                         {
@@ -177,80 +343,209 @@ namespace SpotTheScam.User
             catch (Exception ex)
             {
                 ShowErrorMessage("An error occurred during registration: " + ex.Message);
-                // Log error details for debugging
                 System.Diagnostics.Debug.WriteLine($"Registration Error: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
-        private void DeductPoints(int pointsToDeduct)
+        private bool IsSessionAvailable()
         {
             try
             {
-                // TODO: Implement database update to deduct points from user's account
-                // string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-                // using (SqlConnection conn = new SqlConnection(connectionString))
-                // {
-                //     string query = "UPDATE Users SET Points = Points - @PointsToDeduct WHERE UserId = @UserId";
-                //     using (SqlCommand cmd = new SqlCommand(query, conn))
-                //     {
-                //         cmd.Parameters.AddWithValue("@PointsToDeduct", pointsToDeduct);
-                //         cmd.Parameters.AddWithValue("@UserId", GetCurrentUserId());
-                //         conn.Open();
-                //         cmd.ExecuteNonQuery();
-                //     }
-                // }
+                string sessionId = Request.QueryString["sessionId"];
 
-                // For demo purposes, just update the local variable
-                currentUserPoints -= pointsToDeduct;
-
-                // Update session if needed
-                if (Session["UserPoints"] != null)
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    Session["UserPoints"] = currentUserPoints;
-                }
+                    string query = @"
+                        SELECT 
+                            s.MaxParticipants,
+                            COUNT(r.RegistrationId) as CurrentRegistrations,
+                            s.SessionDate,
+                            s.IsActive
+                        FROM WebinarSessions s
+                        LEFT JOIN WebinarRegistrations r ON s.SessionId = r.SessionId AND r.IsActive = 1
+                        WHERE s.SessionId = @SessionId
+                        GROUP BY s.SessionId, s.MaxParticipants, s.SessionDate, s.IsActive";
 
-                System.Diagnostics.Debug.WriteLine($"Deducted {pointsToDeduct} points. User now has {currentUserPoints} points.");
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        conn.Open();
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                bool isActive = Convert.ToBoolean(reader["IsActive"]);
+                                DateTime sessionDate = Convert.ToDateTime(reader["SessionDate"]);
+                                int maxParticipants = Convert.ToInt32(reader["MaxParticipants"]);
+                                int currentRegistrations = Convert.ToInt32(reader["CurrentRegistrations"]);
+
+                                // Check if session is active, not in the past, and has space
+                                return isActive &&
+                                       sessionDate.Date >= DateTime.Now.Date &&
+                                       currentRegistrations < maxParticipants;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking session availability: {ex.Message}");
+                return false;
+            }
+        }
+
+        private void DeductUserPoints(int pointsToDeduct)
+        {
+            try
+            {
+                int userId = GetCurrentUserId();
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    // Updated to use 'Id' column name to match your existing table
+                    string query = "UPDATE Users SET Points = Points - @PointsToDeduct WHERE Id = @UserId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@PointsToDeduct", pointsToDeduct);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        conn.Open();
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            // Update local variable and session
+                            currentUserPoints -= pointsToDeduct;
+                            Session["UserPoints"] = currentUserPoints;
+
+                            System.Diagnostics.Debug.WriteLine($"Successfully deducted {pointsToDeduct} points from user {userId}");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Failed to deduct points - no rows affected for user {userId}");
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error deducting points: {ex.Message}");
+                throw; // Re-throw to handle in calling method
             }
         }
 
-        private int GetCurrentUserPoints()
+        private bool IsAlreadyRegistered(string email)
         {
-            // TODO: Get from database or session
-            // For demo purposes, returning hardcoded value
-            if (Session["UserPoints"] != null)
+            try
             {
-                return Convert.ToInt32(Session["UserPoints"]);
+                string sessionId = Request.QueryString["sessionId"];
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = "SELECT COUNT(*) FROM WebinarRegistrations WHERE Email = @Email AND SessionId = @SessionId AND IsActive = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Email", email);
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        conn.Open();
+
+                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        return count > 0;
+                    }
+                }
             }
-            return 75; // Default points
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking existing registration: {ex.Message}");
+                return false; // Default to allowing registration on error
+            }
         }
 
+        private bool ProcessRegistration()
+        {
+            try
+            {
+                string sessionId = Request.QueryString["sessionId"];
+                int userId = GetCurrentUserId();
+
+                // Debug: Show what values we're trying to insert
+                System.Diagnostics.Debug.WriteLine($"Attempting registration: SessionId={sessionId}, UserId={userId}");
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = @"
+                        INSERT INTO WebinarRegistrations 
+                        (SessionId, UserId, FirstName, LastName, Email, Phone, SecurityConcerns, BankingMethods, PointsUsed, RegistrationDate, IsActive)
+                        VALUES 
+                        (@SessionId, @UserId, @FirstName, @LastName, @Email, @Phone, @SecurityConcerns, @BankingMethods, @PointsUsed, @RegistrationDate, 1)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        cmd.Parameters.AddWithValue("@FirstName", txtFirstName.Text.Trim());
+                        cmd.Parameters.AddWithValue("@LastName", txtLastName.Text.Trim());
+                        cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
+                        cmd.Parameters.AddWithValue("@Phone", txtPhone.Text.Trim());
+                        cmd.Parameters.AddWithValue("@SecurityConcerns", ddlSecurityConcerns.SelectedValue ?? "");
+                        cmd.Parameters.AddWithValue("@BankingMethods", GetSelectedBankingMethods());
+                        cmd.Parameters.AddWithValue("@PointsUsed", sessionPointsRequired);
+                        cmd.Parameters.AddWithValue("@RegistrationDate", DateTime.Now);
+
+                        conn.Open();
+                        int result = cmd.ExecuteNonQuery();
+
+                        System.Diagnostics.Debug.WriteLine($"Insert result = {result}");
+
+                        return result > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving registration: {ex.Message}");
+                // Show the actual database error
+                ShowErrorMessage($"Database error: {ex.Message} | SessionId: {Request.QueryString["sessionId"]} | UserId: {GetCurrentUserId()}");
+                return false;
+            }
+        }
+
+        private int GetCurrentUserId()
+        {
+            if (Session["UserId"] != null)
+            {
+                return Convert.ToInt32(Session["UserId"]);
+            }
+
+            // For now, return a default user ID for testing
+            // You can change this later when you have proper authentication
+            return 1; // Default test user ID
+        }
+
+        // Validation and helper methods
         private bool ValidateForm()
         {
             bool isValid = true;
             string errorMessage = "";
 
-            // Reset control styles
             ResetControlStyles();
 
-            // Validate First Name
             if (string.IsNullOrWhiteSpace(txtFirstName.Text))
             {
                 txtFirstName.CssClass += " error";
                 isValid = false;
             }
 
-            // Validate Last Name
             if (string.IsNullOrWhiteSpace(txtLastName.Text))
             {
                 txtLastName.CssClass += " error";
                 isValid = false;
             }
 
-            // Validate Email
             if (string.IsNullOrWhiteSpace(txtEmail.Text))
             {
                 txtEmail.CssClass += " error";
@@ -263,7 +558,6 @@ namespace SpotTheScam.User
                 isValid = false;
             }
 
-            // Validate Phone
             if (string.IsNullOrWhiteSpace(txtPhone.Text))
             {
                 txtPhone.CssClass += " error";
@@ -276,7 +570,6 @@ namespace SpotTheScam.User
                 isValid = false;
             }
 
-            // Check for duplicate registration
             if (isValid && IsAlreadyRegistered(txtEmail.Text))
             {
                 txtEmail.CssClass += " error";
@@ -315,60 +608,8 @@ namespace SpotTheScam.User
 
         private bool IsValidPhone(string phone)
         {
-            // Remove common phone number characters
             string cleanPhone = phone.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "").Replace("+", "");
-
-            // Check if it contains only digits and is reasonable length
             return cleanPhone.All(char.IsDigit) && cleanPhone.Length >= 8 && cleanPhone.Length <= 15;
-        }
-
-        private bool IsAlreadyRegistered(string email)
-        {
-            // In a real application, this would check the database
-            // For demo purposes, returning false
-            try
-            {
-                string sessionId = Request.QueryString["sessionId"] ?? "1";
-
-                // TODO: Check database for existing registration
-                return false; // For demo
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error checking registration: {ex.Message}");
-                return false;
-            }
-        }
-
-        private bool ProcessRegistration()
-        {
-            try
-            {
-                string sessionId = Request.QueryString["sessionId"] ?? "1";
-
-                // Create registration object
-                var registration = new WebinarRegistration
-                {
-                    SessionId = sessionId,
-                    FirstName = txtFirstName.Text.Trim(),
-                    LastName = txtLastName.Text.Trim(),
-                    Email = txtEmail.Text.Trim(),
-                    Phone = txtPhone.Text.Trim(),
-                    SecurityConcerns = ddlSecurityConcerns.SelectedValue,
-                    BankingMethods = GetSelectedBankingMethods(),
-                    RegistrationDate = DateTime.Now,
-                    UserId = GetCurrentUserId(),
-                    PointsUsed = sessionPointsRequired
-                };
-
-                // Save to database
-                return SaveRegistration(registration);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error processing registration: {ex.Message}");
-                return false;
-            }
         }
 
         private string GetSelectedBankingMethods()
@@ -382,32 +623,6 @@ namespace SpotTheScam.User
             if (chkBranchVisits.Checked) methods.Add("Branch visits");
 
             return string.Join(", ", methods);
-        }
-
-        private int GetCurrentUserId()
-        {
-            // TODO: Implement based on your authentication system
-            if (Session["UserId"] != null)
-            {
-                return Convert.ToInt32(Session["UserId"]);
-            }
-            return 0; // Guest user or implement proper user ID retrieval
-        }
-
-        private bool SaveRegistration(WebinarRegistration registration)
-        {
-            try
-            {
-                // TODO: Implement database save
-                // For demo purposes, simulate successful save
-                System.Threading.Thread.Sleep(500); // Simulate processing time
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error saving registration: {ex.Message}");
-                return false;
-            }
         }
 
         private void ShowErrorMessage(string message)
@@ -425,7 +640,6 @@ namespace SpotTheScam.User
         }
     }
 
-    // Registration data model
     public class WebinarRegistration
     {
         public string SessionId { get; set; }
