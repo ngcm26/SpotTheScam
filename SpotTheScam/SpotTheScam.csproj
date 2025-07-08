@@ -64,6 +64,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Global.asax" />
     <Content Include="User\Quizzes.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
@@ -83,10 +84,12 @@
     <Content Include="User\UserRegister.aspx" />
     <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="Web.config" />
-    <Content Include="WebForm1.aspx" />
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
     <Compile Include="User\Quizzes.aspx.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -233,9 +236,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
