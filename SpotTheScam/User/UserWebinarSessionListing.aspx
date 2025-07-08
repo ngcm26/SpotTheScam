@@ -261,7 +261,12 @@
             padding: 10px 25px;
             border-radius: 20px;
             font-weight: 600;
-            cursor: pointer;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .page-container {
+            padding-bottom: 60px;
         }
 
         .available-badge {
@@ -291,220 +296,228 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            
+            .page-container {
+                padding-bottom: 40px;
+            }
         }
     </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <!-- Header Section -->
-    <div class="header-section">
+    <div class="page-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="container">
+                <div class="row align-items-center justify-content-center">
+                    <div class="col-auto">
+                        <h1 class="header-title">Book your spot in live sessions with cybersecurity experts and fraud specialists</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="container">
-            <div class="row align-items-center justify-content-center">
-                <div class="col-auto">
-                    <h1 class="header-title">Book your spot in live sessions with cybersecurity experts and fraud specialists</h1>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="filter-label">View:</span>
-                        </div>
-                        <div class="col-auto">
-                            <asp:Button ID="btnAllSessions" runat="server" 
-                                CssClass="filter-btn active" 
-                                OnClick="FilterSessions_Click" 
-                                CommandArgument="All"
-                                Text="All Sessions" />
-                            <asp:Button ID="btnFreeOnly" runat="server" 
-                                CssClass="filter-btn inactive" 
-                                OnClick="FilterSessions_Click" 
-                                CommandArgument="Free"
-                                Text="Free Only" />
-                            <asp:Button ID="btnPremium" runat="server" 
-                                CssClass="filter-btn inactive" 
-                                OnClick="FilterSessions_Click" 
-                                CommandArgument="Premium"
-                                Text="Premium" />
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-auto">
-                            <span class="filter-label">Topic:</span>
-                        </div>
-                        <div class="col-auto">
-                            <asp:DropDownList ID="ddlTopics" runat="server" 
-                                CssClass="topic-dropdown" 
-                                AutoPostBack="true" 
-                                OnSelectedIndexChanged="ddlTopics_SelectedIndexChanged">
-                                <asp:ListItem Value="All" Text="All Topics" Selected="True" />
-                                <asp:ListItem Value="Banking" Text="Banking Security" />
-                                <asp:ListItem Value="Phone" Text="Phone Scams" />
-                                <asp:ListItem Value="Social" Text="Social Media Safety" />
-                                <asp:ListItem Value="Email" Text="Email Scams" />
-                            </asp:DropDownList>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 text-end">
-                    <div>
-                        <span class="filter-label">Current Points:</span>
-                        <span class="points-badge">75 ⭐</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Session Cards -->
-        <div class="row">
-            <div class="col-12">
-                <!-- Session 1 -->
-                <div class="session-card" runat="server" id="session1">
-                    <div class="session-header">
-                        <span class="session-date">📅 June 15, 2025</span>
-                        <span class="session-time">🕐 2:00 PM - 3:00 PM</span>
-                        <span class="session-type type-free">FREE</span>
-                    </div>
-                    
-                    <h3 class="session-title">Protecting Your Online Banking</h3>
-                    <p class="session-description">
-                        Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.
-                    </p>
-                    
-                    <div class="expert-info">
-                        <img src="/Images/expert2.jpg" alt="Dr Harvey Blue" class="expert-avatar" />
-                        <div>
-                            <div class="expert-name">Dr Harvey Blue</div>
-                            <div class="expert-title">Cybersecurity Specialist, 15+ years experience</div>
-                        </div>
-                    </div>
-                    
-                    <div class="session-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">👥</span>
-                            <span>Up to 100 Participants</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⏱️</span>
-                            <span>60 minutes + Q&A</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">💻</span>
-                            <span>Live via video call</span>
-                        </div>
-                    </div>
-                    
-                    <div class="session-footer">
-                        <div class="spots-remaining">
-                            <span class="spots-count">47</span> spots remaining
-                        </div>
-                        <button class="register-btn">Register Now</button>
-                    </div>
-                </div>
-
-                <!-- Session 2 -->
-                <div class="session-card" runat="server" id="session2">
-                    <div class="session-header">
-                        <span class="session-date">📅 June 17, 2025</span>
-                        <span class="session-time">🕐 10:00 AM - 11:30 AM</span>
-                        <span class="session-type type-premium">PREMIUM</span>
-                    </div>
-                    
-                    <h3 class="session-title">Small Group: Latest Phone Scam Tactics</h3>
-                    <p class="session-description">
-                        Intimate session with max 10 participants. Deep dive into current phone scam methods with personalized Q&A time.
-                    </p>
-                    
-                    <div class="expert-info">
-                        <img src="/Images/expert3.jpg" alt="Officer James Wilson" class="expert-avatar" />
-                        <div>
-                            <div class="expert-name">Officer James Wilson</div>
-                            <div class="expert-title">Investigating phone and romance scams for 10+ years, helping victims recover</div>
-                        </div>
-                    </div>
-                    
-                    <div class="session-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">👥</span>
-                            <span>Max 10 Participants</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⏱️</span>
-                            <span>90 minutes</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">💡</span>
-                            <span>Personalized advice</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">📞</span>
-                            <span>Extended Q&A time</span>
-                        </div>
-                    </div>
-                    
-                    <div class="session-footer">
-                        <div>
-                            <div class="points-required">50 POINTS</div>
-                            <div class="spots-remaining">
-                                Only <span class="spots-count">3</span> spots remaining
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="filter-label">View:</span>
+                            </div>
+                            <div class="col-auto">
+                                <asp:Button ID="btnAllSessions" runat="server" 
+                                    CssClass="filter-btn active" 
+                                    OnClick="FilterSessions_Click" 
+                                    CommandArgument="All"
+                                    Text="All Sessions" />
+                                <asp:Button ID="btnFreeOnly" runat="server" 
+                                    CssClass="filter-btn inactive" 
+                                    OnClick="FilterSessions_Click" 
+                                    CommandArgument="Free"
+                                    Text="Free Only" />
+                                <asp:Button ID="btnPremium" runat="server" 
+                                    CssClass="filter-btn inactive" 
+                                    OnClick="FilterSessions_Click" 
+                                    CommandArgument="Premium"
+                                    Text="Premium" />
                             </div>
                         </div>
-                        <button class="reserve-btn">Reserve Spot</button>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-auto">
+                                <span class="filter-label">Topic:</span>
+                            </div>
+                            <div class="col-auto">
+                                <asp:DropDownList ID="ddlTopics" runat="server" 
+                                    CssClass="topic-dropdown" 
+                                    AutoPostBack="true" 
+                                    OnSelectedIndexChanged="ddlTopics_SelectedIndexChanged">
+                                    <asp:ListItem Value="All" Text="All Topics" Selected="True" />
+                                    <asp:ListItem Value="Banking" Text="Banking Security" />
+                                    <asp:ListItem Value="Phone" Text="Phone Scams" />
+                                    <asp:ListItem Value="Social" Text="Social Media Safety" />
+                                    <asp:ListItem Value="Email" Text="Email Scams" />
+                                </asp:DropDownList>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div>
+                            <span class="filter-label">Current Points:</span>
+                            <span class="points-badge">75 ⭐</span>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Session 3 -->
-                <div class="session-card" runat="server" id="session3">
-                    <div class="session-header">
-                        <span class="session-date">📅 June 19, 2025</span>
-                        <span class="session-time">🕐 3:00 PM - 4:00 PM</span>
-                        <span class="session-type type-premium">PREMIUM</span>
-                    </div>
-                    
-                    <h3 class="session-title">VIP One-on-One Safety Consultation</h3>
-                    <p class="session-description">
-                        Private consultation to review your personal digital security, analyze any suspicious communications, and create a personalized safety plan.
-                    </p>
-                    
-                    <div class="expert-info">
-                        <img src="/Images/expert1.jpg" alt="Maria Rodriguez" class="expert-avatar" />
-                        <div>
-                            <div class="expert-name">Maria Rodriguez</div>
-                            <div class="expert-title">Digital Safety Educator, Senior Specialist</div>
+            <!-- Session Cards -->
+            <div class="row">
+                <div class="col-12">
+                    <!-- Session 1 -->
+                    <div class="session-card" runat="server" id="session1">
+                        <div class="session-header">
+                            <span class="session-date">📅 June 15, 2025</span>
+                            <span class="session-time">🕐 2:00 PM - 3:00 PM</span>
+                            <span class="session-type type-free">FREE</span>
+                        </div>
+                        
+                        <h3 class="session-title">Protecting Your Online Banking</h3>
+                        <p class="session-description">
+                            Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.
+                        </p>
+                        
+                        <div class="expert-info">
+                            <img src="/Images/expert2.jpg" alt="Dr Harvey Blue" class="expert-avatar" />
+                            <div>
+                                <div class="expert-name">Dr Harvey Blue</div>
+                                <div class="expert-title">Cybersecurity Specialist, 15+ years experience</div>
+                            </div>
+                        </div>
+                        
+                        <div class="session-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">👥</span>
+                                <span>Up to 100 Participants</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏱️</span>
+                                <span>60 minutes + Q&A</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💻</span>
+                                <span>Live via video call</span>
+                            </div>
+                        </div>
+                        
+                        <div class="session-footer">
+                            <div class="spots-remaining">
+                                <span class="spots-count">47</span> spots remaining
+                            </div>
+                            <a href="UserWebinarRegistration.aspx?sessionId=1" class="register-btn">Register Now</a>
                         </div>
                     </div>
-                    
-                    <div class="session-details">
-                        <div class="detail-item">
-                            <span class="detail-icon">👤</span>
-                            <span>One-on-one session</span>
+
+                    <!-- Session 2 -->
+                    <div class="session-card" runat="server" id="session2">
+                        <div class="session-header">
+                            <span class="session-date">📅 June 17, 2025</span>
+                            <span class="session-time">🕐 10:00 AM - 11:30 AM</span>
+                            <span class="session-type type-premium">PREMIUM</span>
                         </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">⏱️</span>
-                            <span>60 minutes</span>
+                        
+                        <h3 class="session-title">Small Group: Latest Phone Scam Tactics</h3>
+                        <p class="session-description">
+                            Intimate session with max 10 participants. Deep dive into current phone scam methods with personalized Q&A time.
+                        </p>
+                        
+                        <div class="expert-info">
+                            <img src="/Images/expert3.jpg" alt="Officer James Wilson" class="expert-avatar" />
+                            <div>
+                                <div class="expert-name">Officer James Wilson</div>
+                                <div class="expert-title">Investigating phone and romance scams for 10+ years, helping victims recover</div>
+                            </div>
                         </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">📋</span>
-                            <span>Personal safety plan</span>
+                        
+                        <div class="session-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">👥</span>
+                                <span>Max 10 Participants</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏱️</span>
+                                <span>90 minutes</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💡</span>
+                                <span>Personalized advice</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">📞</span>
+                                <span>Extended Q&A time</span>
+                            </div>
                         </div>
-                        <div class="detail-item">
-                            <span class="detail-icon">📞</span>
-                            <span>Follow-up support</span>
+                        
+                        <div class="session-footer">
+                            <div>
+                                <div class="points-required">50 POINTS</div>
+                                <div class="spots-remaining">
+                                    Only <span class="spots-count">3</span> spots remaining
+                                </div>
+                            </div>
+                            <a href="UserWebinarRegistration.aspx?sessionId=2" class="reserve-btn">Reserve Spot</a>
                         </div>
                     </div>
-                    
-                    <div class="session-footer">
-                        <div>
-                            <div class="points-required">100 POINTS</div>
-                            <div class="available-badge">Available</div>
+
+                    <!-- Session 3 -->
+                    <div class="session-card" runat="server" id="session3">
+                        <div class="session-header">
+                            <span class="session-date">📅 June 19, 2025</span>
+                            <span class="session-time">🕐 3:00 PM - 4:00 PM</span>
+                            <span class="session-type type-premium">PREMIUM</span>
                         </div>
-                        <button class="need-points-btn">Need More Points</button>
+                        
+                        <h3 class="session-title">VIP One-on-One Safety Consultation</h3>
+                        <p class="session-description">
+                            Private consultation to review your personal digital security, analyze any suspicious communications, and create a personalized safety plan.
+                        </p>
+                        
+                        <div class="expert-info">
+                            <img src="/Images/expert1.jpg" alt="Maria Rodriguez" class="expert-avatar" />
+                            <div>
+                                <div class="expert-name">Maria Rodriguez</div>
+                                <div class="expert-title">Digital Safety Educator, Senior Specialist</div>
+                            </div>
+                        </div>
+                        
+                        <div class="session-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">👤</span>
+                                <span>One-on-one session</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏱️</span>
+                                <span>60 minutes</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">📋</span>
+                                <span>Personal safety plan</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">📞</span>
+                                <span>Follow-up support</span>
+                            </div>
+                        </div>
+                        
+                        <div class="session-footer">
+                            <div>
+                                <div class="points-required">100 POINTS</div>
+                                <div class="spots-remaining">
+                                    <span style="color: #dc3545; font-weight: 600;">Insufficient Points (Need 25 more)</span>
+                                </div>
+                            </div>
+                            <button class="need-points-btn" disabled>Need More Points</button>
+                        </div>
                     </div>
                 </div>
             </div>

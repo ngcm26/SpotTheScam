@@ -64,6 +64,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
     <Content Include="Staff\AddModules.aspx" />
@@ -81,8 +82,16 @@
     <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="Web.config" />
     <Content Include="WebForm1.aspx" />
+    <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="User\UserWebinarRegistration.aspx.cs">
+      <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserWebinarRegistration.aspx.designer.cs">
+      <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\UserWebinarSessionListing.aspx.cs">
       <DependentUpon>UserWebinarSessionListing.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -195,6 +204,13 @@
     </Compile>
     <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
       <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\WebinarRegistrationSuccess.aspx.cs">
+      <DependentUpon>WebinarRegistrationSuccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\WebinarRegistrationSuccess.aspx.designer.cs">
+      <DependentUpon>WebinarRegistrationSuccess.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
