@@ -6,20 +6,25 @@
             background: linear-gradient(135deg, var(--brand-orange) 0%, #e67e22 100%);
             color: white;
             padding: 60px 0;
-            border-radius: 15px;
             margin-bottom: 50px;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
         }
 
         .hero-icon {
             width: 120px;
             height: 120px;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 30px;
             font-size: 60px;
+            color: var(--brand-orange);
         }
 
         .hero-title {
@@ -108,6 +113,19 @@
             margin-right: -50vw;
         }
 
+        .upcoming-icon {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--brand-orange);
+            margin: 0 auto 30px;
+        }
+
         .webinar-card {
             background: white;
             border-radius: 15px;
@@ -164,7 +182,7 @@
         }
 
         .how-it-works {
-            margin: 60px 0;
+            margin: 60px 0 120px 0;
         }
 
         .step-card {
@@ -209,10 +227,13 @@
             font-size: 1rem;
             margin-top: 30px;
             transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .view-schedule-btn:hover {
             background-color: #b45a22;
+            color: white;
         }
 
         .webinar-icon {
@@ -248,8 +269,10 @@
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
+            <div class="row align-items-center">
+                <div class="col-lg-2 col-md-3 text-center">
+                </div>
+                <div class="col-lg-10 col-md-9">
                     <h1 class="hero-title">Webinar Sessions with Scam Experts</h1>
                     <p class="hero-description">
                         Want to learn more about the different ways to protect and prevent yourself from being a scam victim?
@@ -306,7 +329,9 @@
     <!-- Upcoming Sessions Section -->
     <div class="upcoming-section">
         <div class="container">
-            <h2 class="section-title text-center">Upcoming Sessions This Week</h2>
+            <div class="text-center">
+                <h2 class="section-title">Upcoming Sessions This Week</h2>
+            </div>
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="webinar-card">
@@ -315,7 +340,7 @@
                         <div class="webinar-description">
                             Learn secure banking practices and how to spot fraudulent banking websites with cybersecurity expert Dr. Harvey Blue
                         </div>
-                        <a href="#" class="register-btn">Register Now</a>
+                        <a href="UserWebinarRegistration.aspx?sessionId=1" class="register-btn">Register Now</a>
                     </div>
                 </div>
                 
@@ -326,7 +351,7 @@
                         <div class="webinar-description">
                             Discover the newest phone scam methods and how to protect yourself with Officer James Wilson from the Police Fraud Division
                         </div>
-                        <a href="#" class="register-btn">Register Now</a>
+                        <a href="UserWebinarRegistration.aspx?sessionId=2" class="register-btn">Register Now</a>
                     </div>
                 </div>
                 
@@ -337,13 +362,13 @@
                         <div class="webinar-description">
                             Navigate Facebook, Instagram, and other platforms safely while avoiding scammers with digital educator Maria Rodriguez
                         </div>
-                        <a href="#" class="register-btn">Register Now</a>
+                        <a href="UserWebinarRegistration.aspx?sessionId=3" class="register-btn">Register Now</a>
                     </div>
                 </div>
             </div>
             
             <div class="text-center">
-                <button class="view-schedule-btn">View Full Schedule →</button>
+                <a href="UserWebinarSessionListing.aspx" class="view-schedule-btn">View Full Schedule →</a>
             </div>
         </div>
     </div>
