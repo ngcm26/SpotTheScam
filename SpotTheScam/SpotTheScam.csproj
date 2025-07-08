@@ -64,15 +64,12 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\expert1.jpg" />
-    <Content Include="Staff\StaffVideoCallSession.aspx" />
+    <Content Include="Staff\AddModules.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffExpertWebinar.aspx" />
     <Content Include="Staff\StaffLogin.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
-    <Content Include="User\UserSessions.aspx" />
-    <Content Include="User\ExpertWebinarHomepage.aspx" />
     <Content Include="User\UserHome.aspx" />
     <Content Include="Images\logo.svg" />
     <Content Include="User\UserLogin.aspx" />
@@ -82,12 +79,12 @@
     <Content Include="WebForm1.aspx" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Staff\StaffVideoCallSession.aspx.cs">
-      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+    <Compile Include="Staff\AddModules.aspx.cs">
+      <DependentUpon>AddModules.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Staff\StaffVideoCallSession.aspx.designer.cs">
-      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+    <Compile Include="Staff\AddModules.aspx.designer.cs">
+      <DependentUpon>AddModules.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\ManageUsers.aspx.cs">
       <DependentUpon>ManageUsers.aspx</DependentUpon>
@@ -123,20 +120,6 @@
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.designer.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\UserSessions.aspx.cs">
-      <DependentUpon>UserSessions.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\UserSessions.aspx.designer.cs">
-      <DependentUpon>UserSessions.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\ExpertWebinarHomepage.aspx.cs">
-      <DependentUpon>ExpertWebinarHomepage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\ExpertWebinarHomepage.aspx.designer.cs">
-      <DependentUpon>ExpertWebinarHomepage.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserHome.aspx.cs">
       <DependentUpon>UserHome.aspx</DependentUpon>
