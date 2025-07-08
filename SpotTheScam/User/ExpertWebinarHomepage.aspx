@@ -6,20 +6,25 @@
             background: linear-gradient(135deg, var(--brand-orange) 0%, #e67e22 100%);
             color: white;
             padding: 60px 0;
-            border-radius: 15px;
             margin-bottom: 50px;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
         }
 
         .hero-icon {
             width: 120px;
             height: 120px;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 30px;
             font-size: 60px;
+            color: var(--brand-orange);
         }
 
         .hero-title {
@@ -248,8 +253,10 @@
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
+            <div class="row align-items-center">
+                <div class="col-lg-2 col-md-3 text-center">
+                </div>
+                <div class="col-lg-10 col-md-9">
                     <h1 class="hero-title">Webinar Sessions with Scam Experts</h1>
                     <p class="hero-description">
                         Want to learn more about the different ways to protect and prevent yourself from being a scam victim?

@@ -64,6 +64,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="User\ExpertWebinarHomepage.aspx" />
     <Content Include="Staff\AddModules.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
@@ -79,6 +80,13 @@
     <Content Include="WebForm1.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="User\ExpertWebinarHomepage.aspx.cs">
+      <DependentUpon>ExpertWebinarHomepage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ExpertWebinarHomepage.aspx.designer.cs">
+      <DependentUpon>ExpertWebinarHomepage.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Staff\AddModules.aspx.cs">
       <DependentUpon>AddModules.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
