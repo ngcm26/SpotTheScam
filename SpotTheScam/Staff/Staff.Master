@@ -26,9 +26,9 @@
             background-color: var(--nav-bg);
         }
 
-        .navbar-brand {
-            color: var(--brand-navy);
-            font-weight: 700;
+        .navbar-brand img {
+            max-height: 55px; /* same as User.master */
+            height: auto;
         }
 
         .navbar-nav .nav-link {
@@ -52,9 +52,12 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     <form id="form1" runat="server" class="flex-grow-1 d-flex flex-column">
-        <nav class="navbar navbar-expand-lg shadow-sm py-2">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="StaffDashboard.aspx">Spot The Scam - Staff</a>
+        <nav class="navbar navbar-expand-lg shadow-sm py-2 d-flex align-items-center">
+            <div class="container-fluid d-flex align-items-center">
+                <!-- Updated logo with SVG -->
+                <a class="navbar-brand d-flex align-items-center" href="StaffDashboard.aspx">
+                    <img src="/Images/logostaff.svg" alt="Spot The Scam Logo" />
+                </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
