@@ -64,6 +64,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="User\Quizzes.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
@@ -85,6 +86,13 @@
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="User\Quizzes.aspx.cs">
+      <DependentUpon>Quizzes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\Quizzes.aspx.designer.cs">
+      <DependentUpon>Quizzes.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\UserWebinarRegistration.aspx.cs">
       <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
