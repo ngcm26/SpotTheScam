@@ -73,7 +73,6 @@
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffExpertWebinar.aspx" />
-    <Content Include="Staff\StaffLogin.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
     <Content Include="User\UserBankAccounts.aspx" />
     <Content Include="User\ScamChecker.aspx" />
@@ -145,13 +144,6 @@
     </Compile>
     <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
       <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Staff\StaffLogin.aspx.cs">
-      <DependentUpon>StaffLogin.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Staff\StaffLogin.aspx.designer.cs">
-      <DependentUpon>StaffLogin.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>

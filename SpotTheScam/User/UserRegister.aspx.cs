@@ -55,22 +55,21 @@ namespace SpotTheScam
 
                     // Step 2: If no existing user, insert the new user record.
                     // Your table schema should have at least Username, Email, and Password columns.
-                    string insertQuery = "INSERT INTO Users (Username, Email, Password) VALUES (@Username, @Email, @Password)";
+                    string insertQuery = "INSERT INTO Users (Username, Email, Password, Role) VALUES (@Username, @Email, @Password, @Role)";
                     using (SqlCommand cmd = new SqlCommand(insertQuery, con))
                     {
                         cmd.Parameters.AddWithValue("@Username", username);
                         cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", password); // Storing plain text password
+                        cmd.Parameters.AddWithValue("@Password", password);
+                        cmd.Parameters.AddWithValue("@Role", "user"); // Always set role to user
 
                         cmd.ExecuteNonQuery();
 
-                        // Display a success message and provide a link to the login page.
                         lblMessage.ForeColor = Color.Green;
                         lblMessage.Text = "Account created successfully! You can now <a href='UserLogin.aspx'>login here</a>.";
-
-                        // Optionally, disable the button to prevent double submission
                         btnRegister.Enabled = false;
                     }
+
                 }
                 catch (Exception ex)
                 {
