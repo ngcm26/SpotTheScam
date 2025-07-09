@@ -28,8 +28,8 @@ namespace SpotTheScam
                 try
                 {
                     con.Open();
-                    // Pull both Username and Role so you can check which page to redirect to.
-                    string query = "SELECT Username, Role FROM Users WHERE Email = @Email AND Password = @Password";
+                    // Pull Username, Role, AND Id so you can check which page to redirect to and set UserId.
+                    string query = "SELECT Id, Username, Role FROM Users WHERE Email = @Email AND Password = @Password"; // MODIFIED LINE
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
@@ -39,9 +39,11 @@ namespace SpotTheScam
 
                         if (reader.Read())
                         {
+                            int userId = Convert.ToInt32(reader["Id"]); // ADDED LINE
                             string username = reader["Username"].ToString();
                             string role = reader["Role"].ToString().ToLower(); // lowercase for safety
 
+                            Session["UserId"] = userId; // ADDED LINE
                             Session["Username"] = username;
 
                             if (role == "admin")
