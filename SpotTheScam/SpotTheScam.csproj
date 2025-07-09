@@ -65,6 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="User\FakeOCBCLogin.aspx" />
+    <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\Quizzes.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
@@ -88,6 +90,20 @@
   <ItemGroup>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="User\FakeOCBCLogin.aspx.cs">
+      <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\FakeOCBCLogin.aspx.designer.cs">
+      <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\FakeUOBLogin.aspx.cs">
+      <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\FakeUOBLogin.aspx.designer.cs">
+      <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\Quizzes.aspx.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
