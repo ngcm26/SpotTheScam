@@ -17,7 +17,7 @@
             <h4 class="alert-heading">Access Denied</h4>
             <p>Please log in to view this page.</p>
             <hr>
-            <a href="StaffLogin.aspx" class="btn btn-primary">Go to Login</a>
+            <a href="../User/UserLogin.aspx" class="btn btn-primary">Go to Login</a>
         </div>
     </asp:PlaceHolder>
 </asp:Content>

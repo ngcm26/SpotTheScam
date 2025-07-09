@@ -11,7 +11,7 @@ namespace SpotTheScam.Staff
             Session.Abandon();
 
             // Redirect to login page (or you can use Dashboard to show the "Please log in" message)
-            Response.Redirect("StaffDashboard.aspx");
+            Response.Redirect("~/User/UserLogin.aspx");
         }
     }
 }

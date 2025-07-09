@@ -14,14 +14,13 @@ namespace SpotTheScam
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            // First, check if the page passes all validation rules
             if (!Page.IsValid)
             {
                 return;
             }
 
             string email = txtEmail.Text.Trim();
-            string password = txtPassword.Text; 
+            string password = txtPassword.Text;
 
             string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
             using (SqlConnection con = new SqlConnection(cs))
@@ -29,20 +28,35 @@ namespace SpotTheScam
                 try
                 {
                     con.Open();
-                    string query = "SELECT Username FROM Users WHERE Email = @Email AND Password = @Password";
+                    // Pull Username, Role, AND Id so you can check which page to redirect to and set UserId.
+                    string query = "SELECT Id, Username, Role FROM Users WHERE Email = @Email AND Password = @Password"; // MODIFIED LINE
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
                         cmd.Parameters.AddWithValue("@Password", password);
 
-                        object result = cmd.ExecuteScalar();
+                        SqlDataReader reader = cmd.ExecuteReader();
 
-                        if (result != null)
+                        if (reader.Read())
                         {
-                            string username = result.ToString();
+                            int userId = Convert.ToInt32(reader["Id"]); // ADDED LINE
+                            string username = reader["Username"].ToString();
+                            string role = reader["Role"].ToString().ToLower(); // lowercase for safety
 
+                            Session["UserId"] = userId; // ADDED LINE
                             Session["Username"] = username;
-                            Response.Redirect("UserHome.aspx");
+
+                            if (role == "admin")
+                            {
+                                // Admin → redirect to staff dashboard
+                                Session["StaffName"] = username;
+                                Response.Redirect("~/Staff/StaffDashboard.aspx");
+                            }
+                            else
+                            {
+                                // Normal user → user home
+                                Response.Redirect("UserHome.aspx");
+                            }
                         }
                         else
                         {

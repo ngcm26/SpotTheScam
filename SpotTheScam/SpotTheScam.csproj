@@ -64,10 +64,8 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="User\PhoneScamsQuiz.aspx" />
-    <Content Include="User\QuizCompletion.aspx" />
+    <Content Include="Global.asax" />
     <Content Include="User\Quizzes.aspx" />
-    <Content Include="User\RecoverySupport.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
@@ -75,9 +73,9 @@
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffExpertWebinar.aspx" />
-    <Content Include="Staff\StaffLogin.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
     <Content Include="User\UserBankAccounts.aspx" />
+    <Content Include="User\ScamChecker.aspx" />
     <Content Include="User\UserHome.aspx" />
     <Content Include="Images\logo.svg" />
     <Content Include="User\UserLogin.aspx" />
@@ -85,23 +83,11 @@
     <Content Include="User\UserRegister.aspx" />
     <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="Web.config" />
-    <Content Include="WebForm1.aspx" />
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="User\PhoneScamsQuiz.aspx.cs">
-      <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\PhoneScamsQuiz.aspx.designer.cs">
-      <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\QuizCompletion.aspx.cs">
-      <DependentUpon>QuizCompletion.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\QuizCompletion.aspx.designer.cs">
-      <DependentUpon>QuizCompletion.aspx</DependentUpon>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="User\Quizzes.aspx.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
@@ -109,13 +95,6 @@
     </Compile>
     <Compile Include="User\Quizzes.aspx.designer.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\RecoverySupport.aspx.cs">
-      <DependentUpon>RecoverySupport.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\RecoverySupport.aspx.designer.cs">
-      <DependentUpon>RecoverySupport.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserWebinarRegistration.aspx.cs">
       <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>
@@ -165,13 +144,6 @@
     </Compile>
     <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
       <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Staff\StaffLogin.aspx.cs">
-      <DependentUpon>StaffLogin.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Staff\StaffLogin.aspx.designer.cs">
-      <DependentUpon>StaffLogin.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
@@ -256,9 +228,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
