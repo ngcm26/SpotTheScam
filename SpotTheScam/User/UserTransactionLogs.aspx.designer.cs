@@ -60,6 +60,15 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Literal ltTotalBalance;
 
         /// <summary>
+        /// btnPrevAccount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnPrevAccount;
+
+        /// <summary>
         /// pnlAccountCards control.
         /// </summary>
         /// <remarks>
@@ -78,13 +87,13 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Repeater rptAccounts;
 
         /// <summary>
-        /// btnPrevAccount control.
+        /// btnNextAccount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnPrevAccount;
+        protected global::System.Web.UI.WebControls.LinkButton btnNextAccount;
 
         /// <summary>
         /// accountDots control.
@@ -94,15 +103,6 @@ namespace SpotTheScam.User
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl accountDots;
-
-        /// <summary>
-        /// btnNextAccount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnNextAccount;
 
         /// <summary>
         /// pnlNoAccounts control.

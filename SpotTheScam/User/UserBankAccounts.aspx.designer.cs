@@ -42,6 +42,24 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Label AlertMessage;
 
         /// <summary>
+        /// pnlBankSelection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlBankSelection;
+
+        /// <summary>
+        /// pnlAddAccountForm control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlAddAccountForm;
+
+        /// <summary>
         /// lblBankName control.
         /// </summary>
         /// <remarks>

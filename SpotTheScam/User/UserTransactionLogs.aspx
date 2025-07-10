@@ -1,344 +1,274 @@
-﻿<%@ Page Title="Transaction Logs" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserTransactionLogs.aspx.cs" Inherits="SpotTheScam.User.UserTransactionLogs" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserTransactionLogs.aspx.cs" Inherits="SpotTheScam.User.UserTransactionLogs" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <title>Transaction Logs - SpotTheScam</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <title>Transaction Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Base styles for the body and container */
         body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #F4F6F8; /* Light grey background */
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
+
         .container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
         }
 
-        /* Header section styling, matching homepage gradient */
-        .header-bg {
-            background: linear-gradient(90deg, #D36F2D 52%, #FBECC3 100%);
-            color: white;
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Button primary style, matching homepage orange */
         .btn-primary {
-            background-color: #D36F2D;
-            color: white;
+            background-color: #4f46e5;
+            color: #ffffff;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
-            font-weight: 700;
             transition: background-color 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         .btn-primary:hover {
-            background-color: #C15F22; /* Slightly darker orange on hover */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background-color: #4338ca;
         }
 
-        /* Button secondary style, matching homepage dark blue */
         .btn-secondary {
-            background-color: #051D40;
-            color: white;
+            background-color: #6b7280;
+            color: #ffffff;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
-            font-weight: 700;
             transition: background-color 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         .btn-secondary:hover {
-            background-color: #03122A; /* Slightly darker blue on hover */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background-color: #4b5563;
         }
 
-        /* Input field common styling */
-        .input-field {
-            border: 1px solid #D1D5DB; /* Light grey border */
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            box-sizing: border-box; /* Include padding in width */
-            font-size: 1rem;
-            color: #374151;
-        }
-        .input-field:focus {
-            outline: none;
-            border-color: #D36F2D;
-            box-shadow: 0 0 0 3px rgba(211, 111, 45, 0.2);
-        }
-
-        /* Alert panel styling */
         .alert {
             padding: 1rem;
             border-radius: 0.5rem;
-            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            width: 100%;
+        }
+
+        .gv-header th {
+            background-color: #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
             font-weight: 600;
         }
-        .alert-success {
-            background-color: #D4EDDA; /* Light green */
-            color: #155724; /* Dark green text */
-            border-color: #C3E6CB;
-        }
-        .alert-error {
-            background-color: #F8D7DA; /* Light red */
-            color: #721C24; /* Dark red text */
-            border-color: #F5C6CB;
-        }
 
-        /* GridView styling */
-        .gv-header th {
-            background-color: #051D40; /* Dark blue header */
-            color: white;
-            padding: 0.75rem 1rem;
-            text-align: left;
-            font-weight: 700;
-        }
         .gv-row td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #E5E7EB; /* Light grey border between rows */
-        }
-        .gv-row:nth-child(even) {
-            background-color: #F9FAFB; /* Slightly off-white for even rows */
-        }
-        .gv-row:hover {
-            background-color: #F3F4F6; /* Light grey on hover */
-        }
-        .gv-empty-row td {
-            text-align: center;
-            padding: 1.5rem;
-            color: #6B7280; /* Medium grey text */
-        }
-        .gv-pager table {
-            width: 100%;
-            margin-top: 1rem;
-        }
-        .gv-pager td {
-            padding: 0.5rem;
-            text-align: center;
-        }
-        .gv-pager a, .gv-pager span {
-            display: inline-block;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            border: 1px solid #D1D5DB;
-            color: #374151;
-            text-decoration: none;
-            margin: 0 0.25rem;
-        }
-        .gv-pager span {
-            background-color: #D36F2D; /* Active pager button matches primary button */
-            color: white;
-            border-color: #D36F2D;
-            font-weight: bold;
-        }
-        .gv-pager a:hover {
-            background-color: #E5E7EB;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        /* Account Card Specific Styles */
-        .account-card {
-            background-color: #051D40; /* Dark blue background for cards */
-            color: white;
-            border-radius: 0.75rem; /* rounded-xl */
-            padding: 1.5rem; /* p-6 */
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 150px; /* Ensure cards have a consistent height */
+        .gv-row:nth-child(even) {
+            background-color: #f9fafb;
         }
-        .account-card-header {
+
+        .gv-actions a {
+            color: #4f46e5;
+            text-decoration: none;
+            margin-right: 0.5rem;
+        }
+
+        .gv-actions a:hover {
+            text-decoration: underline;
+        }
+
+        /* Account Carousel Styling */
+        .account-card-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            overflow-x: hidden; /* Hide scrollbar */
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .account-card {
+            flex: 0 0 100%; /* Each card takes full width */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Example gradient */
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-right: 1rem; /* Space between cards */
+        }
+
+        .account-card:last-child {
+            margin-right: 0;
+        }
+
+        .account-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
             margin-bottom: 0.5rem;
         }
-        .account-type {
-            font-size: 0.875rem; /* text-sm */
-            opacity: 0.8;
+
+        .account-card p {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
         }
-        .account-balance {
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: 700; /* font-bold */
-            margin-top: 0.5rem;
+
+        .account-card .balance {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 1rem;
         }
-        .account-number-masked {
-            font-size: 1rem; /* text-base */
-            opacity: 0.9;
-            margin-top: 0.5rem;
+
+        .pagination-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
         }
+
         .pagination-dot {
-            display: inline-block;
-            width: 0.75rem;
-            height: 0.75rem;
-            background-color: #FBECC3; /* Light yellow for inactive dots */
+            height: 10px;
+            width: 10px;
+            background-color: #d1d5db;
             border-radius: 50%;
-            margin: 0 0.25rem;
+            display: inline-block;
+            margin: 0 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            transition: background-color 0.3s ease;
         }
+
         .pagination-dot.active {
-            background-color: #D36F2D; /* Orange for active dot */
-            transform: scale(1.2);
-        }
-        .no-accounts-panel {
-            background-color: #FFF;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            text-align: center;
+            background-color: #4f46e5;
         }
     </style>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </asp:Content>
-
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div class="header-bg py-12 mb-8">
-        <div class="container">
-            <h1 class="text-4xl font-bold mb-2">Your Transaction Logs</h1>
-            <p class="text-lg opacity-90">View and manage all your bank account transactions.</p>
-        </div>
-    </div>
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Your Transaction Logs</h1>
 
-    <div class="container py-8">
-        <!-- Alert Panel for messages -->
-        <asp:Panel ID="AlertPanel" runat="server" Visible="false" CssClass="alert">
+        <asp:Panel ID="AlertPanel" runat="server" Visible="false" CssClass="alert mb-6">
             <asp:Label ID="AlertMessage" runat="server"></asp:Label>
         </asp:Panel>
 
-        <!-- Total Balance and Account Overview Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <%-- Account Overview Section --%>
+        <div class="card p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800">Total Balance</h2>
-                <asp:LinkButton ID="lnkViewAllAccounts" runat="server" Text="View All Accounts" PostBackUrl="~/User/UserBankAccounts.aspx" CssClass="text-[#D36F2D] font-semibold hover:underline"></asp:LinkButton>
+                <h2 class="text-2xl font-semibold text-gray-700">Account Overview</h2>
+                <asp:LinkButton ID="lnkViewAllAccounts" runat="server" PostBackUrl="~/User/UserBankAccounts.aspx" CssClass="text-indigo-600 hover:underline">View All Accounts</asp:LinkButton>
             </div>
-            <asp:Panel ID="pnlAccountOverview" runat="server">
-                <h3 class="text-5xl font-bold text-[#051D40] mb-6">
-                    <asp:Literal ID="ltTotalBalance" runat="server" Text="$0.00"></asp:Literal>
-                </h3>
 
-                <!-- Account Cards Carousel/Repeater -->
-                <asp:Panel ID="pnlAccountCards" runat="server" CssClass="relative">
-                    <asp:Repeater ID="rptAccounts" runat="server">
-                        <ItemTemplate>
-                            <div class="account-card" id="accountCard_<%# Eval("AccountId") %>">
-                                <div class="account-card-header">
-                                    <div>
-                                        <div class="account-type"><%# Eval("AccountType") %></div>
-                                        <div class="text-xl font-semibold mt-1"><%# Eval("BankName") %></div>
-                                    </div>
-                                    <!-- Placeholder for bank/card logo, e.g., Visa icon -->
-                                    <i class="fa-brands fa-cc-visa text-4xl text-[#FBECC3]"></i>
-                                </div>
-                                <div>
-                                    <div class="account-number-masked">**** **** **** <%# Eval("AccountNumber").ToString().Length >= 4 ? Eval("AccountNumber").ToString().Substring(Eval("AccountNumber").ToString().Length - 4) : Eval("AccountNumber") %></div>
-                                    <div class="account-balance"><%# Eval("Balance", "{0:C2}") %></div>
-                                </div>
-                            </div>
-                        </ItemTemplate>
-                    </asp:Repeater>
-                    
-                    <!-- Navigation Buttons for Carousel -->
-                    <div class="flex justify-between items-center mt-4">
-                        <asp:LinkButton ID="btnPrevAccount" runat="server" OnClick="btnPrevAccount_Click" CssClass="text-[#D36F2D] text-lg font-semibold hover:underline">
-                            <i class="fas fa-chevron-left mr-1"></i> Previous
-                        </asp:LinkButton>
-                        <div id="accountDots" runat="server" class="flex">
-                            <!-- Dots will be rendered by JS or code-behind -->
-                        </div>
-                        <asp:LinkButton ID="btnNextAccount" runat="server" OnClick="btnNextAccount_Click" CssClass="text-[#D36F2D] text-lg font-semibold hover:underline">
-                            Next <i class="fas fa-chevron-right ml-1"></i>
-                        </asp:LinkButton>
-                    </div>
-                </asp:Panel>
+            <asp:Panel ID="pnlAccountOverview" runat="server" Visible="false">
+                <div class="mb-4">
+                    <p class="text-gray-600 text-lg">Total Balance Across All Accounts:</p>
+                    <p class="text-4xl font-bold text-indigo-700"><asp:Literal ID="ltTotalBalance" runat="server"></asp:Literal></p>
+                </div>
 
-                <!-- No Accounts Message -->
-                <asp:Panel ID="pnlNoAccounts" runat="server" Visible="false" CssClass="no-accounts-panel">
-                    <p class="text-lg text-gray-600 mb-4">You don't have any bank accounts linked yet.</p>
-                    <asp:Button ID="btnAddFirstAccount" runat="server" Text="Add Your First Account" PostBackUrl="~/User/UserBankAccounts.aspx" CssClass="btn-primary" />
-                </asp:Panel>
+                <div class="relative flex items-center">
+                    <asp:LinkButton ID="btnPrevAccount" runat="server" OnClick="btnPrevAccount_Click" CssClass="absolute left-0 z-10 p-2 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none -ml-4">
+                        <i class="fas fa-chevron-left text-gray-700"></i>
+                    </asp:LinkButton>
+
+                    <asp:Panel ID="pnlAccountCards" runat="server" CssClass="account-card-container flex-grow">
+                        <asp:Repeater ID="rptAccounts" runat="server">
+                            <ItemTemplate>
+                                <div class="account-card flex-shrink-0 w-full">
+                                    <h3 class="font-semibold text-white"><%# Eval("AccountNickname") %></h3>
+                                    <p class="text-sm text-gray-200"><%# Eval("BankName") %> - <%# Eval("AccountType") %></p>
+                                    <p class="text-sm text-gray-200">Account No: <%# Eval("AccountNumber") %></p>
+                                    <p class="balance text-white"><%# Eval("Balance", "{0:C2}") %></p>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                    </asp:Panel>
+
+                    <asp:LinkButton ID="btnNextAccount" runat="server" OnClick="btnNextAccount_Click" CssClass="absolute right-0 z-10 p-2 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none -mr-4">
+                        <i class="fas fa-chevron-right text-gray-700"></i>
+                    </asp:LinkButton>
+                </div>
+                <div id="accountDots" runat="server" class="pagination-dots"></div>
+            </asp:Panel>
+
+            <asp:Panel ID="pnlNoAccounts" runat="server" Visible="false" CssClass="text-center py-8">
+                <p class="text-gray-500 text-lg mb-4">You haven't linked any bank accounts yet.</p>
+                <asp:Button ID="btnAddFirstAccount" runat="server" Text="Add Your First Account" PostBackUrl="~/User/UserBankAccounts.aspx" CssClass="btn-primary" />
             </asp:Panel>
         </div>
 
-        <!-- Filters and Search Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-2xl font-bold text-[#051D40] mb-6">Filter Transactions</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <!-- Start Date Filter -->
+        <%-- Transaction Filters --%>
+        <div class="card p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Filter Transactions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label for="<%= txtStartDate.ClientID %>" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <asp:TextBox ID="txtStartDate" runat="server" TextMode="Date" CssClass="input-field"></asp:TextBox>
+                    <label for="<%=txtStartDate.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Start Date:</label>
+                    <asp:TextBox ID="txtStartDate" runat="server" TextMode="Date" CssClass="form-input"></asp:TextBox>
                 </div>
-                <!-- End Date Filter -->
                 <div>
-                    <label for="<%= txtEndDate.ClientID %>" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                    <asp:TextBox ID="txtEndDate" runat="server" TextMode="Date" CssClass="input-field"></asp:TextBox>
+                    <label for="<%=txtEndDate.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">End Date:</label>
+                    <asp:TextBox ID="txtEndDate" runat="server" TextMode="Date" CssClass="form-input"></asp:TextBox>
                 </div>
-                <!-- Transaction Type Filter -->
                 <div>
-                    <label for="<%= ddlTransactionType.ClientID %>" class="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
-                    <asp:DropDownList ID="ddlTransactionType" runat="server" CssClass="input-field">
-                        <asp:ListItem Value="All" Text="All Types"></asp:ListItem>
-                        <asp:ListItem Value="Credit" Text="Money In"></asp:ListItem>
-                        <asp:ListItem Value="Debit" Text="Money Out"></asp:ListItem>
+                    <label for="<%=ddlTransactionType.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Transaction Type:</label>
+                    <asp:DropDownList ID="ddlTransactionType" runat="server" CssClass="form-input">
+                        <asp:ListItem Text="All Types" Value="All"></asp:ListItem>
+                        <asp:ListItem Text="Credit" Value="Credit"></asp:ListItem>
+                        <asp:ListItem Text="Debit" Value="Debit"></asp:ListItem>
                     </asp:DropDownList>
                 </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Search Bar -->
-                <div>
-                    <label for="<%= txtSearch.ClientID %>" class="block text-sm font-medium text-gray-700 mb-1">Search Description/Recipient</label>
-                    <asp:TextBox ID="txtSearch" runat="server" CssClass="input-field" Placeholder="e.g., Groceries, John Doe"></asp:TextBox>
+                <div class="lg:col-span-2">
+                    <label for="<%=txtSearch.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Search Description/Recipient:</label>
+                    <asp:TextBox ID="txtSearch" runat="server" CssClass="form-input" placeholder="e.g., Groceries, John Doe"></asp:TextBox>
                 </div>
-                <!-- Account Filter -->
                 <div>
-                    <label for="<%= ddlAccount.ClientID %>" class="block text-sm font-medium text-gray-700 mb-1">Filter by Account</label>
-                    <asp:DropDownList ID="ddlAccount" runat="server" CssClass="input-field"></asp:DropDownList>
+                    <label for="<%=ddlAccount.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Select Account:</label>
+                    <asp:DropDownList ID="ddlAccount" runat="server" CssClass="form-input"></asp:DropDownList>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <!-- Apply Filters Button -->
-                <asp:Button ID="btnApplyFilters" runat="server" Text="Apply Filters" OnClick="btnApplyFilters_Click" CssClass="btn-primary w-full sm:w-auto" />
-                <!-- Clear Filters Button -->
-                <asp:Button ID="btnClearFilters" runat="server" Text="Clear Filters" OnClick="btnClearFilters_Click" CssClass="btn-secondary w-full sm:w-auto" />
-                <!-- Export to CSV Button -->
-                <asp:Button ID="btnExportCsv" runat="server" Text="Export to CSV" OnClick="btnExportCsv_Click" CssClass="btn-primary w-full sm:w-auto" />
+            <div class="flex flex-wrap gap-4 justify-end">
+                <asp:Button ID="btnApplyFilters" runat="server" Text="Apply Filters" OnClick="btnApplyFilters_Click" CssClass="btn-primary" />
+                <asp:Button ID="btnClearFilters" runat="server" Text="Clear Filters" OnClick="btnClearFilters_Click" CssClass="btn-secondary" />
+                <asp:Button ID="btnExportCsv" runat="server" Text="Export to CSV" OnClick="btnExportCsv_Click" CssClass="btn-secondary" />
             </div>
         </div>
 
-        <!-- Transaction Logs Display -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-[#051D40] mb-6">Transaction History</h2>
-            <asp:GridView ID="gvTransactions" runat="server" AutoGenerateColumns="False"
-                CssClass="w-full text-sm text-left text-gray-500"
-                HeaderStyle-CssClass="gv-header"
-                RowStyle-CssClass="gv-row"
-                EmptyDataRowStyle-CssClass="gv-empty-row"
-                PagerStyle-CssClass="gv-pager"
-                AllowPaging="True" PageSize="10" OnPageIndexChanging="gvTransactions_PageIndexChanging">
+        <%-- Transactions Grid --%>
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Transactions</h2>
+        <div class="card p-6 overflow-x-auto">
+            <asp:GridView ID="gvTransactions" runat="server" AutoGenerateColumns="False" AllowPaging="True" PageSize="10"
+                OnPageIndexChanging="gvTransactions_PageIndexChanging"
+                CssClass="min-w-full divide-y divide-gray-200" HeaderStyle-CssClass="gv-header" RowStyle-CssClass="gv-row">
                 <Columns>
                     <asp:BoundField DataField="TransactionDate" HeaderText="Date" DataFormatString="{0:d}" />
-                    <asp:BoundField DataField="TransactionTime" HeaderText="Time" DataFormatString="{0:hh\:mm tt}" />
+                    <asp:BoundField DataField="TransactionTime" HeaderText="Time" /> <%-- MODIFIED LINE --%>
                     <asp:BoundField DataField="Description" HeaderText="Description" />
+                    <asp:BoundField DataField="TransactionType" HeaderText="Type" />
+                    <asp:BoundField DataField="Amount" HeaderText="Amount" DataFormatString="{0:C2}" />
                     <asp:BoundField DataField="SenderRecipient" HeaderText="Sender/Recipient" />
-                    <asp:TemplateField HeaderText="Amount">
-                        <ItemTemplate>
-                            <asp:Label runat="server" Text='<%# Eval("Amount", "{0:C2}") %>'
-                                CssClass='<%# Eval("TransactionType").ToString() == "Credit" ? "text-green-600 font-semibold" : "text-red-600 font-semibold" %>'>
-                            </asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:BoundField DataField="BalanceAfterTransaction" HeaderText="Balance" DataFormatString="{0:C2}" />
+                    <asp:BoundField DataField="BalanceAfterTransaction" HeaderText="Balance After" DataFormatString="{0:C2}" />
                     <asp:BoundField DataField="BankName" HeaderText="Bank" />
                     <asp:BoundField DataField="AccountNickname" HeaderText="Account" />
                 </Columns>
                 <EmptyDataTemplate>
-                    No transactions found for the selected filters.
+                    <p class="text-gray-500 text-center py-4">No transactions found for the selected filters.</p>
                 </EmptyDataTemplate>
+                <PagerStyle CssClass="pagination-style" />
             </asp:GridView>
         </div>
     </div>

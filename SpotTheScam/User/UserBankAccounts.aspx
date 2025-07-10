@@ -1,238 +1,213 @@
-﻿<%@ Page Title="Bank Accounts" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserBankAccounts.aspx.cs" Inherits="SpotTheScam.User.UserBankAccounts" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserBankAccounts.aspx.cs" Inherits="SpotTheScam.User.UserBankAccounts" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <title>Your Bank Accounts - SpotTheScam</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <title>Manage Bank Accounts</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Base styles for the body and container */
         body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #F4F6F8; /* Light grey background */
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
+
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
+            max-width: 960px;
         }
 
-        /* Header section styling, matching homepage gradient */
-        .header-bg {
-            background: linear-gradient(90deg, #D36F2D 52%, #FBECC3 100%);
-            color: white;
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Button primary style, matching homepage orange */
         .btn-primary {
-            background-color: #D36F2D;
-            color: white;
+            background-color: #4f46e5;
+            color: #ffffff;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
-            font-weight: 700;
             transition: background-color 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         .btn-primary:hover {
-            background-color: #C15F22; /* Slightly darker orange on hover */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background-color: #4338ca;
         }
 
-        /* Input field common styling */
-        .input-field {
-            border: 1px solid #D1D5DB; /* Light grey border */
+        .btn-secondary {
+            background-color: #6b7280;
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            box-sizing: border-box; /* Include padding in width */
-            font-size: 1rem;
-            color: #374151;
-        }
-        .input-field:focus {
-            outline: none;
-            border-color: #D36F2D;
-            box-shadow: 0 0 0 3px rgba(211, 111, 45, 0.2);
-        }
-        .input-label {
-            display: block;
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500; /* font-medium */
-            color: #4B5563; /* gray-700 */
-            margin-bottom: 0.25rem;
+            transition: background-color 0.3s ease;
         }
 
-        /* Alert panel styling */
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
         .alert {
             padding: 1rem;
             border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
             display: flex;
             align-items: center;
+            gap: 0.75rem;
         }
+
         .alert-success {
-            background-color: #D4EDDA; /* Light green */
-            color: #155724; /* Dark green text */
-            border-color: #C3E6CB;
+            background-color: #d1fae5;
+            color: #065f46;
         }
-        .alert-danger { /* Renamed from alert-error to alert-danger for consistency */
-            background-color: #F8D7DA; /* Light red */
-            color: #721C24; /* Dark red text */
-            border-color: #F5C6CB;
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
+
         .alert-icon {
-            margin-right: 0.75rem;
             font-size: 1.25rem;
         }
 
-        /* GridView styling */
-        .gv-header th {
-            background-color: #051D40; /* Dark blue header */
-            color: white;
-            padding: 0.75rem 1rem;
-            text-align: left;
-            font-weight: 700;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            width: 100%;
         }
-        .gv-row td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #E5E7EB; /* Light grey border between rows */
-            color: #374151;
-        }
-        .gv-row:last-child td {
-            border-bottom: none; /* No border on the last row */
-        }
-        .gv-row:nth-child(even) {
-            background-color: #F9FAFB; /* Slightly off-white for even rows */
-        }
-        .gv-row:hover {
-            background-color: #F3F4F6; /* Light grey on hover */
-        }
-        .gv-empty-row td {
-            text-align: center;
-            padding: 1.5rem;
-            color: #6B7280; /* Medium grey text */
-        }
-        .gv-actions a {
-            color: #D36F2D;
-            text-decoration: none;
-            font-weight: 600;
-            margin-right: 0.75rem;
-            transition: color 0.2s ease;
-        }
-        .gv-actions a:hover {
-            color: #C15F22;
-        }
-        .gv-actions a.delete-link {
-            color: #EF4444; /* Red for delete */
-        }
-        .gv-actions a.delete-link:hover {
-            color: #DC2626;
-        }
+
         .gv-edit-input {
             width: 100%;
             padding: 0.5rem;
-            border: 1px solid #D1D5DB;
-            border-radius: 0.25rem;
-            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
         }
-        .gv-edit-input:focus {
-            outline: none;
-            border-color: #D36F2D;
-            box-shadow: 0 0 0 2px rgba(211, 111, 45, 0.2);
+
+        .gv-header th {
+            background-color: #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .gv-row td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .gv-row:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .gv-actions a {
+            color: #4f46e5;
+            text-decoration: none;
+            margin-right: 0.5rem;
+        }
+
+        .gv-actions a:hover {
+            text-decoration: underline;
+        }
+
+        .bank-option-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .bank-option-card:hover {
+            border-color: #4f46e5;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        .bank-logo {
+            font-size: 3rem; /* Adjust size as needed */
+            margin-bottom: 1rem;
+            color: #4f46e5; /* Example color */
+        }
+        .bank-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
         }
     </style>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </asp:Content>
-
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div class="header-bg py-12 mb-8">
-        <div class="container">
-            <h1 class="text-4xl font-bold mb-2">Your Bank Accounts</h1>
-            <p class="text-lg opacity-90">Manage your linked bank accounts and cards.</p>
-        </div>
-    </div>
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Bank Accounts</h1>
 
-    <div class="container py-8">
-        <!-- Alert Panel -->
-        <asp:Panel ID="AlertPanel" runat="server" Visible="false" CssClass="alert">
+        <asp:Panel ID="AlertPanel" runat="server" Visible="false" CssClass="alert mb-6">
             <i id="AlertIcon" runat="server" class="alert-icon"></i>
             <asp:Label ID="AlertMessage" runat="server"></asp:Label>
         </asp:Panel>
 
-        <!-- Add New Account Form -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-2xl font-bold text-[#051D40] mb-6">Add New Account</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <%-- Bank Selection Panel --%>
+        <asp:Panel ID="pnlBankSelection" runat="server" CssClass="card p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Link a New Bank Account</h2>
+            <p class="text-gray-600 mb-6">Choose your bank to proceed with linking your account. This is a simulated process for demonstration purposes.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="FakeUOBLogin.aspx" class="bank-option-card flex flex-col items-center justify-center">
+                    <span class="bank-logo">🏦</span>
+                    <span class="bank-name">UOB (Simulated)</span>
+                    <p class="text-sm text-gray-500 mt-2">Click to link your UOB account.</p>
+                </a>
+                <a href="FakeOCBCLogin.aspx" class="bank-option-card flex flex-col items-center justify-center">
+                    <span class="bank-logo">🏦</span>
+                    <span class="bank-name">OCBC (Simulated)</span>
+                    <p class="text-sm text-gray-500 mt-2">Click to link your OCBC account.</p>
+                </a>
+            </div>
+        </asp:Panel>
+
+        <%-- Existing Add Account Form (Hidden by default) --%>
+        <asp:Panel ID="pnlAddAccountForm" runat="server" CssClass="card p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Bank Account</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <asp:Label ID="lblBankName" runat="server" Text="Bank Name" CssClass="input-label"></asp:Label>
-                    <asp:TextBox ID="txtBankName" runat="server" CssClass="input-field" Placeholder="e.g., DBS Bank"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="rfvBankName" runat="server" ControlToValidate="txtBankName"
-                        ErrorMessage="Bank Name is required." ForeColor="#EF4444" Display="Dynamic" CssClass="text-sm mt-1"></asp:RequiredFieldValidator>
+                    <asp:Label ID="lblBankName" runat="server" Text="Bank Name:" CssClass="block text-gray-700 text-sm font-bold mb-2"></asp:Label>
+                    <asp:TextBox ID="txtBankName" runat="server" CssClass="form-input"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvBankName" runat="server" ControlToValidate="txtBankName" CssClass="text-red-500 text-xs italic" ErrorMessage="Bank Name is required."></asp:RequiredFieldValidator>
                 </div>
                 <div>
-                    <asp:Label ID="lblAccountType" runat="server" Text="Account Type" CssClass="input-label"></asp:Label>
-                    <asp:TextBox ID="txtAccountType" runat="server" CssClass="input-field" Text="Savings" Placeholder="e.g., Savings, Checking, Credit Card"></asp:TextBox>
-                    <%-- No RequiredFieldValidator for AccountType as it has a default value --%>
+                    <asp:Label ID="lblAccountType" runat="server" Text="Account Type:" CssClass="block text-gray-700 text-sm font-bold mb-2"></asp:Label>
+                    <asp:TextBox ID="txtAccountType" runat="server" Text="Savings" CssClass="form-input"></asp:TextBox>
                 </div>
                 <div>
-                    <asp:Label ID="lblAccountNumber" runat="server" Text="Account Number" CssClass="input-label"></asp:Label>
-                    <asp:TextBox ID="txtAccountNumber" runat="server" CssClass="input-field" Placeholder="e.g., 1234567890"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="rfvAccountNumber" runat="server" ControlToValidate="txtAccountNumber"
-                        ErrorMessage="Account Number is required." ForeColor="#EF4444" Display="Dynamic" CssClass="text-sm mt-1"></asp:RequiredFieldValidator>
+                    <asp:Label ID="lblAccountNumber" runat="server" Text="Account Number:" CssClass="block text-gray-700 text-sm font-bold mb-2"></asp:Label>
+                    <asp:TextBox ID="txtAccountNumber" runat="server" CssClass="form-input"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvAccountNumber" runat="server" ControlToValidate="txtAccountNumber" CssClass="text-red-500 text-xs italic" ErrorMessage="Account Number is required."></asp:RequiredFieldValidator>
                 </div>
                 <div>
-                    <asp:Label ID="lblAccountNickname" runat="server" Text="Account Nickname (Optional)" CssClass="input-label"></asp:Label>
-                    <asp:TextBox ID="txtAccountNickname" runat="server" CssClass="input-field" Placeholder="e.g., Main Savings, Daily Spending"></asp:TextBox>
+                    <asp:Label ID="lblAccountNickname" runat="server" Text="Account Nickname (Optional):" CssClass="block text-gray-700 text-sm font-bold mb-2"></asp:Label>
+                    <asp:TextBox ID="txtAccountNickname" runat="server" CssClass="form-input"></asp:TextBox>
                 </div>
-                <div>
-                    <asp:Label ID="lblBalance" runat="server" Text="Current Balance" CssClass="input-label"></asp:Label>
-                    <asp:TextBox ID="txtBalance" runat="server" TextMode="Number" CssClass="input-field" Placeholder="e.g., 1000.00"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="rfvBalance" runat="server" ControlToValidate="txtBalance"
-                        ErrorMessage="Balance is required." ForeColor="#EF4444" Display="Dynamic" CssClass="text-sm mt-1"></asp:RequiredFieldValidator>
-                    <asp:CompareValidator ID="cvBalance" runat="server" ControlToValidate="txtBalance" Type="Currency" Operator="DataTypeCheck"
-                        ErrorMessage="Balance must be a valid number." ForeColor="#EF4444" Display="Dynamic" CssClass="text-sm mt-1"></asp:CompareValidator>
+                <div class="col-span-1 md:col-span-2">
+                    <asp:Label ID="lblBalance" runat="server" Text="Initial Balance:" CssClass="block text-gray-700 text-sm font-bold mb-2"></asp:Label>
+                    <asp:TextBox ID="txtBalance" runat="server" TextMode="Number" CssClass="form-input"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvBalance" runat="server" ControlToValidate="txtBalance" CssClass="text-red-500 text-xs italic" ErrorMessage="Balance is required."></asp:RequiredFieldValidator>
+                    <asp:CompareValidator ID="cvBalance" runat="server" ControlToValidate="txtBalance" Type="Currency" Operator="DataTypeCheck" CssClass="text-red-500 text-xs italic" ErrorMessage="Balance must be a valid number."></asp:CompareValidator>
                 </div>
             </div>
-            <asp:Button ID="btnAddAccount" runat="server" Text="Add Account" OnClick="btnAddAccount_Click" CssClass="btn-primary w-full md:w-auto" />
-        </div>
+            <asp:Button ID="btnAddAccount" runat="server" Text="Add Account" OnClick="btnAddAccount_Click" CssClass="btn-primary" />
+        </asp:Panel>
 
-        <!-- Existing Bank Accounts Display -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-[#051D40] mb-6">Your Linked Accounts</h2>
-            <asp:GridView ID="gvBankAccounts" runat="server" AutoGenerateColumns="False"
-                CssClass="w-full text-sm text-left text-gray-500"
-                HeaderStyle-CssClass="gv-header"
-                RowStyle-CssClass="gv-row"
-                EmptyDataRowStyle-CssClass="gv-empty-row"
-                AllowEditing="True" AllowDeleting="True" DataKeyNames="AccountId"
-                OnRowEditing="gvBankAccounts_RowEditing"
-                OnRowCancelingEdit="gvBankAccounts_RowCancelingEdit"
-                OnRowUpdating="gvBankAccounts_RowUpdating"
-                OnRowDeleting="gvBankAccounts_RowDeleting">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Your Linked Bank Accounts</h2>
+        <div class="card p-6">
+            <asp:GridView ID="gvBankAccounts" runat="server" AutoGenerateColumns="False" DataKeyNames="AccountId"
+                OnRowEditing="gvBankAccounts_RowEditing" OnRowCancelingEdit="gvBankAccounts_RowCancelingEdit"
+                OnRowUpdating="gvBankAccounts_RowUpdating" OnRowDeleting="gvBankAccounts_RowDeleting"
+                OnRowDataBound="gvBankAccounts_RowDataBound"
+                CssClass="min-w-full divide-y divide-gray-200" HeaderStyle-CssClass="gv-header" RowStyle-CssClass="gv-row">
                 <Columns>
                     <asp:BoundField DataField="BankName" HeaderText="Bank Name" />
                     <asp:BoundField DataField="AccountType" HeaderText="Account Type" />
                     <asp:BoundField DataField="AccountNumber" HeaderText="Account Number" />
                     <asp:BoundField DataField="AccountNickname" HeaderText="Nickname" />
                     <asp:BoundField DataField="Balance" HeaderText="Balance" DataFormatString="{0:C2}" />
-                    <asp:BoundField DataField="DateAdded" HeaderText="Date Added" DataFormatString="{0:d}" ReadOnly="True" />
-                    <asp:TemplateField HeaderText="Actions" ItemStyle-CssClass="gv-actions">
-                        <ItemTemplate>
-                            <asp:LinkButton ID="btnEdit" runat="server" CommandName="Edit" Text="Edit" CssClass="text-[#D36F2D] hover:text-[#C15F22] mr-3"></asp:LinkButton>
-                            <asp:LinkButton ID="btnDelete" runat="server" CommandName="Delete" Text="Delete" CssClass="text-red-500 hover:text-red-700"
-                                OnClientClick="return confirm('Are you sure you want to delete this account?');"></asp:LinkButton>
-                        </ItemTemplate>
-                        <EditItemTemplate>
-                            <asp:LinkButton ID="btnUpdate" runat="server" CommandName="Update" Text="Update" CssClass="text-green-600 hover:text-green-800 mr-3"></asp:LinkButton>
-                            <asp:LinkButton ID="btnCancel" runat="server" CommandName="Cancel" Text="Cancel" CssClass="text-gray-500 hover:text-gray-700"></asp:LinkButton>
-                        </EditItemTemplate>
-                    </asp:TemplateField>
+                    <asp:BoundField DataField="DateAdded" HeaderText="Date Added" DataFormatString="{0:d}" />
+                    <asp:CommandField ShowEditButton="True" ShowDeleteButton="True" ControlStyle-CssClass="gv-actions" HeaderText="Actions" />
                 </Columns>
                 <EmptyDataTemplate>
-                    No bank accounts added yet. Use the form above to add your first account!
+                    <p class="text-gray-500 text-center py-4">No bank accounts linked yet.</p>
                 </EmptyDataTemplate>
             </asp:GridView>
         </div>
