@@ -2,10 +2,55 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
+        /* Reset any margins/padding that might interfere with full-width banner */
+        body, html {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Full-width banner that reaches page edges */
         .hero-banner {
-            background: linear-gradient(135deg, #FFF3CD 0%, #FFE4B5 100%);
-            padding: 2rem 0;
-            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F5E6D3 100%);
+            padding: 2rem 2rem 2rem 3rem;
+            text-align: left;
+            margin: 0;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            box-sizing: border-box;
+        }
+
+        .hero-banner .container {
+            max-width: 1200px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .hero-banner h1 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .hero-banner p {
+            font-size: 0.875rem;
+            color: #333;
+            margin: 0;
+            max-width: none;
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+        }
+
+        /* Main content container */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
         }
 
         .assistance-section {
@@ -14,10 +59,19 @@
         }
 
         .assistance-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
             padding: 2rem;
             background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .assistance-card h3 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-family: Arial, sans-serif;
         }
 
         .hotline-btn {
@@ -26,10 +80,17 @@
             color: white;
             padding: 1rem 2rem;
             border-radius: 8px;
-            font-weight: 600;
+            font-weight: 400;
             font-size: 1rem;
             width: 100%;
             margin-bottom: 2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .hotline-btn:hover {
+            background-color: #B85A24;
         }
 
         .emergency-section {
@@ -53,41 +114,46 @@
         }
 
         .emergency-box .title {
-            font-weight: bold;
+            font-weight: 400;
             font-size: 1rem;
             margin-bottom: 0.5rem;
+            color: #333;
+            font-family: Arial, sans-serif;
         }
 
         .emergency-box .number {
             font-size: 1.25rem;
-            font-weight: bold;
+            font-weight: 700;
             color: #dc3545;
             margin-bottom: 0.5rem;
+            font-family: Arial, sans-serif;
         }
 
         .emergency-box .description {
             font-size: 0.875rem;
             color: #666;
+            font-family: Arial, sans-serif;
         }
 
         .report-box {
-            border-color: #6c757d;
+            border-color: #007bff;
         }
 
         .report-box .icon {
-            color: #6c757d;
+            color: #007bff;
         }
 
         .report-box .number {
-            color: #6c757d;
+            color: #007bff;
         }
 
         .scam-types-section h2 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #333;
+            color: #1a1a1a;
             margin-bottom: 2rem;
             text-decoration: underline;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .scam-grid {
@@ -98,8 +164,8 @@
         }
 
         .scam-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
             padding: 1.5rem;
             background: white;
             display: flex;
@@ -107,11 +173,12 @@
             gap: 1rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .scam-card:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
 
         .scam-icon {
@@ -130,7 +197,8 @@
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #333;
+            color: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .scam-content p {
@@ -138,6 +206,7 @@
             color: #666;
             margin: 0;
             line-height: 1.4;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .banking { background-color: #dc3545; }
@@ -158,11 +227,12 @@
         }
 
         .support-section h2 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #333;
+            color: #1a1a1a;
             margin-bottom: 2rem;
             text-decoration: underline;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .support-grid {
@@ -172,17 +242,19 @@
         }
 
         .support-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
             padding: 1.5rem;
             background: #f8f9fa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .support-card h5 {
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #333;
+            color: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .support-card .phone {
@@ -190,19 +262,25 @@
             font-weight: 600;
             color: #007bff;
             margin-bottom: 0.25rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .support-card .description {
             font-size: 0.875rem;
             color: #666;
             margin: 0;
-        }
-
-        .chat-bubble {
-            display: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         @media (max-width: 768px) {
+            .hero-banner h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-banner p {
+                font-size: 1rem;
+            }
+            
             .emergency-section {
                 flex-direction: column;
             }
@@ -221,24 +299,23 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <!-- Hero Banner -->
     <div class="hero-banner">
-        <div class="container">
-            <h1 style="font-size: 2rem; font-weight: 700; color: #333; margin-bottom: 0.5rem;">Scam Recovery Support</h1>
-            <p style="font-size: 1rem; color: #666; margin: 0;">Immediate assistance and resources for scam victims<br>We're here to help you through this difficult time</p>
-        </div>
+        <h1>Scam Recovery Support</h1>
+        <p>Immediate assistance and resources for scam victims<br />We're here to help you through this difficult time</p>
     </div>
 
-    <div class="container">
+    <!-- Main Content -->
+    <div class="main-content">
         <!-- Immediate Assistance Section -->
         <div class="assistance-section">
             <div class="assistance-card">
                 <div class="text-center">
-                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #333; margin-bottom: 1.5rem;">Need immediate assistance?</h3>
+                    <h3>Need immediate assistance?</h3>
                     <button class="hotline-btn">Call Singapore Scam Hotline: 1799</button>
                 </div>
                 
                 <div class="emergency-section">
                     <div class="emergency-box">
-                        <div class="icon">⚠️</div>
+                        <div class="icon">🚨</div>
                         <div class="title">Emergency</div>
                         <div class="number">999</div>
                         <div class="description">If you feel unsafe right now</div>
