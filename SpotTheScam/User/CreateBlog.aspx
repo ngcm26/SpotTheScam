@@ -1,5 +1,41 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="CreateBlog.aspx.cs" Inherits="SpotTheScam.User.CreateBlog" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <style type="text/css">
+        .auto-style1 {
+            width: 1129px;
+            height: 243px;
+        }
+        .auto-style3 {
+            width: 1052px;
+            height: 15px;
+        }
+        .auto-style4 {
+            height: 15px;
+        }
+    </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <div class="text-start">
+
+        &nbsp;<table class="w-100">
+            <tr>
+                <td class="auto-style3">Blog Title:</td>
+                <td class="auto-style4">
+                    <asp:Button ID="Button1" runat="server" Text="Publish" />
+                </td>
+            </tr>
+        </table>
+        <asp:TextBox ID="TextBox3" runat="server" Width="288px"></asp:TextBox>
+        <br />
+        <br />
+        <br />
+        Blog Image:<br />
+        <asp:FileUpload ID="FileUpload1" runat="server" />
+        <br />
+        <br />
+        <br />
+        Content:<br />
+        <textarea id="TextArea1" class="auto-style1" name="S1"></textarea><br />
+
+    </div>
 </asp:Content>
