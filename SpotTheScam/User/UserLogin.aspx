@@ -2,9 +2,11 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
+        @import url('https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap');
         body {
             background-color: #f0f2f5; /* Light grey background */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            color: #051D40;
         }
 
         .login-container {
@@ -22,14 +24,15 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 480px;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .login-card h2 {
             text-align: center;
-            color: #333;
+            color: #051D40;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            font-family: 'Georgia', serif; 
+            font-family: 'DM Sans', sans-serif;
         }
 
 
@@ -38,16 +41,18 @@
             padding: 12px 15px;
             border: 1px solid #ced4da;
             transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            font-family: 'DM Sans', sans-serif;
+            color: #051D40;
         }
 
         .form-control:focus {
-            border-color: #C88A58; 
-            box-shadow: 0 0 0 0.2rem rgba(200, 138, 88, 0.25);
+            border-color: #D36F2D; 
+            box-shadow: 0 0 0 0.2rem rgba(211, 111, 45, 0.15);
         }
         
         .btn-login {
-            background-color: #C88A58; 
-            border-color: #C88A58;
+            background-color: #D36F2D;
+            border-color: #D36F2D;
             color: #fff;
             width: 100%;
             padding: 12px;
@@ -55,11 +60,12 @@
             font-size: 1rem;
             border-radius: 8px;
             transition: background-color 0.2s;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .btn-login:hover {
-            background-color: #b57b4f; 
-            border-color: #b57b4f;
+            background-color: #b45a22;
+            border-color: #b45a22;
             color: #fff;
         }
 
@@ -67,22 +73,29 @@
             text-align: center;
             margin-top: 1.5rem;
             display: block;
-            color: #555;
+            color: #051D40;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .register-link a {
-            color: #C88A58;
+            color: #D36F2D;
             font-weight: 600;
             text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
         }
         
         .register-link a:hover {
             text-decoration: underline;
+            color: #b45a22;
         }
 
         .error-message {
             color: #dc3545; 
             font-size: 0.875em;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .form-label {
+            color: #051D40;
         }
     </style>
 </asp:Content>

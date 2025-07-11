@@ -19,10 +19,26 @@
     <asp:TextBox ID="txtAuthor" runat="server" /><br /><br />
 
     <asp:Label ID="lblStatus" runat="server" Text="Status:" AssociatedControlID="ddlStatus" /><br />
+
     <asp:DropDownList ID="ddlStatus" runat="server">
-        <asp:ListItem Text="Draft" Value="draft"></asp:ListItem>
-        <asp:ListItem Text="Published" Value="published"></asp:ListItem>
-    </asp:DropDownList><br /><br />
+        <asp:ListItem Text="-- Select Status --" Value="" />
+        <asp:ListItem Text="Draft" Value="draft" />
+        <asp:ListItem Text="Published" Value="published" />
+    </asp:DropDownList><br />
+
+    <asp:RequiredFieldValidator 
+        ID="rfvStatus" 
+        runat="server"
+        ControlToValidate="ddlStatus"
+        InitialValue=""
+        ErrorMessage="* Please select a status: Draft or Published"
+        ForeColor="Red"
+        Display="Dynamic" /><br />
+
+    <p style="font-size: small; color: gray;">
+        Note: Only modules with <strong>Published</strong> status will be visible to users.
+    </p>
+
 
     <asp:Button ID="btnAddModule" runat="server" Text="Add Module" OnClick="btnAddModule_Click" />
 </asp:Content>

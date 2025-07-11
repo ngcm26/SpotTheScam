@@ -137,7 +137,7 @@
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
                     <li><a class="dropdown-item" href="ScamChecker.aspx">Anti Scam Checker</a></li>
-                    <li><a class="dropdown-item" href="EducationModules.aspx">Education Modules</a></li>
+                    <li><a class="dropdown-item" href="UserModules.aspx">Education Modules</a></li>
                     <li><a class="dropdown-item" href="Quizzes.aspx">Quizzes</a></li>
                   </ul>
                 </li>

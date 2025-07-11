@@ -34,6 +34,14 @@ namespace SpotTheScam.Staff
             string status = ddlStatus.SelectedValue;
             string coverImagePath = "";
 
+            // Validation
+            if (string.IsNullOrEmpty(moduleName))
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Module name is required.";
+                return;
+            }
+
             try
             {
                 // Make sure the folder exists
@@ -45,12 +53,24 @@ namespace SpotTheScam.Staff
 
                 if (fuCoverImage.HasFile)
                 {
-                    string filename = Path.GetFileName(fuCoverImage.FileName);
+                    // Validate file type
+                    string fileExtension = Path.GetExtension(fuCoverImage.FileName).ToLower();
+                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+
+                    if (Array.IndexOf(allowedExtensions, fileExtension) == -1)
+                    {
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        lblMessage.Text = "Please select a valid image file (jpg, jpeg, png, gif, bmp).";
+                        return;
+                    }
+
+                    // Create unique filename to avoid conflicts
+                    string filename = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + Path.GetFileName(fuCoverImage.FileName);
                     string savePath = Path.Combine(folderPath, filename);
                     fuCoverImage.SaveAs(savePath);
 
-                    // Store relative path for DB
-                    coverImagePath = "~/Uploads/Modules/" + filename;
+                    // Store relative path for DB (without ~/)
+                    coverImagePath = "Uploads/Modules/" + filename;
                 }
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -73,6 +93,10 @@ namespace SpotTheScam.Staff
                     }
                 }
 
+                // Clear form after successful insertion
+                txtModuleName.Text = "";
+                ddlStatus.SelectedIndex = 0;
+
                 lblMessage.ForeColor = System.Drawing.Color.Green;
                 lblMessage.Text = "Module added successfully!";
             }
@@ -84,4 +108,3 @@ namespace SpotTheScam.Staff
         }
     }
 }
-

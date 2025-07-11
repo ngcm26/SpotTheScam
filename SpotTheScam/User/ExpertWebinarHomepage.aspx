@@ -3,9 +3,9 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .hero-section {
-            background: linear-gradient(135deg, var(--brand-orange) 0%, #e67e22 100%);
-            color: white;
-            padding: 60px 0;
+            background: #D36F2D;
+            color: #fff;
+            padding: 48px 20px 32px 20px;
             margin-bottom: 50px;
             width: 100vw;
             position: relative;
@@ -13,6 +13,7 @@
             right: 50%;
             margin-left: -50vw;
             margin-right: -50vw;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .hero-icon {
@@ -29,14 +30,21 @@
 
         .hero-title {
             font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-family: 'DM Sans', sans-serif;
         }
 
         .hero-description {
-            font-size: 1.1rem;
+            color: #fff;
+            text-align: center;
+            font-size: 1.08rem;
+            max-width: 700px;
+            margin: 0 auto 0 auto;
             line-height: 1.6;
-            opacity: 0.95;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .section-title {
@@ -268,19 +276,11 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <!-- Hero Section -->
     <div class="hero-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-2 col-md-3 text-center">
-                </div>
-                <div class="col-lg-10 col-md-9">
-                    <h1 class="hero-title">Webinar Sessions with Scam Experts</h1>
-                    <p class="hero-description">
-                        Want to learn more about the different ways to protect and prevent yourself from being a scam victim?
-                        Keen on listening to industry experts about various methods commonly used by scammers?
-                        Come join us for webinar sessions with experts to learn more about scams and have all your questions answered!
-                    </p>
-                </div>
-            </div>
+        <h1 class="hero-title">Webinar Sessions with Scam Experts</h1>
+        <div class="hero-description">
+            Want to learn more about the different ways to protect and prevent yourself from being a scam victim?
+            Keen on listening to industry experts about various methods commonly used by scammers?
+            Come join us for webinar sessions with experts to learn more about scams and have all your questions answered!
         </div>
     </div>
 
