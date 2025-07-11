@@ -66,9 +66,11 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Staff\StaffAddModules.aspx" />
+    <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\Quizzes.aspx" />
+    <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
@@ -98,6 +100,13 @@
     <Compile Include="Staff\StaffAddModules.aspx.designer.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\CreateBlog.aspx.cs">
+      <DependentUpon>CreateBlog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\CreateBlog.aspx.designer.cs">
+      <DependentUpon>CreateBlog.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\FakeOCBCLogin.aspx.cs">
       <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -118,6 +127,13 @@
     </Compile>
     <Compile Include="User\Quizzes.aspx.designer.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserBlog.aspx.cs">
+      <DependentUpon>UserBlog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserBlog.aspx.designer.cs">
+      <DependentUpon>UserBlog.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserWebinarRegistration.aspx.cs">
       <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>

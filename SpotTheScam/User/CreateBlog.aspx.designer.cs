@@ -7,9 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SpotTheScam.User {
-    
-    
-    public partial class UserBlog {
+namespace SpotTheScam.User
+{
+
+
+    public partial class CreateBlog
+    {
     }
 }
