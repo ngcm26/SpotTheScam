@@ -368,5 +368,5 @@ FodyWeavers.xsd
 App_Data/
 
 # EXCEPTION: Do NOT ignore database files in SpotTheScam/App_Data/
-!SpotTheScam/App_Data/*.mdf
-!SpotTheScam/App_Data/*.ldf
+!SpotTheScam/SpotTheScam/SpotTheScam/Database/*.mdf
+!SpotTheScam/SpotTheScam/SpotTheScam/Database/*.ldf
