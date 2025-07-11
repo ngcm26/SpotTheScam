@@ -69,7 +69,7 @@
                             <li class="nav-item"><a class="nav-link" href="StaffDashboard.aspx">Dashboard</a></li>
                             <li class="nav-item"><a class="nav-link" href="ManageUsers.aspx">Manage Users</a></li>
                             <li class="nav-item"><a class="nav-link" href="StaffExpertWebinar.aspx">Expert Webinars</a></li>
-                            <li class="nav-item"><a class="nav-link" href="AddModules.aspx">Add Modules</a></li>
+                            <li class="nav-item"><a class="nav-link" href="StaffAddModules.aspx">Add Modules</a></li>
                             <li class="nav-item"><a class="nav-link btn btn-sm btn-danger text-white ms-2" href="StaffLogout.aspx">Logout</a></li>
                         </asp:PlaceHolder>
                     </ul>

@@ -21,6 +21,10 @@ namespace SpotTheScam.User
                     return;
                 }
 
+                // Initially hide the add account form and show the bank selection
+                pnlAddAccountForm.Visible = false;
+                pnlBankSelection.Visible = true;
+
                 LoadBankAccounts();
             }
         }

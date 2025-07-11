@@ -128,13 +128,12 @@ namespace SpotTheScam.User
         protected override void OnLoadComplete(EventArgs e)
         {
             base.OnLoadComplete(e);
-            // This handles the postback from JavaScript for dot clicks
             if (Request["__EVENTTARGET"] == "AccountDotClick")
             {
                 if (int.TryParse(Request["__EVENTARGUMENT"], out int index))
                 {
                     currentAccountIndex = index;
-                    LoadUserAccountsForOverview(); // Reload to display the correct account
+                    LoadUserAccountsForOverview();
                 }
             }
         }
