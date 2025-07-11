@@ -21,21 +21,21 @@
             <tr>
                 <td class="auto-style3">Blog Title:</td>
                 <td class="auto-style4">
-                    <asp:Button ID="Button1" runat="server" Text="Publish" />
+                    <asp:Button ID="btn_Publish" runat="server" Text="Publish" />
                 </td>
             </tr>
         </table>
-        <asp:TextBox ID="TextBox3" runat="server" Width="288px"></asp:TextBox>
+        <asp:TextBox ID="tb_BlogTitle" runat="server" OnTextChanged="TextBox3_TextChanged" Width="288px"></asp:TextBox>
         <br />
         <br />
         <br />
         Blog Image:<br />
-        <asp:FileUpload ID="FileUpload1" runat="server" />
+        <asp:FileUpload ID="blog_FileUpload" runat="server" />
         <br />
         <br />
         <br />
         Content:<br />
-        <textarea id="TextArea1" class="auto-style1" name="S1"></textarea><br />
+        <textarea id="tb_BlogContent" class="auto-style1" name="S1"></textarea><br />
 
     </div>
 </asp:Content>
