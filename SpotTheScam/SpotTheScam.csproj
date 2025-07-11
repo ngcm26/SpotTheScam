@@ -65,13 +65,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Staff\StaffAddModules.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\Quizzes.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
-    <Content Include="Staff\AddModules.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffExpertWebinar.aspx" />
@@ -90,6 +90,13 @@
   <ItemGroup>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\StaffAddModules.aspx.cs">
+      <DependentUpon>StaffAddModules.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffAddModules.aspx.designer.cs">
+      <DependentUpon>StaffAddModules.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\FakeOCBCLogin.aspx.cs">
       <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
@@ -132,13 +139,6 @@
     </Compile>
     <Compile Include="User\ExpertWebinarHomepage.aspx.designer.cs">
       <DependentUpon>ExpertWebinarHomepage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Staff\AddModules.aspx.cs">
-      <DependentUpon>AddModules.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Staff\AddModules.aspx.designer.cs">
-      <DependentUpon>AddModules.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\ManageUsers.aspx.cs">
       <DependentUpon>ManageUsers.aspx</DependentUpon>
@@ -244,7 +244,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Uploads\Modules\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
