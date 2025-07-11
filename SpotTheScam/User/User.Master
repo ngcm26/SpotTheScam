@@ -146,7 +146,7 @@
                   <a class="nav-link" href="Blogs.aspx">Blogs & Forum</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="Transactions.aspx">Transaction Logs</a>
+                  <a class="nav-link" href="UserTransactionLogs.aspx">Transaction Logs</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="ExpertWebinarHomepage.aspx">Expert Webinar Session</a>
