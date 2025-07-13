@@ -15,6 +15,15 @@ namespace SpotTheScam.Staff
     {
 
         /// <summary>
+        /// btnBack control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnBack;
+
+        /// <summary>
         /// lblMessage control.
         /// </summary>
         /// <remarks>
@@ -112,5 +121,21 @@ namespace SpotTheScam.Staff
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnAddModule;
+
+        protected global::System.Web.UI.WebControls.TextBox txtDescription;
+        protected global::System.Web.UI.WebControls.TextBox txtIntroduction;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader1;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader1Text;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader2;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader2Text;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader3;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader3Text;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader4;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader4Text;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader5;
+        protected global::System.Web.UI.WebControls.TextBox txtHeader5Text;
+        protected global::System.Web.UI.WebControls.FileUpload fuImage1;
+        protected global::System.Web.UI.WebControls.FileUpload fuImage2;
+        protected global::System.Web.UI.WebControls.Button btnSaveModuleDetails;
     }
 }

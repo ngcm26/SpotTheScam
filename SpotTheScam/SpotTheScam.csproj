@@ -66,9 +66,11 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Staff\StaffAddModules.aspx" />
+    <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
+    <Content Include="User\ModuleDetails.aspx" />
     <Content Include="User\Quizzes.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
@@ -101,6 +103,13 @@
     <Compile Include="Staff\StaffAddModules.aspx.designer.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Staff\ViewModules.aspx.cs">
+      <DependentUpon>ViewModules.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\ViewModules.aspx.designer.cs">
+      <DependentUpon>ViewModules.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -121,6 +130,13 @@
     </Compile>
     <Compile Include="User\FakeUOBLogin.aspx.designer.cs">
       <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ModuleDetails.aspx.cs">
+      <DependentUpon>ModuleDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ModuleDetails.aspx.designer.cs">
+      <DependentUpon>ModuleDetails.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\Quizzes.aspx.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
