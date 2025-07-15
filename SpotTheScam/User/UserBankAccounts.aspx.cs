@@ -2,8 +2,10 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Web.UI.WebControls;
 using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Text; // Required for StringBuilder
+using System.Collections.Generic; // Required for List<DataRow>
 
 namespace SpotTheScam.User
 {
@@ -11,21 +13,177 @@ namespace SpotTheScam.User
     {
         private string connectionString = ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
 
+        // This list will now be populated from Session or DB on every load
+        private List<DataRow> userAccounts;
+
+        // Use a ViewState-backed property to reliably track the current account index
+        private int CurrentAccountIndex
+        {
+            get
+            {
+                // Retrieve from ViewState, default to 0 if not set
+                if (ViewState["CurrentAccountIndex"] == null)
+                    return 0;
+                return (int)ViewState["CurrentAccountIndex"];
+            }
+            set
+            {
+                ViewState["CurrentAccountIndex"] = value;
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+            if (Session["UserId"] == null)
             {
-                if (Session["UserId"] == null)
+                Response.Redirect("~/User/UserLogin.aspx");
+                return;
+            }
+
+            // Always attempt to load the user accounts data
+            // It will either come from Session (if already loaded) or from the DB
+            LoadUserAccountsForOverview(); // This method is now responsible for populating 'userAccounts' from Session or DB
+
+            // Load accounts for the GridView (Transaction Logs) - separate data source
+            LoadBankAccounts();
+        }
+
+        private void LoadUserAccountsForOverview()
+        {
+            int currentUserId = Convert.ToInt32(Session["UserId"]);
+            decimal totalBalance = 0;
+            DataTable dtAccounts;
+
+            // Check if account data is already in Session
+            if (Session["UserBankAccountsData"] != null)
+            {
+                dtAccounts = (DataTable)Session["UserBankAccountsData"];
+            }
+            else // If not in Session, load from database
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    Response.Redirect("~/User/UserLogin.aspx");
-                    return;
+                    string query = "SELECT AccountId, BankName, AccountType, AccountNumber, AccountNickname, Balance FROM BankAccounts WHERE UserId = @UserId ORDER BY DateAdded ASC";
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    da.SelectCommand.Parameters.AddWithValue("@UserId", currentUserId);
+
+                    dtAccounts = new DataTable();
+                    da.Fill(dtAccounts);
+
+                    // Store the DataTable in Session for subsequent postbacks
+                    Session["UserBankAccountsData"] = dtAccounts;
                 }
+            }
 
-                // Initially hide the add account form and show the bank selection
-                pnlAddAccountForm.Visible = false;
-                pnlBankSelection.Visible = true;
+            // Populate the local userAccounts list and calculate total balance
+            userAccounts = new List<DataRow>();
+            foreach (DataRow row in dtAccounts.Rows)
+            {
+                userAccounts.Add(row);
+                totalBalance += Convert.ToDecimal(row["Balance"]);
+            }
 
-                LoadBankAccounts();
+            ltTotalBalance.Text = totalBalance.ToString("C2"); // Format as currency
+
+            if (userAccounts.Count > 0)
+            {
+                pnlNoAccounts.Visible = false;
+                pnlAccountOverview.Visible = true;
+                DisplayCurrentAccount(); // Display the account based on CurrentAccountIndex
+                RenderPaginationDots(); // Render pagination dots
+            }
+            else
+            {
+                pnlNoAccounts.Visible = true;
+                pnlAccountOverview.Visible = false;
+            }
+        }
+
+        private void DisplayCurrentAccount()
+        {
+            if (userAccounts != null && userAccounts.Count > 0)
+            {
+                // Ensure CurrentAccountIndex is within bounds after navigation
+                if (CurrentAccountIndex < 0) CurrentAccountIndex = userAccounts.Count - 1;
+                if (CurrentAccountIndex >= userAccounts.Count) CurrentAccountIndex = 0;
+
+                // Create a new DataTable containing only the current account's data for the Repeater
+                // This is how your current Repeater binding is set up to show one card at a time.
+                DataTable dtCurrentAccount = new DataTable();
+                dtCurrentAccount.Columns.Add("AccountId", typeof(int));
+                dtCurrentAccount.Columns.Add("BankName", typeof(string));
+                dtCurrentAccount.Columns.Add("AccountType", typeof(string));
+                dtCurrentAccount.Columns.Add("AccountNumber", typeof(string));
+                dtCurrentAccount.Columns.Add("AccountNickname", typeof(string));
+                dtCurrentAccount.Columns.Add("Balance", typeof(decimal));
+
+                dtCurrentAccount.ImportRow(userAccounts[CurrentAccountIndex]);
+
+                rptAccounts.DataSource = dtCurrentAccount;
+                rptAccounts.DataBind();
+            }
+            else
+            {
+                rptAccounts.DataSource = null; // Clear repeater if no accounts
+                rptAccounts.DataBind();
+            }
+        }
+
+        private void RenderPaginationDots()
+        {
+            // Clear existing dots first
+            accountDots.InnerHtml = "";
+
+            if (userAccounts != null && userAccounts.Count > 1)
+            {
+                StringBuilder dotsHtml = new StringBuilder();
+                for (int i = 0; i < userAccounts.Count; i++)
+                {
+                    string activeClass = (i == CurrentAccountIndex) ? " active" : "";
+                    // Using __doPostBack to handle dot clicks server-side
+                    dotsHtml.Append($"<span class=\"pagination-dot{activeClass}\" onclick=\"__doPostBack('AccountDotClick', '{i}')\"></span>");
+                }
+                accountDots.InnerHtml = dotsHtml.ToString();
+            }
+            else
+            {
+                // Ensure dots are hidden if 0 or 1 account
+                accountDots.InnerHtml = "";
+            }
+        }
+
+        protected void btnPrevAccount_Click(object sender, EventArgs e)
+        {
+            if (userAccounts != null && userAccounts.Count > 0)
+            {
+                CurrentAccountIndex--; // Decrement index
+                DisplayCurrentAccount();
+                RenderPaginationDots();
+            }
+        }
+
+        protected void btnNextAccount_Click(object sender, EventArgs e)
+        {
+            if (userAccounts != null && userAccounts.Count > 0)
+            {
+                CurrentAccountIndex++; // Increment index
+                DisplayCurrentAccount();
+                RenderPaginationDots();
+            }
+        }
+
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+            // This handles clicks on the pagination dots
+            if (Request["__EVENTTARGET"] == "AccountDotClick")
+            {
+                if (int.TryParse(Request["__EVENTARGUMENT"], out int index))
+                {
+                    CurrentAccountIndex = index;
+                    // Reload overview, which will re-display current account and dots
+                    LoadUserAccountsForOverview();
+                }
             }
         }
 
@@ -54,101 +212,10 @@ namespace SpotTheScam.User
             }
         }
 
-        protected void btnAddAccount_Click(object sender, EventArgs e)
-        {
-            if (!Page.IsValid)
-            {
-                return;
-            }
-
-            if (Session["UserId"] == null)
-            {
-                ShowAlert("User ID not found in session. Please log in again.", "danger");
-                Response.Redirect("~/User/UserLogin.aspx");
-                return;
-            }
-
-            int currentUserId = Convert.ToInt32(Session["UserId"]);
-
-            string bankName = txtBankName.Text.Trim();
-            string accountType = txtAccountType.Text.Trim();
-            string accountNumber = txtAccountNumber.Text.Trim();
-            string accountNickname = txtAccountNickname.Text.Trim();
-            decimal balance = Convert.ToDecimal(txtBalance.Text.Trim());
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    string checkDuplicateQuery = "SELECT COUNT(*) FROM BankAccounts WHERE AccountNumber = @AccountNumber AND UserId = @UserId";
-                    SqlCommand checkCmd = new SqlCommand(checkDuplicateQuery, conn);
-                    checkCmd.Parameters.AddWithValue("@AccountNumber", accountNumber);
-                    checkCmd.Parameters.AddWithValue("@UserId", currentUserId);
-                    int existingAccounts = (int)checkCmd.ExecuteScalar();
-
-                    if (existingAccounts > 0)
-                    {
-                        ShowAlert("An account with this number already exists for your user. Please use a different account number.", "danger");
-                        return;
-                    }
-
-                    string query = @"INSERT INTO BankAccounts (UserId, BankName, AccountType, AccountNumber, AccountNickname, Balance)
-                                   VALUES (@UserId, @BankName, @AccountType, @AccountNumber, @AccountNickname, @Balance)";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-
-                    cmd.Parameters.AddWithValue("@UserId", currentUserId);
-                    cmd.Parameters.AddWithValue("@BankName", bankName);
-                    cmd.Parameters.AddWithValue("@AccountType", accountType);
-                    cmd.Parameters.AddWithValue("@AccountNumber", accountNumber);
-                    cmd.Parameters.AddWithValue("@AccountNickname", accountNickname);
-                    cmd.Parameters.AddWithValue("@Balance", balance);
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        ShowAlert("Bank account added successfully!", "success");
-                        ClearForm();
-                        LoadBankAccounts();
-                    }
-                    else
-                    {
-                        ShowAlert("Failed to add bank account. Please try again.", "danger");
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    ShowAlert("An account with this number already exists. Please use a different account number.", "danger");
-                }
-                else
-                {
-                    ShowAlert("A database error occurred while adding the account: " + ex.Message, "danger");
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowAlert("An unexpected error occurred while adding the account: " + ex.Message, "danger");
-            }
-        }
-
-        private void ClearForm()
-        {
-            txtBankName.Text = string.Empty;
-            txtAccountType.Text = "Savings";
-            txtAccountNumber.Text = string.Empty;
-            txtAccountNickname.Text = string.Empty;
-            txtBalance.Text = string.Empty;
-        }
-
         private void ShowAlert(string message, string type)
         {
-            AlertPanel.CssClass = $"alert alert-{type}";
+            string cssClass = type == "success" ? "alert alert-success" : "alert alert-danger"; // Changed 'error' to 'danger' for consistency with Bootstrap-like alerts
+            AlertPanel.CssClass = cssClass;
             AlertMessage.Text = message;
             AlertPanel.Visible = true;
 
@@ -243,6 +310,7 @@ namespace SpotTheScam.User
 
             gvBankAccounts.EditIndex = -1;
             LoadBankAccounts();
+            LoadUserAccountsForOverview(); // Reload the overview to reflect changes
         }
 
         protected void gvBankAccounts_RowDeleting(object sender, GridViewDeleteEventArgs e)
@@ -277,6 +345,7 @@ namespace SpotTheScam.User
             }
 
             LoadBankAccounts();
+            LoadUserAccountsForOverview(); // Reload the overview to reflect changes
         }
 
         protected void gvBankAccounts_RowDataBound(object sender, GridViewRowEventArgs e)

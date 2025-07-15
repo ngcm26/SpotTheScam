@@ -67,6 +67,7 @@
     <Content Include="Global.asax" />
     <Content Include="Staff\StaffAddModules.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
+    <Content Include="User\AddBankAccounts.aspx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
@@ -109,6 +110,13 @@
     </Compile>
     <Compile Include="Staff\ViewModules.aspx.designer.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\AddBankAccounts.aspx.cs">
+      <DependentUpon>AddBankAccounts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\AddBankAccounts.aspx.designer.cs">
+      <DependentUpon>AddBankAccounts.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\Blog.cs" />
     <Compile Include="User\CreateBlog.aspx.cs">
