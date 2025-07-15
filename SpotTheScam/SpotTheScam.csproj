@@ -71,7 +71,11 @@
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\ModuleDetails.aspx" />
+    <Content Include="User\PhoneScamsQuiz.aspx" />
+    <Content Include="User\QuizCompletion.aspx" />
     <Content Include="User\Quizzes.aspx" />
+    <Content Include="User\RecoverySupport.aspx" />
+    <Content Include="User\ScamRecoveryGuidance.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
@@ -139,12 +143,37 @@
     <Compile Include="User\ModuleDetails.aspx.designer.cs">
       <DependentUpon>ModuleDetails.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\PhoneScamsQuiz.aspx.cs">
+      <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\PhoneScamsQuiz.aspx.designer.cs">
+      <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\QuizCompletion.aspx.cs">
+      <DependentUpon>QuizCompletion.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\QuizCompletion.aspx.designer.cs">
+      <DependentUpon>QuizCompletion.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\Quizzes.aspx.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\Quizzes.aspx.designer.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\RecoverySupport.aspx.cs">
+      <DependentUpon>RecoverySupport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\RecoverySupport.aspx.designer.cs">
+      <DependentUpon>RecoverySupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ScamRecoveryGuidance.aspx.cs">
+      <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ScamRecoveryGuidance.aspx.designer.cs">
+      <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserBlog.aspx.cs">
       <DependentUpon>UserBlog.aspx</DependentUpon>
