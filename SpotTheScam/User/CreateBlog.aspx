@@ -17,7 +17,8 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="text-start">
 
-        &nbsp;<table class="w-100">
+        &nbsp;<asp:Button ID="btn_back" runat="server" Text="Back" />
+        <table class="w-100">
             <tr>
                 <td class="auto-style3">Blog Title:</td>
                 <td class="auto-style4">

@@ -110,6 +110,7 @@
     <Compile Include="Staff\ViewModules.aspx.designer.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\Blog.cs" />
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
