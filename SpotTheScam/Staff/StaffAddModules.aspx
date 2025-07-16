@@ -25,6 +25,22 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .cover-image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+        .cover-image-preview .placeholder-text {
+            color: #bcbcbc;
+            font-size: 1.2em;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         .cover-image-label {
             text-align: center;
@@ -32,6 +48,7 @@
             font-size: 1.15em;
             font-weight: 500;
             margin-top: 0.5em;
+            cursor: pointer;
         }
         .module-info-section {
             flex: 1;
@@ -111,15 +128,112 @@
             display: block;
         }
     </style>
+    
+    <script type="text/javascript">
+        function previewCoverImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('coverImagePreview');
+                    var placeholder = document.getElementById('coverImagePlaceholder');
+                    
+                    // Clear existing content
+                    preview.innerHTML = '';
+                    
+                    // Create image element
+                    var img = document.createElement('img');
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '16px';
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                    
+                    // Create remove button
+                    var removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.innerHTML = '✕';
+                    removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; font-weight: bold;';
+                    removeBtn.onclick = function() { removeCoverImage(); };
+                    preview.appendChild(removeBtn);
+                    
+                    // Hide placeholder text
+                    if (placeholder) {
+                        placeholder.style.display = 'none';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function removeCoverImage() {
+            var preview = document.getElementById('coverImagePreview');
+            var placeholder = document.getElementById('coverImagePlaceholder');
+            var fileInput = document.getElementById('<%= fuCoverImage.ClientID %>');
+            
+            // Clear preview
+            preview.innerHTML = '<span id="coverImagePlaceholder" class="placeholder-text">Cover image</span>';
+            
+            // Clear file input
+            fileInput.value = '';
+        }
+        
+        function previewImage1(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('image1Preview');
+                    if (preview) {
+                        preview.innerHTML = '<div style="position: relative; display: inline-block; margin-top: 10px;"><img src="' + e.target.result + '" style="max-width: 200px; max-height: 150px; border-radius: 8px;" /><button type="button" onclick="removeImage1()" style="position: absolute; top: 4px; right: 4px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 10px; font-weight: bold;">✕</button></div>';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function removeImage1() {
+            var preview = document.getElementById('image1Preview');
+            var fileInput = document.getElementById('<%= fuImage1.ClientID %>');
+            
+            // Clear preview
+            preview.innerHTML = '';
+            
+            // Clear file input
+            fileInput.value = '';
+        }
+        
+        function previewImage2(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('image2Preview');
+                    if (preview) {
+                        preview.innerHTML = '<div style="position: relative; display: inline-block; margin-top: 10px;"><img src="' + e.target.result + '" style="max-width: 200px; max-height: 150px; border-radius: 8px;" /><button type="button" onclick="removeImage2()" style="position: absolute; top: 4px; right: 4px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 10px; font-weight: bold;">✕</button></div>';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function removeImage2() {
+            var preview = document.getElementById('image2Preview');
+            var fileInput = document.getElementById('<%= fuImage2.ClientID %>');
+            
+            // Clear preview
+            preview.innerHTML = '';
+            
+            // Clear file input
+            fileInput.value = '';
+        }
+    </script>
     <!-- Main form, now stretches edge to edge -->
     <div class="add-module-container">
         <!-- Left: Cover Image Preview -->
         <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="cover-image-preview">
-                <!-- Optionally show preview if available -->
-                <span style="color: #bcbcbc; font-size: 1.2em;">Cover image</span>
+            <div class="cover-image-preview" id="coverImagePreview">
+                <span id="coverImagePlaceholder" class="placeholder-text">Cover image</span>
             </div>
-            <asp:FileUpload ID="fuCoverImage" runat="server" CssClass="form-input" style="display:none;" />
+            <asp:FileUpload ID="fuCoverImage" runat="server" CssClass="form-input" style="display:none;" onchange="previewCoverImage(this);" />
             <label for="<%= fuCoverImage.ClientID %>" class="cover-image-label" style="cursor:pointer;">Change cover image</label>
         </div>
         <!-- Right: Module Information -->
@@ -193,9 +307,11 @@
         <asp:RequiredFieldValidator ID="rfvHeader5Text" runat="server" ControlToValidate="txtHeader5Text" ErrorMessage="Text for Header 5 is required." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
 
         <label for="fuImage1" class="form-label">Image 1:</label>
-        <asp:FileUpload ID="fuImage1" runat="server" CssClass="form-input" />
+        <asp:FileUpload ID="fuImage1" runat="server" CssClass="form-input" onchange="previewImage1(this);" />
+        <div id="image1Preview"></div>
         <label for="fuImage2" class="form-label">Image 2:</label>
-        <asp:FileUpload ID="fuImage2" runat="server" CssClass="form-input" />
+        <asp:FileUpload ID="fuImage2" runat="server" CssClass="form-input" onchange="previewImage2(this);" />
+        <div id="image2Preview"></div>
         <div class="form-actions">
             <asp:Button ID="btnAddModule" runat="server" Text="Add Module" OnClick="btnAddModule_Click" CssClass="btn btn-primary" />
         </div>

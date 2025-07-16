@@ -66,6 +66,7 @@
   <ItemGroup>
     <Content Include="Staff\EditModule.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Staff\EditUsers.aspx" />
     <Content Include="Staff\IndividualBlogStafff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
@@ -114,6 +115,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\EditUsers.aspx.cs">
+      <DependentUpon>EditUsers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\EditUsers.aspx.designer.cs">
+      <DependentUpon>EditUsers.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\IndividualBlogStafff.aspx.cs">
       <DependentUpon>IndividualBlogStafff.aspx</DependentUpon>
