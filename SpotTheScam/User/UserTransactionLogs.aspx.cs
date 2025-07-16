@@ -169,16 +169,18 @@ namespace SpotTheScam.User
                 StringBuilder queryBuilder = new StringBuilder();
                 queryBuilder.Append(@"
                     SELECT 
-                        bt.TransactionId,
-                        bt.TransactionDate,
-                        bt.TransactionTime,
-                        bt.Description,
-                        bt.TransactionType,
-                        bt.Amount,
-                        bt.SenderRecipient,
-                        bt.BalanceAfterTransaction,
-                        ba.BankName,
-                        ba.AccountNickname
+                    bt.TransactionId,
+                    bt.TransactionDate,
+                    bt.TransactionTime,
+                    bt.Description,
+                    bt.TransactionType,
+                    bt.Amount,
+                    bt.SenderRecipient,
+                    bt.BalanceAfterTransaction,
+                    bt.IsFlagged,
+                    bt.Severity,
+                    ba.BankName,
+                    ba.AccountNickname
                     FROM BankTransactions bt
                     INNER JOIN BankAccounts ba ON bt.AccountId = ba.AccountId
                     WHERE bt.UserId = @UserId
@@ -413,5 +415,28 @@ namespace SpotTheScam.User
             ";
             ScriptManager.RegisterStartupScript(this, GetType(), "HideAlert", script, true);
         }
+
+        protected void gvTransactions_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                bool isFlagged = false;
+                string severity = "";
+
+                if (DataBinder.Eval(e.Row.DataItem, "IsFlagged") != DBNull.Value)
+                    isFlagged = Convert.ToBoolean(DataBinder.Eval(e.Row.DataItem, "IsFlagged"));
+                if (DataBinder.Eval(e.Row.DataItem, "Severity") != DBNull.Value)
+                    severity = DataBinder.Eval(e.Row.DataItem, "Severity").ToString();
+
+                if (isFlagged)
+                {
+                    if (severity == "red")
+                        e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#fee2e2"); // light red
+                    else if (severity == "yellow")
+                        e.Row.BackColor = System.Drawing.ColorTranslator.FromHtml("#fefcbf"); // light yellow
+                }
+            }
+        }
+
     }
 }

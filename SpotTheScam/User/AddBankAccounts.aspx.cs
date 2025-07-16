@@ -290,8 +290,31 @@ namespace SpotTheScam.User
         // Helper method to insert a single transaction
         private static void InsertMockTransaction(SqlConnection conn, SqlTransaction transaction, int accountId, int userId, DateTime date, TimeSpan time, string description, string type, decimal amount, decimal balanceAfter, string senderRecipient)
         {
-            string query = @"INSERT INTO BankTransactions (AccountId, UserId, TransactionDate, TransactionTime, Description, TransactionType, Amount, BalanceAfterTransaction, SenderRecipient)
-                             VALUES (@AccountId, @UserId, @TransactionDate, @TransactionTime, @Description, @TransactionType, @Amount, @BalanceAfterTransaction, @SenderRecipient)";
+            // Flagging logic
+            bool isFlagged = false;
+            string severity = null;
+
+            // Rule 1: Large amount
+            if (amount > 500)
+            {
+                isFlagged = true;
+                severity = "red";
+            }
+            // Rule 2: Unknown recipient (simple check for demo)
+            else if (senderRecipient != null && (senderRecipient.ToLower().Contains("unknown") || senderRecipient.ToLower().Contains("suspicious")))
+            {
+                isFlagged = true;
+                severity = "yellow";
+            }
+            // Rule 3: Time outside 7am–9pm
+            else if (time < TimeSpan.FromHours(7) || time > TimeSpan.FromHours(21))
+            {
+                isFlagged = true;
+                severity = "yellow";
+            }
+
+            string query = @"INSERT INTO BankTransactions (AccountId, UserId, TransactionDate, TransactionTime, Description, TransactionType, Amount, BalanceAfterTransaction, SenderRecipient, IsFlagged, Severity)
+                     VALUES (@AccountId, @UserId, @TransactionDate, @TransactionTime, @Description, @TransactionType, @Amount, @BalanceAfterTransaction, @SenderRecipient, @IsFlagged, @Severity)";
             using (SqlCommand cmd = new SqlCommand(query, conn, transaction))
             {
                 cmd.Parameters.AddWithValue("@AccountId", accountId);
@@ -302,7 +325,9 @@ namespace SpotTheScam.User
                 cmd.Parameters.AddWithValue("@TransactionType", type);
                 cmd.Parameters.AddWithValue("@Amount", amount);
                 cmd.Parameters.AddWithValue("@BalanceAfterTransaction", balanceAfter);
-                cmd.Parameters.AddWithValue("@SenderRecipient", senderRecipient);
+                cmd.Parameters.AddWithValue("@SenderRecipient", senderRecipient ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@IsFlagged", isFlagged);
+                cmd.Parameters.AddWithValue("@Severity", (object)severity ?? DBNull.Value);
                 cmd.ExecuteNonQuery();
             }
         }

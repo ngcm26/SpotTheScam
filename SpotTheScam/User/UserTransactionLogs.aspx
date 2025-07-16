@@ -28,9 +28,9 @@
             transition: background-color 0.3s ease;
         }
 
-        .btn-primary:hover {
-            background-color: #4338ca;
-        }
+            .btn-primary:hover {
+                background-color: #4338ca;
+            }
 
         .btn-secondary {
             background-color: #6b7280;
@@ -40,9 +40,9 @@
             transition: background-color 0.3s ease;
         }
 
-        .btn-secondary:hover {
-            background-color: #4b5563;
-        }
+            .btn-secondary:hover {
+                background-color: #4b5563;
+            }
 
         .alert {
             padding: 1rem;
@@ -95,9 +95,9 @@
             margin-right: 0.5rem;
         }
 
-        .gv-actions a:hover {
-            text-decoration: underline;
-        }
+            .gv-actions a:hover {
+                text-decoration: underline;
+            }
 
         /* Account Carousel Styling */
         .account-card-container {
@@ -117,26 +117,26 @@
             margin-right: 1rem; /* Space between cards */
         }
 
-        .account-card:last-child {
-            margin-right: 0;
-        }
+            .account-card:last-child {
+                margin-right: 0;
+            }
 
-        .account-card h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
+            .account-card h3 {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
 
-        .account-card p {
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
+            .account-card p {
+                font-size: 1rem;
+                margin-bottom: 0.25rem;
+            }
 
-        .account-card .balance {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-top: 1rem;
-        }
+            .account-card .balance {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-top: 1rem;
+            }
 
         .pagination-dots {
             display: flex;
@@ -155,9 +155,9 @@
             transition: background-color 0.3s ease;
         }
 
-        .pagination-dot.active {
-            background-color: #4f46e5;
-        }
+            .pagination-dot.active {
+                background-color: #4f46e5;
+            }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -178,7 +178,9 @@
             <asp:Panel ID="pnlAccountOverview" runat="server" Visible="false">
                 <div class="mb-4">
                     <p class="text-gray-600 text-lg">Total Balance Across All Accounts:</p>
-                    <p class="text-4xl font-bold text-indigo-700"><asp:Literal ID="ltTotalBalance" runat="server"></asp:Literal></p>
+                    <p class="text-4xl font-bold text-indigo-700">
+                        <asp:Literal ID="ltTotalBalance" runat="server"></asp:Literal>
+                    </p>
                 </div>
 
                 <div class="relative flex items-center">
@@ -267,10 +269,21 @@
         <div class="card p-6 overflow-x-auto">
             <asp:GridView ID="gvTransactions" runat="server" AutoGenerateColumns="False" AllowPaging="True" PageSize="10"
                 OnPageIndexChanging="gvTransactions_PageIndexChanging"
+                OnRowDataBound="gvTransactions_RowDataBound"
                 CssClass="min-w-full divide-y divide-gray-200" HeaderStyle-CssClass="gv-header" RowStyle-CssClass="gv-row">
                 <Columns>
+                    <asp:TemplateField HeaderText="Flag">
+                        <ItemTemplate>
+                            <%# 
+                    (Eval("IsFlagged") != DBNull.Value && Convert.ToBoolean(Eval("IsFlagged"))) 
+                    ? $"<a href='TransactionDetails.aspx?tid={Eval("TransactionId")}'><i class='fas fa-exclamation-circle' style='color:{(Eval("Severity").ToString() == "red" ? "#e53e3e" : "#ecc94b")};' title='{Eval("Severity")} flagged'></i></a>" 
+                    : "" 
+                %>
+                        </ItemTemplate>
+                    </asp:TemplateField>
                     <asp:BoundField DataField="TransactionDate" HeaderText="Date" DataFormatString="{0:d}" />
-                    <asp:BoundField DataField="TransactionTime" HeaderText="Time" /> <%-- MODIFIED LINE --%>
+                    <asp:BoundField DataField="TransactionTime" HeaderText="Time" />
+                    <%-- MODIFIED LINE --%>
                     <asp:BoundField DataField="Description" HeaderText="Description" />
                     <asp:BoundField DataField="TransactionType" HeaderText="Type" />
                     <asp:BoundField DataField="Amount" HeaderText="Amount" DataFormatString="{0:C2}" />
