@@ -51,12 +51,13 @@ namespace SpotTheScam.User
                 }
                 if (result >= 0)
                 {
-                    string folderPath = Server.MapPath("~/Uploads/Blog_pictures/");
+                    string folderPath = Server.MapPath("~/Uploads/");
                     image = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(blog_FileUpload.FileName);
                     string fullPath = folderPath + image;
 
                     blog_FileUpload.SaveAs(fullPath);
                     Response.Write("<script>alert('You have successfully submitted your blog post. Your blog post will be verified by a staff before being published!');</script>");
+                    Response.Redirect("UserHome.aspx");
                 }
                 else
                 {
