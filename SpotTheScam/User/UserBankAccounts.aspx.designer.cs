@@ -42,157 +42,103 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Label AlertMessage;
 
         /// <summary>
-        /// pnlBankSelection control.
+        /// lnkViewAllAccounts control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlBankSelection;
+        protected global::System.Web.UI.WebControls.LinkButton lnkViewAllAccounts;
 
         /// <summary>
-        /// pnlAddAccountForm control.
+        /// hlAddAccount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlAddAccountForm;
+        protected global::System.Web.UI.WebControls.HyperLink hlAddAccount;
 
         /// <summary>
-        /// lblBankName control.
+        /// pnlAccountOverview control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblBankName;
+        protected global::System.Web.UI.WebControls.Panel pnlAccountOverview;
 
         /// <summary>
-        /// txtBankName control.
+        /// ltTotalBalance control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtBankName;
+        protected global::System.Web.UI.WebControls.Literal ltTotalBalance;
 
         /// <summary>
-        /// rfvBankName control.
+        /// btnPrevAccount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvBankName;
+        protected global::System.Web.UI.WebControls.LinkButton btnPrevAccount;
 
         /// <summary>
-        /// lblAccountType control.
+        /// pnlAccountCards control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAccountType;
+        protected global::System.Web.UI.WebControls.Panel pnlAccountCards;
 
         /// <summary>
-        /// txtAccountType control.
+        /// rptAccounts control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAccountType;
+        protected global::System.Web.UI.WebControls.Repeater rptAccounts;
 
         /// <summary>
-        /// lblAccountNumber control.
+        /// btnNextAccount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAccountNumber;
+        protected global::System.Web.UI.WebControls.LinkButton btnNextAccount;
 
         /// <summary>
-        /// txtAccountNumber control.
+        /// accountDots control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAccountNumber;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl accountDots;
 
         /// <summary>
-        /// rfvAccountNumber control.
+        /// pnlNoAccounts control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvAccountNumber;
+        protected global::System.Web.UI.WebControls.Panel pnlNoAccounts;
 
         /// <summary>
-        /// lblAccountNickname control.
+        /// btnAddFirstAccount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAccountNickname;
-
-        /// <summary>
-        /// txtAccountNickname control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAccountNickname;
-
-        /// <summary>
-        /// lblBalance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblBalance;
-
-        /// <summary>
-        /// txtBalance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtBalance;
-
-        /// <summary>
-        /// rfvBalance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvBalance;
-
-        /// <summary>
-        /// cvBalance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CompareValidator cvBalance;
-
-        /// <summary>
-        /// btnAddAccount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddAccount;
+        protected global::System.Web.UI.WebControls.Button btnAddFirstAccount;
 
         /// <summary>
         /// gvBankAccounts control.

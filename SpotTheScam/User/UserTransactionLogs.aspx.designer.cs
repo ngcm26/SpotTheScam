@@ -168,6 +168,51 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.DropDownList ddlAccount;
 
         /// <summary>
+        /// txtMinAmount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtMinAmount;
+
+        /// <summary>
+        /// cvMinAmount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CompareValidator cvMinAmount;
+
+        /// <summary>
+        /// txtMaxAmount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtMaxAmount;
+
+        /// <summary>
+        /// cvMaxAmount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CompareValidator cvMaxAmount;
+
+        /// <summary>
+        /// cvAmountRange control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CompareValidator cvAmountRange;
+
+        /// <summary>
         /// btnApplyFilters control.
         /// </summary>
         /// <remarks>
