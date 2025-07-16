@@ -358,7 +358,7 @@
             <asp:Repeater ID="rptModules" runat="server">
                 <ItemTemplate>
                     <div class="carousel-card-wrapper" style="display: none; flex-direction: column; align-items: center;">
-                        <a href="#" class="module-link" data-module-id='<%# Eval("module_id") %>' style="text-decoration:none;">
+                        <a href='ModuleInformation.aspx?module_id=<%# Eval("module_id") %>' class="module-link" style="text-decoration:none;">
                             <div class="module-card">
                                 <img src='<%# ResolveUrl(Eval("cover_image").ToString()) %>' alt="Module Cover" />
                             </div>
@@ -385,22 +385,7 @@
 
             console.log('isLoggedIn:', isLoggedIn);
 
-            function attachModuleClickHandlers() {
-                document.querySelectorAll('.module-link').forEach(function(link) {
-                    link.onclick = function(e) {
-                        if (isLoggedIn !== 'true') {
-                            e.preventDefault();
-                            var moduleId = link.dataset.moduleId;
-                            var returnUrl = encodeURIComponent(window.location.pathname + '?moduleId=' + moduleId);
-                            window.location.href = 'UserLogin.aspx?returnUrl=' + returnUrl;
-                        } else {
-                            // TODO: Navigate to module details or start module
-                            // window.location.href = 'ModuleDetails.aspx?id=' + link.dataset.moduleId;
-                        }
-                    };
-                });
-            }
-            attachModuleClickHandlers();
+            // No need for attachModuleClickHandlers, links now go directly to ModuleInformation.aspx
 
             function updateCarousel() {
                 cards.forEach((card, idx) => {
@@ -408,7 +393,7 @@
                 });
                 leftBtn.disabled = startIdx === 0;
                 rightBtn.disabled = (startIdx + visibleCount >= cards.length);
-                attachModuleClickHandlers();
+                // No need to re-attach handlers here as the links now navigate directly
             }
 
             leftBtn.addEventListener('click', function() {

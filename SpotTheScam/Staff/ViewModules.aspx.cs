@@ -45,12 +45,14 @@ namespace SpotTheScam.Staff
                 {
                     query += " ORDER BY date_created DESC";
                 }
+
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     if (!string.IsNullOrEmpty(search))
                         cmd.Parameters.AddWithValue("@search", "%" + search + "%");
                     if (!string.IsNullOrEmpty(status))
                         cmd.Parameters.AddWithValue("@status", status);
+
                     conn.Open();
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(dt);
@@ -70,7 +72,7 @@ namespace SpotTheScam.Staff
             if (e.CommandName == "EditModule")
             {
                 string moduleId = e.CommandArgument.ToString();
-                Response.Redirect($"StaffEditModule.aspx?module_id={moduleId}");
+                Response.Redirect($"EditModule.aspx?module_id={moduleId}");
             }
             else if (e.CommandName == "DeleteModule")
             {
@@ -78,8 +80,10 @@ namespace SpotTheScam.Staff
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = "DELETE FROM Modules WHERE module_id = @module_id";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+
+                    // Only delete from Modules — ModuleInformation will be auto-deleted (ON DELETE CASCADE)
+                    string deleteModule = "DELETE FROM Modules WHERE module_id = @module_id";
+                    using (SqlCommand cmd = new SqlCommand(deleteModule, conn))
                     {
                         cmd.Parameters.AddWithValue("@module_id", moduleId);
                         cmd.ExecuteNonQuery();
