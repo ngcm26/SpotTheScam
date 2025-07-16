@@ -240,6 +240,20 @@
                     <label for="<%=ddlAccount.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Select Account:</label>
                     <asp:DropDownList ID="ddlAccount" runat="server" CssClass="form-input"></asp:DropDownList>
                 </div>
+
+                <div>
+                    <label for="<%=txtMinAmount.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Min Amount:</label>
+                    <asp:TextBox ID="txtMinAmount" runat="server" CssClass="form-input" TextMode="Number"></asp:TextBox>
+                    <asp:CompareValidator ID="cvMinAmount" runat="server" ControlToValidate="txtMinAmount" Operator="DataTypeCheck" Type="Currency" ErrorMessage="*Must be a valid number" Display="Dynamic" CssClass="text-red-500 text-xs mt-1"></asp:CompareValidator>
+                </div>
+
+                <div>
+                    <label for="<%=txtMaxAmount.ClientID%>" class="block text-gray-700 text-sm font-bold mb-2">Max Amount:</label>
+                    <asp:TextBox ID="txtMaxAmount" runat="server" CssClass="form-input" TextMode="Number"></asp:TextBox>
+                    <asp:CompareValidator ID="cvMaxAmount" runat="server" ControlToValidate="txtMaxAmount" Operator="DataTypeCheck" Type="Currency" ErrorMessage="*Must be a valid number" Display="Dynamic" CssClass="text-red-500 text-xs mt-1"></asp:CompareValidator>
+                    <asp:CompareValidator ID="cvAmountRange" runat="server" ControlToValidate="txtMaxAmount" ControlToCompare="txtMinAmount" Operator="GreaterThanEqual" Type="Currency" ErrorMessage="*Max amount must be >= Min amount" Display="Dynamic" CssClass="text-red-500 text-xs mt-1"></asp:CompareValidator>
+                </div>
+
             </div>
             <div class="flex flex-wrap gap-4 justify-end">
                 <asp:Button ID="btnApplyFilters" runat="server" Text="Apply Filters" OnClick="btnApplyFilters_Click" CssClass="btn-primary" />

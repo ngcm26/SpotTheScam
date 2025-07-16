@@ -216,6 +216,22 @@ namespace SpotTheScam.User
                     cmd.Parameters.AddWithValue("@AccountId", Convert.ToInt32(ddlAccount.SelectedValue));
                 }
 
+                // --- NEW: Amount Range Filtering ---
+                decimal minAmount;
+                if (decimal.TryParse(txtMinAmount.Text, out minAmount))
+                {
+                    queryBuilder.Append(" AND bt.Amount >= @MinAmount");
+                    cmd.Parameters.AddWithValue("@MinAmount", minAmount);
+                }
+
+                decimal maxAmount;
+                if (decimal.TryParse(txtMaxAmount.Text, out maxAmount))
+                {
+                    queryBuilder.Append(" AND bt.Amount <= @MaxAmount");
+                    cmd.Parameters.AddWithValue("@MaxAmount", maxAmount);
+                }
+                // --- END NEW ---
+
                 queryBuilder.Append(" ORDER BY bt.TransactionDate DESC, bt.TransactionTime DESC");
 
                 cmd.CommandText = queryBuilder.ToString();
@@ -243,6 +259,10 @@ namespace SpotTheScam.User
             ddlTransactionType.SelectedValue = "All";
             txtSearch.Text = string.Empty;
             ddlAccount.SelectedValue = "All";
+            // --- NEW: Clear Amount Filters ---
+            txtMinAmount.Text = string.Empty;
+            txtMaxAmount.Text = string.Empty;
+            // --- END NEW ---
             LoadTransactions();
             ShowAlert("Filters cleared.", "success");
         }
@@ -305,6 +325,22 @@ namespace SpotTheScam.User
                     cmd.Parameters.AddWithValue("@AccountId", Convert.ToInt32(ddlAccount.SelectedValue));
                 }
 
+                // --- NEW: Amount Range Filtering for Export ---
+                decimal minAmount;
+                if (decimal.TryParse(txtMinAmount.Text, out minAmount))
+                {
+                    queryBuilder.Append(" AND bt.Amount >= @MinAmount");
+                    cmd.Parameters.AddWithValue("@MinAmount", minAmount);
+                }
+
+                decimal maxAmount;
+                if (decimal.TryParse(txtMaxAmount.Text, out maxAmount))
+                {
+                    queryBuilder.Append(" AND bt.Amount <= @MaxAmount");
+                    cmd.Parameters.AddWithValue("@MaxAmount", maxAmount);
+                }
+                // --- END NEW ---
+
                 queryBuilder.Append(" ORDER BY bt.TransactionDate DESC, bt.TransactionTime DESC");
 
                 cmd.CommandText = queryBuilder.ToString();
@@ -318,9 +354,13 @@ namespace SpotTheScam.User
             {
                 StringBuilder sb = new StringBuilder();
 
+                // Add BOM for UTF-8 compatibility with Excel
+                sb.Append("\uFEFF");
+
+                // Include all columns in CSV header
                 foreach (DataColumn col in dt.Columns)
                 {
-                    sb.AppendFormat("\"{0}\",", col.ColumnName);
+                    sb.AppendFormat("\"{0}\",", col.ColumnName.Replace("\"", "\"\""));
                 }
                 sb.AppendLine();
 
@@ -328,7 +368,9 @@ namespace SpotTheScam.User
                 {
                     foreach (DataColumn col in dt.Columns)
                     {
-                        sb.AppendFormat("\"{0}\",", row[col.ColumnName].ToString().Replace("\"", "\"\""));
+                        // Handle potential commas within data by enclosing in quotes
+                        string data = row[col.ColumnName].ToString();
+                        sb.AppendFormat("\"{0}\",", data.Replace("\"", "\"\""));
                     }
                     sb.AppendLine();
                 }
@@ -336,8 +378,8 @@ namespace SpotTheScam.User
                 Response.Clear();
                 Response.Buffer = true;
                 Response.AddHeader("content-disposition", "attachment;filename=TransactionLogs_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv");
-                Response.Charset = "";
-                Response.ContentType = "application/text";
+                Response.Charset = "UTF-8"; // Specify UTF-8 encoding
+                Response.ContentType = "application/csv"; // More appropriate content type
                 Response.Output.Write(sb.ToString());
                 Response.Flush();
                 Response.End();

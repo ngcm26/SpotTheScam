@@ -10,7 +10,7 @@
 
         /* Full-width banner that reaches page edges */
         .hero-banner {
-            background: linear-gradient(135deg, #FFFFFF 0%, #F5E6D3 100%);
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFF4E6 100%);
             padding: 2rem 2rem 2rem 3rem;
             text-align: left;
             margin: 0;
