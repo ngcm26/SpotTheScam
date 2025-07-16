@@ -72,8 +72,17 @@
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
+<<<<<<< HEAD
     <Content Include="User\ModuleInformation.aspx" />
+=======
+    <Content Include="User\ModuleDetails.aspx" />
+    <Content Include="User\PhoneScamsQuiz.aspx" />
+    <Content Include="User\PointsDebug.aspx" />
+    <Content Include="User\QuizCompletion.aspx" />
+>>>>>>> c6c45d90fa8d0d0a2cc0fa759c1e8ab317c27238
     <Content Include="User\Quizzes.aspx" />
+    <Content Include="User\RecoverySupport.aspx" />
+    <Content Include="User\ScamRecoveryGuidance.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
@@ -155,12 +164,47 @@
     <Compile Include="User\ModuleInformation.aspx.designer.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\PhoneScamsQuiz.aspx.cs">
+      <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\PhoneScamsQuiz.aspx.designer.cs">
+      <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\PointsDebug.aspx.cs">
+      <DependentUpon>PointsDebug.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\PointsDebug.aspx.designer.cs">
+      <DependentUpon>PointsDebug.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\QuizCompletion.aspx.cs">
+      <DependentUpon>QuizCompletion.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\QuizCompletion.aspx.designer.cs">
+      <DependentUpon>QuizCompletion.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\Quizzes.aspx.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\Quizzes.aspx.designer.cs">
       <DependentUpon>Quizzes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\RecoverySupport.aspx.cs">
+      <DependentUpon>RecoverySupport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\RecoverySupport.aspx.designer.cs">
+      <DependentUpon>RecoverySupport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ScamRecoveryGuidance.aspx.cs">
+      <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ScamRecoveryGuidance.aspx.designer.cs">
+      <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserBlog.aspx.cs">
       <DependentUpon>UserBlog.aspx</DependentUpon>
