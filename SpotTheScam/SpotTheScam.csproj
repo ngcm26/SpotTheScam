@@ -1,4 +1,4 @@
-﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -72,14 +72,11 @@
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
-<<<<<<< HEAD
     <Content Include="User\ModuleInformation.aspx" />
-=======
     <Content Include="User\ModuleDetails.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
     <Content Include="User\PointsDebug.aspx" />
     <Content Include="User\QuizCompletion.aspx" />
->>>>>>> c6c45d90fa8d0d0a2cc0fa759c1e8ab317c27238
     <Content Include="User\Quizzes.aspx" />
     <Content Include="User\RecoverySupport.aspx" />
     <Content Include="User\ScamRecoveryGuidance.aspx" />
