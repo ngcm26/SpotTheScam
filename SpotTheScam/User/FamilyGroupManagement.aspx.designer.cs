@@ -15,6 +15,33 @@ namespace SpotTheScam.User
     {
 
         /// <summary>
+        /// rptGroups control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptGroups;
+
+        /// <summary>
+        /// txtGroupNameSidebar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtGroupNameSidebar;
+
+        /// <summary>
+        /// btnCreateGroupSidebar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCreateGroupSidebar;
+
+        /// <summary>
         /// AlertPanel control.
         /// </summary>
         /// <remarks>
@@ -33,40 +60,49 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Label AlertMessage;
 
         /// <summary>
-        /// txtGroupName control.
+        /// pnlGroupDetails control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtGroupName;
+        protected global::System.Web.UI.WebControls.Panel pnlGroupDetails;
 
         /// <summary>
-        /// btnCreateGroup control.
+        /// ltGroupNameSidebar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCreateGroup;
+        protected global::System.Web.UI.WebControls.Literal ltGroupNameSidebar;
 
         /// <summary>
-        /// pnlGroupInfo control.
+        /// ltGroupCreatedSidebar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlGroupInfo;
+        protected global::System.Web.UI.WebControls.Literal ltGroupCreatedSidebar;
 
         /// <summary>
-        /// ltGroupName control.
+        /// ltGroupMemberCount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltGroupName;
+        protected global::System.Web.UI.WebControls.Literal ltGroupMemberCount;
+
+        /// <summary>
+        /// gvMembers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvMembers;
 
         /// <summary>
         /// txtAddMemberEmail control.
@@ -96,12 +132,39 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Button btnAddMember;
 
         /// <summary>
-        /// gvMembers control.
+        /// txtRenameGroup control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvMembers;
+        protected global::System.Web.UI.WebControls.TextBox txtRenameGroup;
+
+        /// <summary>
+        /// btnRenameGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRenameGroup;
+
+        /// <summary>
+        /// btnDeleteGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeleteGroup;
+
+        /// <summary>
+        /// pnlNoGroupSelected control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlNoGroupSelected;
     }
 }
