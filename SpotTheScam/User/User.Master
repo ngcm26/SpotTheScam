@@ -41,14 +41,14 @@
             transition: color 0.3s ease;
         }
 
-        .navbar-nav .nav-link:hover {
-            color: var(--brand-orange);
-        }
+            .navbar-nav .nav-link:hover {
+                color: var(--brand-orange);
+            }
 
-        /* Remove underline */
-        .navbar-nav .nav-link::after {
-            display: none;
-        }
+            /* Remove underline */
+            .navbar-nav .nav-link::after {
+                display: none;
+            }
 
         /* Hover dropdown */
         .nav-item.dropdown:hover .dropdown-menu {
@@ -73,10 +73,10 @@
             transition: background 0.2s ease, color 0.2s ease;
         }
 
-        .dropdown-item:hover {
-            background-color: var(--brand-orange);
-            color: #ffffff;
-        }
+            .dropdown-item:hover {
+                background-color: var(--brand-orange);
+                color: #ffffff;
+            }
 
         /* Buttons */
         .btn-outline-dark {
@@ -85,25 +85,23 @@
             font-weight: 600;
         }
 
-        .btn-outline-dark:hover {
-            background-color: var(--brand-orange);
-            color: #fff;
-        }
+            .btn-outline-dark:hover {
+                background-color: var(--brand-orange);
+                color: #fff;
+            }
 
         .btn-warning {
             background-color: var(--brand-orange);
             border: none;
         }
 
-        .btn-warning:hover {
-            background-color: #b45a22;
-        }
+            .btn-warning:hover {
+                background-color: #b45a22;
+            }
 
         footer {
             background-color: var(--brand-navy);
         }
-
-
     </style>
 
     <asp:ContentPlaceHolder ID="head" runat="server" />
@@ -111,73 +109,80 @@
 <body class="d-flex flex-column min-vh-100">
     <form id="form1" runat="server" class="flex-grow-1 d-flex flex-column">
 
-       <!-- Navbar -->
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg shadow-sm py-2 d-flex align-items-center">
-          <div class="container-fluid d-flex align-items-center">
-            <!-- Logo with SVG -->
-            <a class="navbar-brand d-flex align-items-center" href="UserHome.aspx">
-              <img src="/Images/logo.svg" alt="Spot The Scam Logo" style="max-height: 55px; height: auto;" />
-            </a>
+            <div class="container-fluid d-flex align-items-center">
+                <!-- Logo with SVG -->
+                <a class="navbar-brand d-flex align-items-center" href="UserHome.aspx">
+                    <img src="/Images/logo.svg" alt="Spot The Scam Logo" style="max-height: 55px; height: auto;" />
+                </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span class="navbar-toggler-icon"></span>
-            </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-            <div class="collapse navbar-collapse align-items-center" id="navbarNav">
-              <!-- Center Links -->
-              <ul class="navbar-nav mx-auto mb-2 mb-lg-0 d-flex align-items-center h-100">
-                <li class="nav-item">
-                  <a class="nav-link" href="RecoverySupport.aspx">Scam recovery support</a>
-                </li>
+                <div class="collapse navbar-collapse align-items-center" id="navbarNav">
+                    <!-- Center Links -->
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 d-flex align-items-center h-100">
+                        <li class="nav-item">
+                            <a class="nav-link" href="RecoverySupport.aspx">Scam recovery support</a>
+                        </li>
 
-                <!-- Hover Dropdown for Protection -->
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="protectionDropdown" role="button">
-                    Protection against scam
-                  </a>
-                  <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
-                    <li><a class="dropdown-item" href="ScamChecker.aspx">Anti Scam Checker</a></li>
-                    <li><a class="dropdown-item" href="UserModules.aspx">Education Modules</a></li>
-                    <li><a class="dropdown-item" href="Quizzes.aspx">Quizzes</a></li>
-                  </ul>
-                </li>
+                        <!-- Hover Dropdown for Protection -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="protectionDropdown" role="button">Protection against scam
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
+                                <li><a class="dropdown-item" href="ScamChecker.aspx">Anti Scam Checker</a></li>
+                                <li><a class="dropdown-item" href="UserModules.aspx">Education Modules</a></li>
+                                <li><a class="dropdown-item" href="Quizzes.aspx">Quizzes</a></li>
+                            </ul>
+                        </li>
 
-                <li class="nav-item">
-                  <a class="nav-link" href="CreateBlog.aspx">Blogs & Forum</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="CreateBlog.aspx">Blogs & Forum</a>
 
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="UserTransactionLogs.aspx">Transaction Logs</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="ExpertWebinarHomepage.aspx">Expert Webinar Session</a>
-                </li>
-              </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management
+  </a>
+                            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                                <li><a class="dropdown-item" href="UserTransactionLogs.aspx">Transaction Logs</a></li>
+                                <li><a class="dropdown-item" href="UserBankAccounts.aspx">Bank Accounts & Cards</a></li>
+                                <li><a class="dropdown-item" href="FamilyGroupManagement.aspx">Family Group Management</a></li>
+                                <!-- Add more related features here as needed -->
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="ExpertWebinarHomepage.aspx">Expert Webinar Session</a>
+                        </li>
+                    </ul>
 
-              <!-- Right Buttons -->
-              <ul class="navbar-nav ms-auto d-flex align-items-center">
-                <!-- For GUESTS ONLY -->
-                <asp:PlaceHolder ID="phGuest" runat="server" Visible="false">
-                  <li class="nav-item">
-                    <a href="UserLogin.aspx" class="btn btn-outline-dark me-2">Login</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="UserRegister.aspx" class="btn btn-warning text-white fw-bold">Sign up</a>
-                  </li>
-                </asp:PlaceHolder>
+                    <!-- Right Buttons -->
+                    <ul class="navbar-nav ms-auto d-flex align-items-center">
+                        <!-- For GUESTS ONLY -->
+                        <asp:PlaceHolder ID="phGuest" runat="server" Visible="false">
+                            <li class="nav-item">
+                                <a href="UserLogin.aspx" class="btn btn-outline-dark me-2">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="UserRegister.aspx" class="btn btn-warning text-white fw-bold">Sign up</a>
+                            </li>
+                        </asp:PlaceHolder>
 
-                <!-- For LOGGED-IN USERS ONLY -->
-                <asp:PlaceHolder ID="phUser" runat="server" Visible="false">
-                  <li class="nav-item d-flex align-items-center me-3">
-                    <span class="fw-bold text-dark">👋 Welcome, <asp:Label ID="lblUsername" runat="server" /></span>
-                  </li>
-                  <li class="nav-item">
-                    <a href="UserLogout.aspx" class="btn btn-outline-danger">Logout</a>
-                  </li>
-                </asp:PlaceHolder>
-              </ul>
+                        <!-- For LOGGED-IN USERS ONLY -->
+                        <asp:PlaceHolder ID="phUser" runat="server" Visible="false">
+                            <li class="nav-item d-flex align-items-center me-3">
+                                <span class="fw-bold text-dark">👋 Welcome,
+                                    <asp:Label ID="lblUsername" runat="server" /></span>
+                            </li>
+                            <li class="nav-item">
+                                <a href="UserLogout.aspx" class="btn btn-outline-danger">Logout</a>
+                            </li>
+                        </asp:PlaceHolder>
+                    </ul>
+                </div>
             </div>
-          </div>
         </nav>
 
         <!-- Page Content -->

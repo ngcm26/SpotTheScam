@@ -66,12 +66,15 @@
   <ItemGroup>
     <Content Include="Staff\EditModule.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Staff\IndividualBlogStafff.aspx" />
+    <Content Include="Staff\ManageBlog.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\AddBankAccounts.aspx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
+    <Content Include="User\FamilyGroupManagement.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
     <Content Include="User\ModuleDetails.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
@@ -111,6 +114,20 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\IndividualBlogStafff.aspx.cs">
+      <DependentUpon>IndividualBlogStafff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\IndividualBlogStafff.aspx.designer.cs">
+      <DependentUpon>IndividualBlogStafff.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\ManageBlog.aspx.cs">
+      <DependentUpon>ManageBlog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\ManageBlog.aspx.designer.cs">
+      <DependentUpon>ManageBlog.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffAddModules.aspx.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
@@ -153,6 +170,13 @@
     </Compile>
     <Compile Include="User\FakeUOBLogin.aspx.designer.cs">
       <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\FamilyGroupManagement.aspx.cs">
+      <DependentUpon>FamilyGroupManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\FamilyGroupManagement.aspx.designer.cs">
+      <DependentUpon>FamilyGroupManagement.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ModuleInformation.aspx.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
@@ -350,6 +374,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Uploads\Blog_Pictures\" />
     <Folder Include="Uploads\Modules\" />
   </ItemGroup>
   <PropertyGroup>

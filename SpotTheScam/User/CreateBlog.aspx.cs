@@ -14,6 +14,12 @@ namespace SpotTheScam.User
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["UserId"] == null)
+            {
+                Response.Write("<script>alert('Please login to proceed!');</script>");
+                Response.Redirect("UserLogin.aspx");
+            }
+
 
         }
 
@@ -51,7 +57,7 @@ namespace SpotTheScam.User
                 }
                 if (result >= 0)
                 {
-                    string folderPath = Server.MapPath("~/Uploads/");
+                    string folderPath = Server.MapPath("~/Uploads/Blog_Pictures/");
                     image = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(blog_FileUpload.FileName);
                     string fullPath = folderPath + image;
 
