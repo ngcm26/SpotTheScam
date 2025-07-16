@@ -72,6 +72,7 @@
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\ModuleDetails.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
+    <Content Include="User\PointsDebug.aspx" />
     <Content Include="User\QuizCompletion.aspx" />
     <Content Include="User\Quizzes.aspx" />
     <Content Include="User\RecoverySupport.aspx" />
@@ -145,12 +146,21 @@
     </Compile>
     <Compile Include="User\PhoneScamsQuiz.aspx.cs">
       <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\PhoneScamsQuiz.aspx.designer.cs">
       <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\PointsDebug.aspx.cs">
+      <DependentUpon>PointsDebug.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\PointsDebug.aspx.designer.cs">
+      <DependentUpon>PointsDebug.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\QuizCompletion.aspx.cs">
       <DependentUpon>QuizCompletion.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\QuizCompletion.aspx.designer.cs">
       <DependentUpon>QuizCompletion.aspx</DependentUpon>
@@ -171,6 +181,7 @@
     </Compile>
     <Compile Include="User\ScamRecoveryGuidance.aspx.cs">
       <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\ScamRecoveryGuidance.aspx.designer.cs">
       <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>

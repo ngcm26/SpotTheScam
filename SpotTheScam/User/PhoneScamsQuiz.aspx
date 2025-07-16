@@ -633,6 +633,264 @@
             }
         ];
 
+        // Enhanced saveQuizCompletion with better error reporting
+        function saveQuizCompletion(totalPointsEarned, correctAnswers) {
+            console.log("=== SAVING QUIZ COMPLETION ===");
+            console.log("Total points earned:", totalPointsEarned, "Correct answers:", correctAnswers);
+
+            return new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'PhoneScamsQuiz.aspx/CompleteQuiz', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                var data = JSON.stringify({
+                    totalPointsEarned: totalPointsEarned,
+                    correctAnswers: correctAnswers
+                });
+
+                console.log("Sending completion data:", data);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        console.log("Completion AJAX Response Status:", xhr.status);
+                        console.log("Completion AJAX Response Text:", xhr.responseText);
+
+                        if (xhr.status === 200) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                console.log("Completion response:", response);
+
+                                if (response.d) {
+                                    console.log("Server completion response:", response.d);
+                                    if (response.d.indexOf("Error") !== -1) {
+                                        console.error("Server error during completion:", response.d);
+                                        reject(response.d);
+                                    } else {
+                                        console.log("Quiz completion saved successfully");
+                                        resolve(response.d);
+                                    }
+                                } else {
+                                    resolve("Success");
+                                }
+                            } catch (e) {
+                                console.error("Error parsing completion response:", e);
+                                console.error("Raw response was:", xhr.responseText);
+                                reject(`JSON Parse Error: ${e.message}`);
+                            }
+                        } else {
+                            console.error('Error saving quiz completion. Status:', xhr.status);
+                            console.error('Response headers:', xhr.getAllResponseHeaders());
+                            console.error('Response text:', xhr.responseText);
+                            reject(`HTTP Error ${xhr.status}: ${xhr.responseText}`);
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
+                    console.error("Network error during completion");
+                    console.error("XHR object:", xhr);
+                    reject("Network error - check your internet connection");
+                };
+
+                xhr.ontimeout = function () {
+                    console.error("Request timeout during completion");
+                    reject("Request timeout - please try again");
+                };
+
+                xhr.timeout = 30000; // 30 second timeout
+
+                try {
+                    xhr.send(data);
+                } catch (sendError) {
+                    console.error("Error sending request:", sendError);
+                    reject(`Send Error: ${sendError.message}`);
+                }
+            });
+        }
+
+        // Complete quiz function with proper total points calculation
+        function completeQuiz() {
+            console.log("=== COMPLETING QUIZ ===");
+
+            // Get the ACTUAL starting points from when the page first loaded
+            const actualStartingPoints = parseInt(document.getElementById('<%= lblCurrentPoints.ClientID %>').getAttribute('data-starting-points') || '<%= lblCurrentPoints.Text %>');
+
+            // Calculate ONLY the points earned from questions in this session
+            const pointsFromQuestions = totalPoints - actualStartingPoints;
+
+            console.log("Starting points:", actualStartingPoints);
+            console.log("Current total points:", totalPoints);
+            console.log("Points from questions:", pointsFromQuestions);
+            console.log("Correct answers:", correctAnswersCount);
+
+            // Save completion with just the question points - bonuses are handled server-side
+            saveQuizCompletion(pointsFromQuestions, correctAnswersCount)
+                .then(() => {
+                    // Calculate the total points earned including bonuses
+                    const totalPointsEarned = pointsFromQuestions + getBonusPoints(correctAnswersCount);
+
+                    // Redirect to completion page with all necessary parameters
+                    const params = new URLSearchParams({
+                        quiz: "Phone Scams Quiz",
+                        points: totalPointsEarned, // Total points earned from this quiz
+                        correct: correctAnswersCount,
+                        total: quizData.length,
+                        currentPoints: totalPoints // Pass the current total points
+                    });
+
+                    window.location.href = `QuizCompletion.aspx?${params.toString()}`;
+                })
+                .catch(error => {
+                    console.error("Error completing quiz:", error);
+                    alert("There was an error completing the quiz. Please try again.");
+                });
+        }
+
+        // Helper function to calculate bonus points for display
+        function getBonusPoints(correctAnswers) {
+            let bonusPoints = 0;
+
+            // These should match the server-side bonus calculation
+            bonusPoints += 10; // Completion bonus
+            bonusPoints += 20; // First time bonus (we'll assume first time for display)
+
+            if (correctAnswers === 10) {
+                bonusPoints += 50; // Perfect score bonus
+            }
+
+            return bonusPoints;
+        }
+
+        function saveQuizProgress(questionNumber, selectedAnswer, isCorrect, hintUsed, pointsEarned) {
+            console.log("=== SAVING QUIZ PROGRESS ===");
+            console.log("Question:", questionNumber, "Answer:", selectedAnswer, "Correct:", isCorrect, "Points:", pointsEarned);
+
+            // Make AJAX call to save progress
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'PhoneScamsQuiz.aspx/SaveQuizProgress', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            var data = JSON.stringify({
+                questionNumber: questionNumber,
+                selectedAnswer: selectedAnswer,
+                isCorrect: isCorrect,
+                hintUsed: hintUsed,
+                pointsEarned: pointsEarned
+            });
+
+            console.log("Sending data:", data);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    console.log("AJAX Response Status:", xhr.status);
+                    console.log("AJAX Response Text:", xhr.responseText);
+
+                    if (xhr.status === 200) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            console.log("Parsed response:", response);
+
+                            if (response.d) {
+                                console.log("Server response:", response.d);
+                                if (response.d.indexOf("Error") !== -1) {
+                                    console.error("Server error:", response.d);
+                                } else {
+                                    console.log("Progress saved successfully");
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Error parsing response:", e);
+                        }
+                    } else {
+                        console.error('Error saving progress. Status:', xhr.status, 'Response:', xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.onerror = function () {
+                console.error("Network error occurred");
+            };
+
+            xhr.send(data);
+        }
+
+        function selectAnswer(answer) {
+            if (questionAnswered) return;
+
+            console.log("Answer selected:", answer);
+            selectedAnswer = answer;
+            const question = quizData[currentQuestionIndex];
+
+            // Mark as answered
+            questionAnswered = true;
+            answeredQuestions[currentQuestionIndex] = true;
+
+            // Update hidden field
+            document.getElementById('<%= hdnSelectedAnswer.ClientID %>').value = answer;
+
+            // Disable further selections and remove onclick events
+            document.querySelectorAll('.answer-option').forEach(option => {
+                option.onclick = null;
+                option.style.pointerEvents = 'none';
+
+                const letter = option.querySelector('.option-letter').textContent;
+                const feedbackLink = option.querySelector('.click-feedback');
+
+                // Show and enable feedback links
+                feedbackLink.style.display = 'inline';
+                feedbackLink.style.pointerEvents = 'auto';
+                feedbackLink.onclick = function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showOptionFeedback(letter);
+                };
+
+                // Color code the answers
+                if (letter === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Calculate and show points
+            let pointsEarned = 0;
+            const isCorrect = (answer === question.correctAnswer);
+
+            if (isCorrect) {
+                pointsEarned = hintUsed ? 10 : 15;
+                totalPoints += pointsEarned;
+                correctAnswersCount++;
+                console.log("Points earned:", pointsEarned, "Total points:", totalPoints, "Correct answers:", correctAnswersCount);
+
+                // Store updated points and correct answers in session storage
+                sessionStorage.setItem('quizPoints', totalPoints.toString());
+                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
+
+                showPointsNotification(pointsEarned, true);
+                showFeedback(true, question.explanation);
+            } else {
+                console.log("Wrong answer, no points earned");
+                showPointsNotification(0, false);
+                showFeedback(false, question.feedback[answer]);
+
+                // Still update session storage for correct answers count
+                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
+            }
+
+            // Update total points display immediately
+            document.getElementById('<%= lblCurrentPoints.ClientID %>').textContent = totalPoints;
+
+            // Save progress to database
+            saveQuizProgress(currentQuestionIndex + 1, answer, isCorrect, hintUsed, pointsEarned);
+
+            // Disable hint button
+            document.getElementById('hintBtn').disabled = true;
+
+            // Update back button state
+            updateBackButtonState();
+        }
+
         function loadQuestion() {
             console.log("Loading question:", currentQuestionIndex + 1, "of", quizData.length);
             const question = quizData[currentQuestionIndex];
@@ -716,130 +974,6 @@
             // Update hidden fields
             document.getElementById('<%= hdnSelectedAnswer.ClientID %>').value = '';
             document.getElementById('<%= hdnHintUsed.ClientID %>').value = 'false';
-        }
-
-        function selectAnswer(answer) {
-            if (questionAnswered) return;
-
-            console.log("Answer selected:", answer);
-            selectedAnswer = answer;
-            const question = quizData[currentQuestionIndex];
-
-            // Mark as answered
-            questionAnswered = true;
-            answeredQuestions[currentQuestionIndex] = true; // Track that this question is answered
-
-            // Update hidden field
-            document.getElementById('<%= hdnSelectedAnswer.ClientID %>').value = answer;
-            
-            // Disable further selections and remove onclick events
-            document.querySelectorAll('.answer-option').forEach(option => {
-                option.onclick = null; // Remove click handler
-                option.style.pointerEvents = 'none'; // Disable clicking on the option itself
-                
-                const letter = option.querySelector('.option-letter').textContent;
-                const feedbackLink = option.querySelector('.click-feedback');
-                
-                // Show and enable feedback links
-                feedbackLink.style.display = 'inline';
-                feedbackLink.style.pointerEvents = 'auto'; // Allow clicking on feedback
-                feedbackLink.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    showOptionFeedback(letter);
-                };
-                
-                // Color code the answers
-                if (letter === question.correctAnswer) {
-                    option.classList.add('correct');
-                } else {
-                    option.classList.add('incorrect');
-                }
-            });
-            
-            // Calculate and show points
-            let pointsEarned = 0;
-            const isCorrect = (answer === question.correctAnswer);
-            
-            if (isCorrect) {
-                pointsEarned = hintUsed ? 10 : 15;
-                totalPoints += pointsEarned;
-                correctAnswersCount++; // Increment correct answers count
-                console.log("Points earned:", pointsEarned, "Total points:", totalPoints, "Correct answers:", correctAnswersCount);
-                
-                // Store updated points and correct answers in session storage
-                sessionStorage.setItem('quizPoints', totalPoints.toString());
-                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
-                
-                showPointsNotification(pointsEarned, true);
-                showFeedback(true, question.explanation);
-            } else {
-                console.log("Wrong answer, no points earned");
-                showPointsNotification(0, false);
-                showFeedback(false, question.feedback[answer]);
-                
-                // Still update session storage for correct answers count
-                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
-            }
-            
-            // Update total points display immediately
-            document.getElementById('<%= lblCurrentPoints.ClientID %>').textContent = totalPoints;
-
-            // Save progress to database
-            saveQuizProgress(currentQuestionIndex + 1, answer, isCorrect, hintUsed, pointsEarned);
-
-            // Disable hint button
-            document.getElementById('hintBtn').disabled = true;
-            
-            // Update back button state
-            updateBackButtonState();
-        }
-
-        function saveQuizProgress(questionNumber, selectedAnswer, isCorrect, hintUsed, pointsEarned) {
-            console.log("=== SAVING QUIZ PROGRESS ===");
-            console.log("Question:", questionNumber, "Answer:", selectedAnswer, "Correct:", isCorrect, "Points:", pointsEarned);
-            
-            // Make AJAX call to save progress
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'PhoneScamsQuiz.aspx/SaveQuizProgress', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            
-            var data = JSON.stringify({
-                questionNumber: questionNumber,
-                selectedAnswer: selectedAnswer,
-                isCorrect: isCorrect,
-                hintUsed: hintUsed,
-                pointsEarned: pointsEarned
-            });
-            
-            console.log("Sending data:", data);
-            
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    console.log("AJAX Response Status:", xhr.status);
-                    console.log("AJAX Response Text:", xhr.responseText);
-                    
-                    if (xhr.status === 200) {
-                        try {
-                            var response = JSON.parse(xhr.responseText);
-                            console.log("Parsed response:", response);
-                            
-                            if (response.d) {
-                                console.log("Server response:", response.d);
-                                if (response.d.indexOf("Error") !== -1) {
-                                    console.error("Server error:", response.d);
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Error parsing response:", e);
-                        }
-                    } else {
-                        console.error('Error saving progress. Status:', xhr.status, 'Response:', xhr.responseText);
-                    }
-                }
-            };
-            
-            xhr.send(data);
         }
 
         function showHint() {
@@ -935,51 +1069,6 @@
             return false; // Prevent any form submission
         }
 
-        function completeQuiz() {
-            console.log("=== COMPLETING QUIZ ===");
-            console.log("Total points:", totalPoints);
-            console.log("Correct answers:", correctAnswersCount);
-            console.log("Current question index:", currentQuestionIndex);
-            
-            // Calculate final points
-            const completionBonus = 10;
-            const finalPoints = totalPoints + completionBonus;
-            
-            console.log("Final points with bonus:", finalPoints);
-            
-            // Clear session storage
-            sessionStorage.removeItem('quizPoints');
-            sessionStorage.removeItem('correctAnswers');
-            
-            // Build URL for completion page
-            const params = new URLSearchParams({
-                quiz: "Phone Scams Quiz",
-                points: finalPoints,
-                correct: correctAnswersCount,
-                total: quizData.length,
-                totalPoints: finalPoints
-            });
-            
-            const url = `QuizCompletion.aspx?${params.toString()}`;
-            console.log("Redirecting to:", url);
-            
-            // Redirect immediately
-            window.location.href = url;
-        }
-
-        function saveQuizCompletion(totalPointsEarned, correctAnswers) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'PhoneScamsQuiz.aspx/CompleteQuiz', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            
-            var data = JSON.stringify({
-                totalPointsEarned: totalPointsEarned,
-                correctAnswers: correctAnswers
-            });
-            
-            xhr.send(data);
-        }
-
         function updateBackButtonState() {
             const backButton = document.querySelector('.btn-back');
             
@@ -1048,7 +1137,7 @@
             }
         }
 
-        // Initialize on page load
+        // Window onload to properly handle dynamic starting points
         window.onload = function () {
             // Check if we have a stored question index from server
             var storedIndex = document.getElementById('<%= hdnCurrentQuestionIndex.ClientID %>').value;
@@ -1062,22 +1151,29 @@
                 hintUsed = true;
             }
             
-            // CRITICAL: Points management
+            // Get the user's ACTUAL current points from the server (loaded from database)
+            const userActualPoints = parseInt('<%= lblCurrentPoints.Text %>');
+            console.log("User's actual points from database:", userActualPoints);
+
+            // Store the starting points as a data attribute for later reference
+            document.getElementById('<%= lblCurrentPoints.ClientID %>').setAttribute('data-starting-points', userActualPoints);
+
+            // CRITICAL: Points management with dynamic starting points
             var storedPoints = sessionStorage.getItem('quizPoints');
             var storedCorrectAnswers = sessionStorage.getItem('correctAnswers');
-            
+
             if (storedPoints && currentQuestionIndex > 0) {
                 // Restore from session storage if we're not on the first question
                 totalPoints = parseInt(storedPoints);
                 correctAnswersCount = parseInt(storedCorrectAnswers || '0');
                 console.log("Restored points from session:", totalPoints, "Correct answers:", correctAnswersCount);
             } else if (currentQuestionIndex === 0) {
-                // Only use server value on the very first load
-                totalPoints = parseInt('<%= lblCurrentPoints.Text %>');
+                // Use the user's actual current points from database as starting point
+                totalPoints = userActualPoints;
                 correctAnswersCount = 0;
                 sessionStorage.setItem('quizPoints', totalPoints.toString());
                 sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
-                console.log("Initial load - points from server:", totalPoints);
+                console.log("Initial load - using user's actual points:", totalPoints);
             }
 
             // Initialize answered questions array based on current question index

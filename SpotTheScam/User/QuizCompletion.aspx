@@ -7,7 +7,7 @@
             --brand-navy: #051D40;
         }
 
-        .points-badge {
+        .current-points-badge {
             background: #FFC107;
             color: #000;
             padding: 5px 15px;
@@ -232,7 +232,7 @@
                 margin: 0 15px;
             }
             
-            .points-badge {
+            .current-points-badge {
                 position: static;
                 display: inline-block;
                 margin-bottom: 20px;
@@ -281,9 +281,9 @@
     <div class="page-container">
         <div class="container">
             <div class="success-card">
-                <!-- Points Badge -->
-                <div class="points-badge">
-                    <span>Total Points: <asp:Label ID="lblTotalPoints" runat="server" Text="0" /> ⭐</span>
+                <!-- Current Points Badge -->
+                <div class="current-points-badge">
+                    <span>Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
                 </div>
                 
                 <!-- Success Icon -->

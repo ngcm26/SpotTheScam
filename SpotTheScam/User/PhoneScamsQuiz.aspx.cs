@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Web.Configuration;
 using System.Configuration;
+using System.Web.Services;
 
 namespace SpotTheScam.User
 {
@@ -24,11 +25,101 @@ namespace SpotTheScam.User
                     return;
                 }
 
+                // CRITICAL: Ensure quiz exists before starting
+                EnsureQuizAndCategoryExist();
+
                 // Initialize quiz
                 InitializeQuiz();
                 LoadUserPoints();
+
+                // Debug session state
+                System.Diagnostics.Debug.WriteLine($"Page_Load - Session UserID: {Session["UserID"]}");
+                System.Diagnostics.Debug.WriteLine($"Page_Load - Session Username: {Session["Username"]}");
             }
-            // Don't reload points on postback - let JavaScript maintain them
+        }
+
+        private void EnsureQuizAndCategoryExist()
+        {
+            try
+            {
+                string connectionString = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // First ensure category exists
+                    int categoryId = EnsureCategoryExists(conn);
+                    System.Diagnostics.Debug.WriteLine($"Category ID ensured: {categoryId}");
+
+                    // Then check if "Phone Scams" quiz exists
+                    string checkQuizQuery = "SELECT COUNT(*) FROM Quizzes WHERE QuizTitle = 'Phone Scams'";
+                    using (SqlCommand cmd = new SqlCommand(checkQuizQuery, conn))
+                    {
+                        int quizCount = Convert.ToInt32(cmd.ExecuteScalar());
+                        System.Diagnostics.Debug.WriteLine($"Phone Scams quiz count: {quizCount}");
+
+                        if (quizCount == 0)
+                        {
+                            // Create the quiz record with the correct category
+                            System.Diagnostics.Debug.WriteLine("Creating Phone Scams quiz record...");
+                            CreateQuizRecord(conn, categoryId);
+                            System.Diagnostics.Debug.WriteLine("Phone Scams quiz record created successfully");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("Phone Scams quiz already exists");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error ensuring quiz exists: {ex.Message}");
+                // Don't throw - let the page continue
+            }
+        }
+
+        private int EnsureCategoryExists(SqlConnection conn)
+        {
+            try
+            {
+                // Check if any category exists
+                string checkCategoryQuery = "SELECT TOP 1 CategoryId FROM QuizCategories";
+                using (SqlCommand cmd = new SqlCommand(checkCategoryQuery, conn))
+                {
+                    object result = cmd.ExecuteScalar();
+                    if (result != null)
+                    {
+                        int existingId = Convert.ToInt32(result);
+                        System.Diagnostics.Debug.WriteLine($"Found existing category: {existingId}");
+                        return existingId;
+                    }
+                }
+
+                // If no category exists, create one
+                System.Diagnostics.Debug.WriteLine("No category found, creating default category...");
+                string createCategoryQuery = @"
+                    INSERT INTO QuizCategories (CategoryName, Description, CreatedDate)
+                    OUTPUT INSERTED.CategoryId
+                    VALUES (@CategoryName, @Description, @CreatedDate)";
+
+                using (SqlCommand cmd = new SqlCommand(createCategoryQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@CategoryName", "Security Awareness");
+                    cmd.Parameters.AddWithValue("@Description", "Quizzes to test knowledge about security and scam prevention");
+                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
+
+                    int newCategoryId = Convert.ToInt32(cmd.ExecuteScalar());
+                    System.Diagnostics.Debug.WriteLine($"Created new category with ID: {newCategoryId}");
+                    return newCategoryId;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error ensuring category exists: {ex.Message}");
+                // Return 1 as fallback - this should work in most cases
+                return 1;
+            }
         }
 
         private void InitializeQuiz()
@@ -50,13 +141,16 @@ namespace SpotTheScam.User
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"=== LoadUserPoints START ===");
+                System.Diagnostics.Debug.WriteLine($"Session Username: {Session["Username"]}");
+
                 string connectionString = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Get UserID from Username first
-                    string getUserIdQuery = "SELECT UserId FROM Users WHERE Username = @Username";
+                    // Get UserID from Username first - using correct column name
+                    string getUserIdQuery = "SELECT Id FROM Users WHERE Username = @Username";
                     int userId = 0;
 
                     using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
@@ -73,34 +167,90 @@ namespace SpotTheScam.User
                         else
                         {
                             System.Diagnostics.Debug.WriteLine($"User not found: {Session["Username"]}");
-                            // User not found, redirect to login
                             Response.Redirect("UserLogin.aspx");
                             return;
                         }
                     }
 
-                    // Now get points for this user
-                    string query = @"
-                        SELECT ISNULL(SUM(Points), 0) as TotalPoints 
-                        FROM PointsTransactions 
-                        WHERE UserId = @UserId";
+                    // Get points from PointsTransactions with fresh read to avoid caching issues
+                    int pointsFromTransactions = 0;
+                    int maxRetries = 5;
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    for (int retry = 0; retry < maxRetries; retry++)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Attempt {retry + 1} to get user points...");
+
+                        // Force fresh read by using WITH (NOLOCK) and ORDER BY to ensure we get latest data
+                        string query = @"
+                            SELECT ISNULL(SUM(Points), 0) as TotalPoints 
+                            FROM PointsTransactions WITH (NOLOCK)
+                            WHERE UserId = @UserId";
+
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@UserId", userId);
+                            object result = cmd.ExecuteScalar();
+
+                            if (result != null)
+                            {
+                                int currentPoints = Convert.ToInt32(result);
+                                System.Diagnostics.Debug.WriteLine($"Attempt {retry + 1}: Points found: {currentPoints}");
+
+                                // If this is a reasonable result (not negative), use it
+                                if (currentPoints >= 0)
+                                {
+                                    pointsFromTransactions = currentPoints;
+
+                                    // If we got a result that's different from previous attempts or this is the last try, use it
+                                    if (retry == 0 || currentPoints != pointsFromTransactions || retry == maxRetries - 1)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // If this isn't the last retry, wait a bit before trying again
+                        if (retry < maxRetries - 1)
+                        {
+                            System.Threading.Thread.Sleep(500); // Wait 0.5 seconds
+                        }
+                    }
+
+                    lblCurrentPoints.Text = pointsFromTransactions.ToString();
+                    System.Diagnostics.Debug.WriteLine($"Final total points loaded: {pointsFromTransactions}");
+
+                    // Debug: Show recent transactions for this user to verify data
+                    string debugQuery = @"
+                        SELECT TOP 15 TransactionType, Points, Description, TransactionDate
+                        FROM PointsTransactions WITH (NOLOCK)
+                        WHERE UserId = @UserId
+                        ORDER BY TransactionDate DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(debugQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@UserId", userId);
-                        object result = cmd.ExecuteScalar();
-
-                        if (result != null)
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            lblCurrentPoints.Text = result.ToString();
-                            System.Diagnostics.Debug.WriteLine($"Total points loaded: {result}");
+                            System.Diagnostics.Debug.WriteLine("=== Recent Transactions (Quiz Start) ===");
+                            int transactionCount = 0;
+                            int totalCalculated = 0;
+                            while (reader.Read())
+                            {
+                                transactionCount++;
+                                int points = Convert.ToInt32(reader["Points"]);
+                                totalCalculated += points;
+                                System.Diagnostics.Debug.WriteLine($"{transactionCount}. {reader["TransactionType"]}: {points} points - {reader["Description"]} ({reader["TransactionDate"]})");
+                            }
+                            System.Diagnostics.Debug.WriteLine($"Total transactions found: {transactionCount}");
+                            System.Diagnostics.Debug.WriteLine($"Manual calculation of recent transactions: {totalCalculated}");
                         }
                     }
                 }
+                System.Diagnostics.Debug.WriteLine($"=== LoadUserPoints END - lblCurrentPoints.Text: {lblCurrentPoints.Text} ===");
             }
             catch (Exception ex)
             {
-                // Log error and set default points
                 System.Diagnostics.Debug.WriteLine($"Error loading user points: {ex.Message}");
                 lblCurrentPoints.Text = "0";
             }
@@ -108,7 +258,6 @@ namespace SpotTheScam.User
 
         private int GetCurrentUserId()
         {
-            // First check if UserID is in session
             if (Session["UserID"] != null)
             {
                 return Convert.ToInt32(Session["UserID"]);
@@ -120,7 +269,7 @@ namespace SpotTheScam.User
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string getUserIdQuery = "SELECT UserId FROM Users WHERE Username = @Username";
+                    string getUserIdQuery = "SELECT Id FROM Users WHERE Username = @Username";
 
                     using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
                     {
@@ -130,7 +279,7 @@ namespace SpotTheScam.User
                         if (result != null)
                         {
                             int userId = Convert.ToInt32(result);
-                            Session["UserID"] = userId; // Store for future use
+                            Session["UserID"] = userId;
                             return userId;
                         }
                     }
@@ -138,7 +287,7 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                // Log error: System.Diagnostics.Debug.WriteLine(ex.Message);
+                System.Diagnostics.Debug.WriteLine($"Error getting user ID: {ex.Message}");
             }
             return 0;
         }
@@ -165,58 +314,47 @@ namespace SpotTheScam.User
                         if (result != null)
                         {
                             quizId = Convert.ToInt32(result);
-                        }
-                        else
-                        {
-                            // Create quiz record if it doesn't exist
-                            CreateQuizRecord(conn);
-                            using (SqlCommand cmd2 = new SqlCommand(getQuizIdQuery, conn))
-                            {
-                                result = cmd2.ExecuteScalar();
-                                if (result != null)
-                                {
-                                    quizId = Convert.ToInt32(result);
-                                }
-                            }
+                            System.Diagnostics.Debug.WriteLine($"Found Quiz ID: {quizId}");
                         }
                     }
 
-                    // Check if user has already completed this quiz
-                    string checkCompletionQuery = @"
-                        SELECT COUNT(*) 
-                        FROM UserQuizSessions 
-                        WHERE UserId = @UserId AND QuizId = @QuizId AND SessionStatus = 'Completed'";
-
-                    using (SqlCommand cmd = new SqlCommand(checkCompletionQuery, conn))
+                    if (quizId > 0)
                     {
-                        cmd.Parameters.AddWithValue("@UserId", userId);
-                        cmd.Parameters.AddWithValue("@QuizId", quizId);
+                        // Check if user has already completed this quiz
+                        string checkCompletionQuery = @"
+                            SELECT COUNT(*) 
+                            FROM UserQuizSessions 
+                            WHERE UserId = @UserId AND QuizId = @QuizId AND SessionStatus = 'Completed'";
 
-                        int completedCount = Convert.ToInt32(cmd.ExecuteScalar());
-
-                        if (completedCount > 0)
+                        using (SqlCommand cmd = new SqlCommand(checkCompletionQuery, conn))
                         {
-                            // User has already completed this quiz - show retake message
-                            string script = @"
-                                if (confirm('You have already completed this quiz! You can retake it for practice, but you won\'t earn points again. Do you want to continue?')) {
-                                    // Continue with quiz
-                                } else {
-                                    window.location.href = 'Quizzes.aspx';
-                                }
-                            ";
-                            ClientScript.RegisterStartupScript(this.GetType(), "RetakeAlert", script, true);
+                            cmd.Parameters.AddWithValue("@UserId", userId);
+                            cmd.Parameters.AddWithValue("@QuizId", quizId);
+
+                            int completedCount = Convert.ToInt32(cmd.ExecuteScalar());
+
+                            if (completedCount > 0)
+                            {
+                                string script = @"
+                                    if (confirm('You have already completed this quiz! You can retake it for practice, but you won\'t earn points again. Do you want to continue?')) {
+                                        // Continue with quiz
+                                    } else {
+                                        window.location.href = 'Quizzes.aspx';
+                                    }
+                                ";
+                                ClientScript.RegisterStartupScript(this.GetType(), "RetakeAlert", script, true);
+                            }
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log error but continue with quiz
-                // System.Diagnostics.Debug.WriteLine(ex.Message);
+                System.Diagnostics.Debug.WriteLine($"Error checking quiz progress: {ex.Message}");
             }
         }
 
-        private void CreateQuizRecord(SqlConnection conn)
+        private void CreateQuizRecord(SqlConnection conn, int categoryId)
         {
             string createQuizQuery = @"
                 INSERT INTO Quizzes (CategoryId, QuizTitle, QuizDescription, TotalQuestions, PointsPerCorrect, BonusPointsNoHint, TimeLimit, CreatedDate)
@@ -224,21 +362,21 @@ namespace SpotTheScam.User
 
             using (SqlCommand cmd = new SqlCommand(createQuizQuery, conn))
             {
-                // Get or create category for Phone Scams (assuming CategoryId 1 for beginner)
-                cmd.Parameters.AddWithValue("@CategoryId", 1);
+                cmd.Parameters.AddWithValue("@CategoryId", categoryId);
                 cmd.Parameters.AddWithValue("@QuizTitle", "Phone Scams");
                 cmd.Parameters.AddWithValue("@QuizDescription", "Learn to identify suspicious calls and protect yourself from phone scams");
                 cmd.Parameters.AddWithValue("@TotalQuestions", 10);
                 cmd.Parameters.AddWithValue("@PointsPerCorrect", 10);
                 cmd.Parameters.AddWithValue("@BonusPointsNoHint", 5);
-                cmd.Parameters.AddWithValue("@TimeLimit", 600); // 10 minutes
+                cmd.Parameters.AddWithValue("@TimeLimit", 600);
                 cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
 
                 cmd.ExecuteNonQuery();
+                System.Diagnostics.Debug.WriteLine("Quiz record created successfully");
             }
         }
 
-        [System.Web.Services.WebMethod]
+        [System.Web.Services.WebMethod(EnableSession = true)]
         public static string SaveQuizProgress(int questionNumber, string selectedAnswer, bool isCorrect, bool hintUsed, int pointsEarned)
         {
             try
@@ -246,17 +384,20 @@ namespace SpotTheScam.User
                 HttpContext context = HttpContext.Current;
                 if (context.Session["UserID"] == null)
                 {
+                    System.Diagnostics.Debug.WriteLine("SaveQuizProgress: Session UserID is null");
                     return "Error: User not logged in";
                 }
 
                 int userId = Convert.ToInt32(context.Session["UserID"]);
+                System.Diagnostics.Debug.WriteLine($"=== SaveQuizProgress called ===");
+                System.Diagnostics.Debug.WriteLine($"UserID: {userId}, Question: {questionNumber}, Answer: {selectedAnswer}, Correct: {isCorrect}, Points: {pointsEarned}");
 
                 string connectionString = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Get quiz ID
+                    // Get quiz ID - it should exist now
                     string getQuizIdQuery = "SELECT QuizId FROM Quizzes WHERE QuizTitle = 'Phone Scams'";
                     int quizId = 0;
 
@@ -266,55 +407,62 @@ namespace SpotTheScam.User
                         if (result != null)
                         {
                             quizId = Convert.ToInt32(result);
+                            System.Diagnostics.Debug.WriteLine($"Quiz ID found: {quizId}");
                         }
                         else
                         {
+                            System.Diagnostics.Debug.WriteLine("Quiz not found in SaveQuizProgress");
                             return "Error: Quiz not found";
                         }
                     }
 
                     // Get or create session
                     int sessionId = GetOrCreateSession(conn, userId, quizId);
+                    System.Diagnostics.Debug.WriteLine($"Session ID: {sessionId}");
 
-                    // Check if this question was already answered (prevent duplicates)
+                    // Check if this question was already answered
                     string checkExistingQuery = @"
                         SELECT COUNT(*) FROM UserQuizAnswers 
-                        WHERE SessionId = @SessionId AND QuestionId = @QuestionId";
+                        WHERE SessionId = @SessionId AND QuestionId = @QuestionNumber";
 
                     using (SqlCommand cmd = new SqlCommand(checkExistingQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                        cmd.Parameters.AddWithValue("@QuestionId", questionNumber);
+                        cmd.Parameters.AddWithValue("@QuestionNumber", questionNumber);
 
                         int existingCount = Convert.ToInt32(cmd.ExecuteScalar());
                         if (existingCount > 0)
                         {
-                            return "Already answered"; // Don't save duplicate answers
+                            System.Diagnostics.Debug.WriteLine("Question already answered - skipping");
+                            return "Already answered";
                         }
                     }
 
                     // Save user answer
                     string saveAnswerQuery = @"
                         INSERT INTO UserQuizAnswers (SessionId, QuestionId, SelectedOption, IsCorrect, HintUsed, PointsEarned, AnswerTime)
-                        VALUES (@SessionId, @QuestionId, @SelectedOption, @IsCorrect, @HintUsed, @PointsEarned, @AnswerTime)";
+                        VALUES (@SessionId, @QuestionNumber, @SelectedOption, @IsCorrect, @HintUsed, @PointsEarned, @AnswerTime)";
 
                     using (SqlCommand cmd = new SqlCommand(saveAnswerQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                        cmd.Parameters.AddWithValue("@QuestionId", questionNumber);
+                        cmd.Parameters.AddWithValue("@QuestionNumber", questionNumber);
                         cmd.Parameters.AddWithValue("@SelectedOption", selectedAnswer);
                         cmd.Parameters.AddWithValue("@IsCorrect", isCorrect);
                         cmd.Parameters.AddWithValue("@HintUsed", hintUsed);
                         cmd.Parameters.AddWithValue("@PointsEarned", pointsEarned);
                         cmd.Parameters.AddWithValue("@AnswerTime", DateTime.Now);
 
-                        cmd.ExecuteNonQuery();
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"Answer saved: {rowsAffected} rows affected");
                     }
 
                     // Add points transaction if points were earned
                     if (pointsEarned > 0)
                     {
-                        AddPointsTransaction(conn, userId, pointsEarned, $"Phone Scams Quiz - Question {questionNumber}");
+                        System.Diagnostics.Debug.WriteLine($"Adding points transaction: {pointsEarned} points");
+                        bool success = AddPointsTransaction(conn, userId, pointsEarned, $"Phone Scams Quiz - Question {questionNumber}");
+                        System.Diagnostics.Debug.WriteLine($"Points transaction success: {success}");
                     }
 
                     return "Success";
@@ -322,6 +470,8 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error in SaveQuizProgress: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 return "Error: " + ex.Message;
             }
         }
@@ -363,10 +513,14 @@ namespace SpotTheScam.User
             }
         }
 
-        private static void AddPointsTransaction(SqlConnection conn, int userId, int points, string description)
+        private static bool AddPointsTransaction(SqlConnection conn, int userId, int points, string description)
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"=== AddPointsTransaction START ===");
+                System.Diagnostics.Debug.WriteLine($"UserId: {userId}, Points: {points}, Description: {description}");
+
+                // Insert the transaction
                 string addPointsQuery = @"
                     INSERT INTO PointsTransactions (UserId, TransactionType, Points, Description, TransactionDate)
                     VALUES (@UserId, @TransactionType, @Points, @Description, @TransactionDate)";
@@ -380,17 +534,19 @@ namespace SpotTheScam.User
                     cmd.Parameters.AddWithValue("@TransactionDate", DateTime.Now);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine($"Points transaction saved: {rowsAffected} rows affected. UserId: {userId}, Points: {points}, Description: {description}");
+                    System.Diagnostics.Debug.WriteLine($"Points transaction saved: {rowsAffected} rows affected");
+
+                    return rowsAffected > 0;
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving points transaction: {ex.Message}");
-                throw; // Re-throw to let calling method handle it
+                return false;
             }
         }
 
-        [System.Web.Services.WebMethod]
+        [System.Web.Services.WebMethod(EnableSession = true)]
         public static string CompleteQuiz(int totalPointsEarned, int correctAnswers)
         {
             try
@@ -398,71 +554,111 @@ namespace SpotTheScam.User
                 HttpContext context = HttpContext.Current;
                 if (context.Session["UserID"] == null)
                 {
+                    System.Diagnostics.Debug.WriteLine("CompleteQuiz: Session UserID is null");
                     return "Error: User not logged in";
                 }
 
                 int userId = Convert.ToInt32(context.Session["UserID"]);
+                System.Diagnostics.Debug.WriteLine($"=== CompleteQuiz called ===");
+                System.Diagnostics.Debug.WriteLine($"UserID: {userId}, TotalPoints: {totalPointsEarned}, CorrectAnswers: {correctAnswers}");
 
                 string connectionString = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Get quiz and session info
+                    // Get quiz ID - should exist now
                     string getQuizIdQuery = "SELECT QuizId FROM Quizzes WHERE QuizTitle = 'Phone Scams'";
                     object quizIdResult = new SqlCommand(getQuizIdQuery, conn).ExecuteScalar();
-                    if (quizIdResult == null) return "Error: Quiz not found";
 
-                    int quizId = Convert.ToInt32(quizIdResult);
-                    int sessionId = GetOrCreateSession(conn, userId, quizId);
-
-                    // Update session as completed
-                    string updateSessionQuery = @"
-                        UPDATE UserQuizSessions 
-                        SET EndTime = @EndTime, 
-                            TotalQuestions = @TotalQuestions, 
-                            CorrectAnswers = @CorrectAnswers, 
-                            TotalPointsEarned = @TotalPointsEarned,
-                            SessionStatus = @SessionStatus
-                        WHERE SessionId = @SessionId";
-
-                    using (SqlCommand cmd = new SqlCommand(updateSessionQuery, conn))
+                    int quizId = 0;
+                    if (quizIdResult != null)
                     {
-                        cmd.Parameters.AddWithValue("@EndTime", DateTime.Now);
-                        cmd.Parameters.AddWithValue("@TotalQuestions", 10);
-                        cmd.Parameters.AddWithValue("@CorrectAnswers", correctAnswers);
-                        cmd.Parameters.AddWithValue("@TotalPointsEarned", totalPointsEarned);
-                        cmd.Parameters.AddWithValue("@SessionStatus", "Completed");
-                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
-
-                        cmd.ExecuteNonQuery();
+                        quizId = Convert.ToInt32(quizIdResult);
+                        System.Diagnostics.Debug.WriteLine($"Quiz ID found: {quizId}");
                     }
 
-                    // Check if this is first completion for bonus points
-                    string checkFirstTimeQuery = @"
+                    // Check if user has already completed this quiz to avoid duplicate bonuses
+                    string checkCompletionQuery = @"
                         SELECT COUNT(*) 
                         FROM UserQuizSessions 
                         WHERE UserId = @UserId AND QuizId = @QuizId AND SessionStatus = 'Completed'";
 
-                    using (SqlCommand cmd = new SqlCommand(checkFirstTimeQuery, conn))
+                    bool alreadyCompleted = false;
+                    using (SqlCommand cmd = new SqlCommand(checkCompletionQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@UserId", userId);
                         cmd.Parameters.AddWithValue("@QuizId", quizId);
-
                         int completedCount = Convert.ToInt32(cmd.ExecuteScalar());
+                        alreadyCompleted = (completedCount > 0);
+                        System.Diagnostics.Debug.WriteLine($"Already completed count: {completedCount}");
+                    }
 
-                        if (completedCount == 1) // First completion
+                    // Get or create session
+                    int sessionId = 0;
+                    if (quizId > 0)
+                    {
+                        sessionId = GetOrCreateSession(conn, userId, quizId);
+                        System.Diagnostics.Debug.WriteLine($"Session ID: {sessionId}");
+
+                        // Calculate total points from quiz including bonuses
+                        int totalPointsIncludingBonuses = totalPointsEarned;
+
+                        // Calculate and add completion bonuses (only if not already completed)
+                        if (!alreadyCompleted)
                         {
                             int completionBonus = 10;
                             int firstTimeBonus = 20;
                             int perfectScoreBonus = (correctAnswers == 10) ? 50 : 0;
-
                             int totalBonus = completionBonus + firstTimeBonus + perfectScoreBonus;
+
+                            totalPointsIncludingBonuses += totalBonus;
 
                             if (totalBonus > 0)
                             {
-                                AddPointsTransaction(conn, userId, totalBonus, "Phone Scams Quiz - Completion Bonus");
+                                System.Diagnostics.Debug.WriteLine($"Adding completion bonus: {totalBonus} points");
+
+                                string bonusDescription = "Phone Scams Quiz - Completion Bonus";
+                                if (perfectScoreBonus > 0)
+                                {
+                                    bonusDescription += " (Perfect Score!)";
+                                }
+
+                                bool bonusSuccess = AddPointsTransaction(conn, userId, totalBonus, bonusDescription);
+                                System.Diagnostics.Debug.WriteLine($"Bonus points success: {bonusSuccess}");
+
+                                if (!bonusSuccess)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("Warning: Failed to add bonus points");
+                                }
                             }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("Quiz already completed - no bonus points awarded");
+                        }
+
+                        // Update session as completed
+                        string updateSessionQuery = @"
+                            UPDATE UserQuizSessions 
+                            SET EndTime = @EndTime, 
+                                TotalQuestions = @TotalQuestions, 
+                                CorrectAnswers = @CorrectAnswers, 
+                                TotalPointsEarned = @TotalPointsEarned,
+                                SessionStatus = @SessionStatus
+                            WHERE SessionId = @SessionId";
+
+                        using (SqlCommand cmd = new SqlCommand(updateSessionQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@EndTime", DateTime.Now);
+                            cmd.Parameters.AddWithValue("@TotalQuestions", 10);
+                            cmd.Parameters.AddWithValue("@CorrectAnswers", correctAnswers);
+                            cmd.Parameters.AddWithValue("@TotalPointsEarned", totalPointsIncludingBonuses);
+                            cmd.Parameters.AddWithValue("@SessionStatus", "Completed");
+                            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+
+                            int rowsAffected = cmd.ExecuteNonQuery();
+                            System.Diagnostics.Debug.WriteLine($"Session updated: {rowsAffected} rows affected");
                         }
                     }
 
@@ -471,6 +667,8 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error in CompleteQuiz: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 return "Error: " + ex.Message;
             }
         }
