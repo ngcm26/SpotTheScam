@@ -1,10 +1,6 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="CreateBlog.aspx.cs" Inherits="SpotTheScam.User.CreateBlog" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style type="text/css">
-        .auto-style1 {
-            width: 1129px;
-            height: 243px;
-        }
         .auto-style3 {
             width: 1052px;
             height: 15px;
@@ -15,14 +11,14 @@
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    
     <div class="text-start">
-
         &nbsp;<asp:Button ID="btn_back" runat="server" Text="Back" />
         <table class="w-100">
             <tr>
                 <td class="auto-style3">Blog Title:</td>
                 <td class="auto-style4">
-                    <asp:Button ID="btn_Publish" runat="server" Text="Publish" />
+                    <asp:Button ID="btn_Publish" runat="server" Text="Publish" OnClick="btn_Publish_Click" />
                 </td>
             </tr>
         </table>
@@ -36,7 +32,8 @@
         <br />
         <br />
         Content:<br />
-        <textarea id="tb_BlogContent" class="auto-style1" name="S1"></textarea><br />
+        <asp:TextBox ID="tb_BlogContent" runat="server" Height="297px" TextMode="MultiLine" Width="1053px"></asp:TextBox>
+        <br />
 
     </div>
 </asp:Content>
