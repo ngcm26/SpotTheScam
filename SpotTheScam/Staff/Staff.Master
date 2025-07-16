@@ -71,6 +71,7 @@
                         <asp:PlaceHolder ID="phNavOptions" runat="server" Visible="false">
                             <li class="nav-item"><a class="nav-link" href="StaffDashboard.aspx">Dashboard</a></li>
                             <li class="nav-item"><a class="nav-link" href="ManageUsers.aspx">Manage Users</a></li>
+                            <li class="nav-item"><a class="nav-link" href="ManageBlog.aspx">Manage Blog</a></li>
                             <li class="nav-item"><a class="nav-link" href="StaffExpertWebinar.aspx">Expert Webinars</a></li>
                             <li class="nav-item"><a class="nav-link" href="ViewModules.aspx">Modules</a></li>
                             <li class="nav-item"><a class="nav-link btn btn-sm btn-danger text-white ms-2" href="StaffLogout.aspx">Logout</a></li>
