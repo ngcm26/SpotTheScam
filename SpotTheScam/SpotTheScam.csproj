@@ -358,6 +358,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Uploads\Blog_Pictures\" />
     <Folder Include="Uploads\Modules\" />
   </ItemGroup>
   <PropertyGroup>
