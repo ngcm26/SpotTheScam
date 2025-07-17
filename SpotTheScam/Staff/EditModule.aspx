@@ -123,6 +123,35 @@
             display: block;
             margin-bottom: 8px;
         }
+        .form-actions {
+            margin-top: 18px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #C46A1D;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #a85a1a;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">

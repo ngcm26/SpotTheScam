@@ -55,7 +55,7 @@ namespace SpotTheScam.User
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                string query = "SELECT * FROM ModuleInformation WHERE module_id = @module_id";
+                string query = "SELECT mi.*, m.module_name FROM ModuleInformation mi INNER JOIN Modules m ON mi.module_id = m.module_id WHERE mi.module_id = @module_id";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@module_id", moduleId);

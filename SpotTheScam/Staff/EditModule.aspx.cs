@@ -40,8 +40,8 @@ namespace SpotTheScam
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    // Load from Modules table for author and status
-                    string modQuery = "SELECT author, status FROM Modules WHERE module_id = @module_id";
+                    // Load from Modules table for module_name, author, status, and cover_image
+                    string modQuery = "SELECT module_name, author, status, cover_image FROM Modules WHERE module_id = @module_id";
                     using (SqlCommand modCmd = new SqlCommand(modQuery, conn))
                     {
                         modCmd.Parameters.AddWithValue("@module_id", Request.QueryString["module_id"]);
@@ -49,10 +49,19 @@ namespace SpotTheScam
                         {
                             if (modReader.Read())
                             {
+                                txtModuleName.Text = modReader["module_name"].ToString();
                                 txtAuthor.Text = modReader["author"].ToString();
                                 string status = modReader["status"].ToString();
                                 if (!string.IsNullOrEmpty(status) && ddlStatus.Items.FindByValue(status) != null)
                                     ddlStatus.SelectedValue = status;
+                                
+                                // Load cover image
+                                string coverImage = modReader["cover_image"].ToString();
+                                if (!string.IsNullOrEmpty(coverImage))
+                                {
+                                    imgCurrentCover.ImageUrl = coverImage;
+                                    imgCurrentCover.Visible = true;
+                                }
                             }
                         }
                     }
@@ -65,7 +74,6 @@ namespace SpotTheScam
                         {
                             if (reader.Read())
                             {
-                                txtModuleName.Text = reader["module_name"].ToString();
                                 txtDescription.Text = reader["description"].ToString();
                                 txtIntroduction.Text = reader["introduction"].ToString();
                                 txtHeader1.Text = reader["header1"].ToString();
@@ -93,18 +101,6 @@ namespace SpotTheScam
                                     imgCurrentImage2.Visible = true;
                                 }
                             }
-                        }
-                    }
-                    // Load cover image
-                    string coverQuery = "SELECT cover_image FROM Modules WHERE module_id = @module_id";
-                    using (SqlCommand coverCmd = new SqlCommand(coverQuery, conn))
-                    {
-                        coverCmd.Parameters.AddWithValue("@module_id", Request.QueryString["module_id"]);
-                        object coverObj = coverCmd.ExecuteScalar();
-                        if (coverObj != null && !string.IsNullOrEmpty(coverObj.ToString()))
-                        {
-                            imgCurrentCover.ImageUrl = coverObj.ToString();
-                            imgCurrentCover.Visible = true;
                         }
                     }
                 }
@@ -159,13 +155,14 @@ namespace SpotTheScam
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
-                        // Update Modules table for author, status, and cover image
-                        string modUpdate = @"UPDATE Modules SET author = @author, status = @status {0} WHERE module_id = @module_id";
+                        // Update Modules table for module_name, author, status, and cover image
+                        string modUpdate = @"UPDATE Modules SET module_name = @module_name, author = @author, status = @status {0} WHERE module_id = @module_id";
                         string coverSet = coverImagePath != null ? ", cover_image = @cover_image" : "";
                         modUpdate = string.Format(modUpdate, coverSet);
                         using (SqlCommand modCmd = new SqlCommand(modUpdate, conn))
                         {
                             modCmd.Parameters.AddWithValue("@module_id", moduleId);
+                            modCmd.Parameters.AddWithValue("@module_name", txtModuleName.Text.Trim());
                             modCmd.Parameters.AddWithValue("@status", ddlStatus.SelectedValue);
                             modCmd.Parameters.AddWithValue("@author", txtAuthor.Text);
                             if (coverImagePath != null) modCmd.Parameters.AddWithValue("@cover_image", coverImagePath);
@@ -181,7 +178,6 @@ namespace SpotTheScam
                             {
                                 // Update
                                 string updateQuery = @"UPDATE ModuleInformation SET
-                                    module_name = @module_name,
                                     description = @description,
                                     introduction = @introduction,
                                     header1 = @header1,
@@ -203,7 +199,6 @@ namespace SpotTheScam
                                 using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                                 {
                                     cmd.Parameters.AddWithValue("@module_id", moduleId);
-                                    cmd.Parameters.AddWithValue("@module_name", txtModuleName.Text.Trim());
                                     cmd.Parameters.AddWithValue("@description", txtDescription.Text.Trim());
                                     cmd.Parameters.AddWithValue("@introduction", txtIntroduction.Text.Trim());
                                     cmd.Parameters.AddWithValue("@header1", txtHeader1.Text.Trim());
@@ -225,13 +220,12 @@ namespace SpotTheScam
                             {
                                 // Insert
                                 string insertQuery = @"INSERT INTO ModuleInformation
-                                    (module_id, module_name, description, introduction, header1, header1_text, header2, header2_text, header3, header3_text, header4, header4_text, header5, header5_text, image1, image2)
+                                    (module_id, description, introduction, header1, header1_text, header2, header2_text, header3, header3_text, header4, header4_text, header5, header5_text, image1, image2)
                                     VALUES
-                                    (@module_id, @module_name, @description, @introduction, @header1, @header1_text, @header2, @header2_text, @header3, @header3_text, @header4, @header4_text, @header5, @header5_text, @image1, @image2)";
+                                    (@module_id, @description, @introduction, @header1, @header1_text, @header2, @header2_text, @header3, @header3_text, @header4, @header4_text, @header5, @header5_text, @image1, @image2)";
                                 using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                                 {
                                     cmd.Parameters.AddWithValue("@module_id", moduleId);
-                                    cmd.Parameters.AddWithValue("@module_name", txtModuleName.Text.Trim());
                                     cmd.Parameters.AddWithValue("@description", txtDescription.Text.Trim());
                                     cmd.Parameters.AddWithValue("@introduction", txtIntroduction.Text.Trim());
                                     cmd.Parameters.AddWithValue("@header1", txtHeader1.Text.Trim());
@@ -251,7 +245,7 @@ namespace SpotTheScam
                             }
                         }
                     }
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "updateSuccess", "alert('Module information updated successfully!');", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "updateSuccess", "alert('Module information updated successfully!'); window.location='ViewModules.aspx';", true);
                 }
                 catch (Exception ex)
                 {
