@@ -10,7 +10,8 @@
         <asp:Image ID="img_cover" runat="server" Height="287px" Width="1104px" />
     </p>
     <p>
-        <asp:Label ID="lbl_content" runat="server"></asp:Label>
+        
+        <asp:Literal ID="lbl_content" runat="server" Mode="PassThrough" />
     </p>
     <p>
         &nbsp;</p>

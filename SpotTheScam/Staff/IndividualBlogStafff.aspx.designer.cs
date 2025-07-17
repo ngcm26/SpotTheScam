@@ -48,6 +48,6 @@ namespace SpotTheScam.Staff
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lbl_content;
+        protected global::System.Web.UI.WebControls.Literal lbl_content;
     }
 }

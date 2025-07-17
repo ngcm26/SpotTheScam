@@ -34,6 +34,7 @@ namespace SpotTheScam.User
 
                 string image = "";
                 string blog_title = tb_BlogTitle.Text;
+
                 string blog_content = tb_BlogContent.Text;
                 DateTime current_time = DateTime.Now;
 
