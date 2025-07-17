@@ -7,6 +7,8 @@ using System.Runtime.Remoting.Contexts;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Ganss.XSS;
+
 
 namespace SpotTheScam.User
 {
