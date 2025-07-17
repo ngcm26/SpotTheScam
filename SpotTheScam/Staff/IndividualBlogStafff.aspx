@@ -2,7 +2,18 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+    <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+    <h2>
+    <asp:Label ID="lbl_title" runat="server"></asp:Label>
+    </h2>
+    <p>
+        <asp:Image ID="img_cover" runat="server" Height="287px" Width="1104px" />
+    </p>
+    <p>
+        <asp:Label ID="lbl_content" runat="server"></asp:Label>
+    </p>
+    <p>
+        &nbsp;</p>
     <br />
     <br />
     <br />
