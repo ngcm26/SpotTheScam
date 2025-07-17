@@ -22,6 +22,11 @@ namespace SpotTheScam.Staff
 
         protected void gv_blog_SelectedIndexChanged(object sender, EventArgs e)
         {
+            GridViewRow row = gv_blog.SelectedRow;
+            int postID = int.Parse(row.Cells[0].Text);
+
+            Response.Redirect("IndividualBlogStafff.aspx?postID=" + postID);
+            
 
         }
 
