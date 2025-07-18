@@ -7,7 +7,8 @@ using System.Runtime.Remoting.Contexts;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Ganss.XSS;
+using Ganss.Xss;
+
 
 
 namespace SpotTheScam.User
@@ -37,7 +38,13 @@ namespace SpotTheScam.User
                 string image = "";
                 string blog_title = tb_BlogTitle.Text;
 
-                string blog_content = tb_BlogContent.Text;
+
+                string rawContent = tb_BlogContent.Text;
+                var sanitizer = new HtmlSanitizer();
+                string safeContent = sanitizer.Sanitize(rawContent);
+
+
+                string blog_content = safeContent;
                 DateTime current_time = DateTime.Now;
 
 
