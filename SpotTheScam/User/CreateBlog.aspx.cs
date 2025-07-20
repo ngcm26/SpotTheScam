@@ -7,6 +7,9 @@ using System.Runtime.Remoting.Contexts;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Ganss.Xss;
+
+
 
 namespace SpotTheScam.User
 {
@@ -14,6 +17,12 @@ namespace SpotTheScam.User
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["UserId"] == null)
+            {
+                Response.Write("<script>alert('Please login to proceed!');</script>");
+                Response.Redirect("UserLogin.aspx");
+            }
+
 
         }
 
@@ -28,8 +37,25 @@ namespace SpotTheScam.User
 
                 string image = "";
                 string blog_title = tb_BlogTitle.Text;
-                string blog_content = tb_BlogContent.Text;
+
+
+                string rawContent = tb_BlogContent.Text;
+                var sanitizer = new HtmlSanitizer();
+                string safeContent = sanitizer.Sanitize(rawContent);
+
+
+                string blog_content = safeContent;
                 DateTime current_time = DateTime.Now;
+
+
+                if (blog_FileUpload.HasFile)
+                {
+                    string folderPath = Server.MapPath("~/Uploads/Blog_Pictures/");
+                    image = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(blog_FileUpload.FileName);
+                    string fullPath = folderPath + image;
+
+                    blog_FileUpload.SaveAs(fullPath);
+                }
 
                 string connectionString = ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -49,20 +75,17 @@ namespace SpotTheScam.User
                     }
 
                 }
-                if (result >= 0)
+                if (result > 0)
                 {
-                    string folderPath = Server.MapPath("~/Uploads/");
-                    image = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(blog_FileUpload.FileName);
-                    string fullPath = folderPath + image;
-
-                    blog_FileUpload.SaveAs(fullPath);
-                    Response.Write("<script>alert('You have successfully submitted your blog post. Your blog post will be verified by a staff before being published!');</script>");
-                    Response.Redirect("UserHome.aspx");
+                    string script = "alert('You have successfully submitted your blog post. Your blog post will be verified by a staff before being published!'); window.location='UserHome.aspx';";
+                    ClientScript.RegisterStartupScript(this.GetType(), "alert", script, true);
                 }
                 else
                 {
-                    Response.Write("<script>alert('Problem submitting the blog post. Try again!');</script>");
+                    string script = "alert('Problem submitting the blog post. Try again!'); window.location='UserHome.aspx';";
+                    ClientScript.RegisterStartupScript(this.GetType(), "alert", script, true);
                 }
+
             }
             else
             {

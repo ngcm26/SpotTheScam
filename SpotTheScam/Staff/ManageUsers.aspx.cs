@@ -26,7 +26,7 @@ namespace SpotTheScam.Staff
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT Id, Username, Email, PhoneNumber FROM Users";
+                string query = "SELECT Id, Username, Email, PhoneNumber, Role FROM Users";
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -35,41 +35,27 @@ namespace SpotTheScam.Staff
             }
         }
 
-        protected void gvUsers_RowEditing(object sender, GridViewEditEventArgs e)
+        protected string GetRoleClass(string role)
         {
-            gvUsers.EditIndex = e.NewEditIndex;
-            LoadUsers();
-        }
-
-        protected void gvUsers_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
-        {
-            gvUsers.EditIndex = -1;
-            LoadUsers();
-        }
-
-        protected void gvUsers_RowUpdating(object sender, GridViewUpdateEventArgs e)
-        {
-            int userId = Convert.ToInt32(gvUsers.DataKeys[e.RowIndex].Value);
-
-            GridViewRow row = gvUsers.Rows[e.RowIndex];
-            string username = ((TextBox)(row.Cells[0].Controls[0])).Text.Trim();
-            string email = ((TextBox)(row.Cells[1].Controls[0])).Text.Trim();
-            string phone = ((TextBox)(row.Cells[2].Controls[0])).Text.Trim();
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            switch (role.ToLower())
             {
-                conn.Open();
-                string query = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber WHERE Id = @Id";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Username", username);
-                cmd.Parameters.AddWithValue("@Email", email);
-                cmd.Parameters.AddWithValue("@PhoneNumber", phone);
-                cmd.Parameters.AddWithValue("@Id", userId);
-                cmd.ExecuteNonQuery();
+                case "admin":
+                    return "role-admin";
+                case "staff":
+                    return "role-staff";
+                case "user":
+                default:
+                    return "role-user";
             }
+        }
 
-            gvUsers.EditIndex = -1;
-            LoadUsers();
+        protected void gvUsers_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "EditUser")
+            {
+                int userId = Convert.ToInt32(e.CommandArgument);
+                Response.Redirect($"EditUsers.aspx?user_id={userId}");
+            }
         }
 
         protected void gvUsers_RowDeleting(object sender, GridViewDeleteEventArgs e)
@@ -85,6 +71,39 @@ namespace SpotTheScam.Staff
                 cmd.ExecuteNonQuery();
             }
 
+            LoadUsers();
+        }
+
+        protected void btnFilter_Click(object sender, EventArgs e)
+        {
+            string searchTerm = txtSearch.Text.Trim();
+            
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT Id, Username, Email, PhoneNumber, Role FROM Users";
+                
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query += " WHERE Username LIKE @SearchTerm OR Email LIKE @SearchTerm OR PhoneNumber LIKE @SearchTerm OR Role LIKE @SearchTerm";
+                }
+                
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    da.SelectCommand.Parameters.AddWithValue("@SearchTerm", "%" + searchTerm + "%");
+                }
+                
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                gvUsers.DataSource = dt;
+                gvUsers.DataBind();
+            }
+        }
+
+        protected void btnClearFilters_Click(object sender, EventArgs e)
+        {
+            txtSearch.Text = "";
             LoadUsers();
         }
     }

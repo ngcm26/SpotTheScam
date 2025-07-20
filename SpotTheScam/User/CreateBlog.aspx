@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="CreateBlog.aspx.cs" Inherits="SpotTheScam.User.CreateBlog" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="CreateBlog.aspx.cs" Inherits="SpotTheScam.User.CreateBlog" ValidateRequest="false" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style type="text/css">
         .auto-style3 {
@@ -9,6 +9,8 @@
             height: 15px;
         }
     </style>
+    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     
@@ -32,7 +34,11 @@
         <br />
         <br />
         Content:<br />
-        <asp:TextBox ID="tb_BlogContent" runat="server" Height="297px" TextMode="MultiLine" Width="1053px"></asp:TextBox>
+        <asp:TextBox ID="tb_BlogContent" runat="server" TextMode="MultiLine" Rows="10" Columns="80"></asp:TextBox>
+
+        <script>
+            CKEDITOR.replace('<%= tb_BlogContent.ClientID %>');
+        </script>
         <br />
 
     </div>

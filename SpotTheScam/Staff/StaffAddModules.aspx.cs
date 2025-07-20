@@ -131,14 +131,13 @@ namespace SpotTheScam.Staff
                     lblMessage.Text = "Saving detailed module information...";
 
                     string infoQuery = @"INSERT INTO ModuleInformation
-                        (module_id, module_name, description, introduction, header1, header1_text, header2, header2_text, header3, header3_text, header4, header4_text, header5, header5_text, image1, image2)
+                        (module_id, description, introduction, header1, header1_text, header2, header2_text, header3, header3_text, header4, header4_text, header5, header5_text, image1, image2)
                         VALUES
-                        (@module_id, @module_name, @description, @introduction, @header1, @header1_text, @header2, @header2_text, @header3, @header3_text, @header4, @header4_text, @header5, @header5_text, @image1, @image2)";
+                        (@module_id, @description, @introduction, @header1, @header1_text, @header2, @header2_text, @header3, @header3_text, @header4, @header4_text, @header5, @header5_text, @image1, @image2)";
 
                     using (SqlCommand cmd = new SqlCommand(infoQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@module_id", newModuleId);
-                        cmd.Parameters.AddWithValue("@module_name", moduleName);
                         cmd.Parameters.AddWithValue("@description", description);
                         cmd.Parameters.AddWithValue("@introduction", introduction);
                         cmd.Parameters.AddWithValue("@header1", header1);

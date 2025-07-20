@@ -28,16 +28,20 @@ namespace SpotTheScam.User
 
             if (!IsPostBack)
             {
-                LoadUserGroup();
+                BindGroupsSidebar();
+                if (CurrentGroupId != null)
+                    LoadSelectedGroup(CurrentGroupId.Value);
+                else
+                    ShowNoGroupSelected();
             }
         }
 
-        private void LoadUserGroup()
+        private void BindGroupsSidebar()
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                    SELECT fg.GroupId, fg.GroupName
+                    SELECT fg.GroupId, fg.GroupName, fg.DateCreated
                     FROM FamilyGroups fg
                     INNER JOIN FamilyGroupMembers fgm ON fg.GroupId = fgm.GroupId
                     WHERE fgm.UserId = @UserId
@@ -45,26 +49,23 @@ namespace SpotTheScam.User
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@UserId", CurrentUserId);
 
-                conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
-                {
-                    CurrentGroupId = Convert.ToInt32(reader["GroupId"]);
-                    ltGroupName.Text = reader["GroupName"].ToString();
-                    pnlGroupInfo.Visible = true;
-                    LoadGroupMembers();
-                }
-                else
-                {
-                    pnlGroupInfo.Visible = false;
-                }
-                reader.Close();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                // Add CurrentGroupId column for active styling
+                dt.Columns.Add("CurrentGroupId", typeof(int));
+                foreach (DataRow row in dt.Rows)
+                    row["CurrentGroupId"] = CurrentGroupId ?? -1;
+
+                rptGroups.DataSource = dt;
+                rptGroups.DataBind();
             }
         }
 
-        protected void btnCreateGroup_Click(object sender, EventArgs e)
+        protected void btnCreateGroupSidebar_Click(object sender, EventArgs e)
         {
-            string groupName = txtGroupName.Text.Trim();
+            string groupName = txtGroupNameSidebar.Text.Trim();
             if (string.IsNullOrEmpty(groupName))
             {
                 ShowAlert("Group name cannot be empty.", "danger");
@@ -77,7 +78,7 @@ namespace SpotTheScam.User
                 SqlTransaction transaction = conn.BeginTransaction();
                 try
                 {
-                    string insertGroup = "INSERT INTO FamilyGroups (GroupName, CreatedByUserId) OUTPUT INSERTED.GroupId VALUES (@GroupName, @CreatedByUserId)";
+                    string insertGroup = "INSERT INTO FamilyGroups (GroupName, CreatedByUserId, DateCreated) OUTPUT INSERTED.GroupId VALUES (@GroupName, @CreatedByUserId, GETDATE())";
                     SqlCommand cmdGroup = new SqlCommand(insertGroup, conn, transaction);
                     cmdGroup.Parameters.AddWithValue("@GroupName", groupName);
                     cmdGroup.Parameters.AddWithValue("@CreatedByUserId", CurrentUserId);
@@ -93,7 +94,8 @@ namespace SpotTheScam.User
                     transaction.Commit();
                     CurrentGroupId = groupId;
                     ShowAlert("Family group created successfully!", "success");
-                    LoadUserGroup();
+                    BindGroupsSidebar();
+                    LoadSelectedGroup(groupId);
                 }
                 catch (Exception ex)
                 {
@@ -101,6 +103,59 @@ namespace SpotTheScam.User
                     ShowAlert("Error creating group: " + ex.Message, "danger");
                 }
             }
+        }
+
+        protected void lnkSelectGroup_Click(object sender, EventArgs e)
+        {
+            var lnk = sender as LinkButton;
+            if (lnk == null) return;
+
+            int groupId;
+            if (!int.TryParse(lnk.CommandArgument, out groupId)) return;
+
+            CurrentGroupId = groupId;
+            BindGroupsSidebar();
+            LoadSelectedGroup(groupId);
+        }
+
+        private void LoadSelectedGroup(int groupId)
+        {
+            // Load group details
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT GroupName, DateCreated FROM FamilyGroups WHERE GroupId = @GroupId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@GroupId", groupId);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    ltGroupNameSidebar.Text = reader["GroupName"].ToString();
+                    ltGroupCreatedSidebar.Text = Convert.ToDateTime(reader["DateCreated"]).ToString("d");
+                }
+                reader.Close();
+            }
+
+            // Load member count
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT COUNT(*) FROM FamilyGroupMembers WHERE GroupId = @GroupId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@GroupId", groupId);
+                conn.Open();
+                int memberCount = (int)cmd.ExecuteScalar();
+                ltGroupMemberCount.Text = memberCount.ToString();
+            }
+
+            pnlGroupDetails.Visible = true;
+            pnlNoGroupSelected.Visible = false;
+            LoadGroupMembers(groupId);
+        }
+
+        private void ShowNoGroupSelected()
+        {
+            pnlGroupDetails.Visible = false;
+            pnlNoGroupSelected.Visible = true;
         }
 
         protected void btnAddMember_Click(object sender, EventArgs e)
@@ -154,14 +209,12 @@ namespace SpotTheScam.User
                 cmdInsert.ExecuteNonQuery();
 
                 ShowAlert("Member added successfully!", "success");
-                LoadGroupMembers();
+                LoadGroupMembers(CurrentGroupId.Value);
             }
         }
 
-        private void LoadGroupMembers()
+        private void LoadGroupMembers(int groupId)
         {
-            if (CurrentGroupId == null) return;
-
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
@@ -171,7 +224,7 @@ namespace SpotTheScam.User
                     WHERE fgm.GroupId = @GroupId
                 ";
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@GroupId", CurrentGroupId);
+                cmd.Parameters.AddWithValue("@GroupId", groupId);
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -207,7 +260,7 @@ namespace SpotTheScam.User
                 cmd.ExecuteNonQuery();
             }
             ShowAlert("Member removed successfully.", "success");
-            LoadGroupMembers();
+            LoadGroupMembers(CurrentGroupId.Value);
         }
 
         private void ShowAlert(string message, string type)
@@ -230,7 +283,7 @@ namespace SpotTheScam.User
                 int index = Convert.ToInt32(((GridViewRow)((Button)e.CommandSource).NamingContainer).RowIndex);
                 gvMembers.EditIndex = index;
                 EditingRowIndex = index;
-                LoadGroupMembers();
+                LoadGroupMembers(CurrentGroupId.Value);
             }
             else if (e.CommandName == "SaveRole")
             {
@@ -255,13 +308,13 @@ namespace SpotTheScam.User
                 gvMembers.EditIndex = -1;
                 EditingRowIndex = -1;
                 ShowAlert("Role updated successfully.", "success");
-                LoadGroupMembers();
+                LoadGroupMembers(CurrentGroupId.Value);
             }
             else if (e.CommandName == "CancelEdit")
             {
                 gvMembers.EditIndex = -1;
                 EditingRowIndex = -1;
-                LoadGroupMembers();
+                LoadGroupMembers(CurrentGroupId.Value);
             }
         }
 
@@ -269,10 +322,7 @@ namespace SpotTheScam.User
         {
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
-                // Only show Edit/Save/Cancel buttons for admins
                 DataRowView drv = (DataRowView)e.Row.DataItem;
-                string role = drv["Role"].ToString();
-                int userId = Convert.ToInt32(drv["UserId"]);
                 bool isAdmin = IsCurrentUserAdmin();
 
                 Button btnEdit = (Button)e.Row.FindControl("btnEdit");
@@ -300,5 +350,73 @@ namespace SpotTheScam.User
             }
         }
 
+        protected void btnRenameGroup_Click(object sender, EventArgs e)
+        {
+            if (CurrentGroupId == null)
+            {
+                ShowAlert("No group selected.", "danger");
+                return;
+            }
+            string newName = txtRenameGroup.Text.Trim();
+            if (string.IsNullOrEmpty(newName))
+            {
+                ShowAlert("Group name cannot be empty.", "danger");
+                return;
+            }
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string update = "UPDATE FamilyGroups SET GroupName = @GroupName WHERE GroupId = @GroupId";
+                SqlCommand cmd = new SqlCommand(update, conn);
+                cmd.Parameters.AddWithValue("@GroupName", newName);
+                cmd.Parameters.AddWithValue("@GroupId", CurrentGroupId);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            ShowAlert("Group name updated successfully.", "success");
+            BindGroupsSidebar();
+            LoadSelectedGroup(CurrentGroupId.Value);
+        }
+
+        protected void btnDeleteGroup_Click(object sender, EventArgs e)
+        {
+            if (CurrentGroupId == null)
+            {
+                ShowAlert("No group selected.", "danger");
+                return;
+            }
+            if (!IsCurrentUserAdmin())
+            {
+                ShowAlert("Only admins can delete the group.", "danger");
+                return;
+            }
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                SqlTransaction transaction = conn.BeginTransaction();
+                try
+                {
+                    string deleteMembers = "DELETE FROM FamilyGroupMembers WHERE GroupId = @GroupId";
+                    SqlCommand cmdMembers = new SqlCommand(deleteMembers, conn, transaction);
+                    cmdMembers.Parameters.AddWithValue("@GroupId", CurrentGroupId);
+                    cmdMembers.ExecuteNonQuery();
+
+                    string deleteGroup = "DELETE FROM FamilyGroups WHERE GroupId = @GroupId";
+                    SqlCommand cmdGroup = new SqlCommand(deleteGroup, conn, transaction);
+                    cmdGroup.Parameters.AddWithValue("@GroupId", CurrentGroupId);
+                    cmdGroup.ExecuteNonQuery();
+
+                    transaction.Commit();
+                    Session["CurrentGroupId"] = null;
+                    BindGroupsSidebar();
+                    ShowNoGroupSelected();
+                    ShowAlert("Group deleted successfully.", "success");
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    ShowAlert("Error deleting group: " + ex.Message, "danger");
+                }
+            }
+        }
     }
 }
