@@ -1138,13 +1138,14 @@
         }
 
         // Window onload to properly handle dynamic starting points
+        // Window onload to properly handle dynamic starting points
         window.onload = function () {
             // Check if we have a stored question index from server
             var storedIndex = document.getElementById('<%= hdnCurrentQuestionIndex.ClientID %>').value;
             if (storedIndex && storedIndex !== '') {
                 currentQuestionIndex = parseInt(storedIndex);
             }
-            
+
             // Check if hint was used from server
             var storedHintUsed = document.getElementById('<%= hdnHintUsed.ClientID %>').value;
             if (storedHintUsed === 'true') {
@@ -1158,6 +1159,13 @@
             // Store the starting points as a data attribute for later reference
             document.getElementById('<%= lblCurrentPoints.ClientID %>').setAttribute('data-starting-points', userActualPoints);
 
+            // CRITICAL: Clear session storage if we're starting a fresh quiz (question index = 0)
+            if (currentQuestionIndex === 0) {
+                console.log("Starting fresh quiz - clearing session storage");
+                sessionStorage.removeItem('quizPoints');
+                sessionStorage.removeItem('correctAnswers');
+            }
+
             // CRITICAL: Points management with dynamic starting points
             var storedPoints = sessionStorage.getItem('quizPoints');
             var storedCorrectAnswers = sessionStorage.getItem('correctAnswers');
@@ -1167,7 +1175,7 @@
                 totalPoints = parseInt(storedPoints);
                 correctAnswersCount = parseInt(storedCorrectAnswers || '0');
                 console.log("Restored points from session:", totalPoints, "Correct answers:", correctAnswersCount);
-            } else if (currentQuestionIndex === 0) {
+            } else {
                 // Use the user's actual current points from database as starting point
                 totalPoints = userActualPoints;
                 correctAnswersCount = 0;
