@@ -365,160 +365,69 @@
                     <div class="col-md-4 text-end">
                         <div>
                             <span class="filter-label">Current Points:</span>
-                            <span class="points-badge">75 ⭐</span>
+                            <span class="points-badge"><asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Session Cards -->
+            <!-- Dynamic Session Cards -->
             <div class="row">
                 <div class="col-12">
-                    <!-- Session 1 -->
-                    <div class="session-card" runat="server" id="session1">
-                        <div class="session-header">
-                            <span class="session-date">📅 June 15, 2025</span>
-                            <span class="session-time">🕐 2:00 PM - 3:00 PM</span>
-                            <span class="session-type type-free">FREE</span>
-                        </div>
-                        
-                        <h3 class="session-title">Protecting Your Online Banking</h3>
-                        <p class="session-description">
-                            Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.
-                        </p>
-                        
-                        <div class="expert-info">
-                            <img src="/Images/expert2.jpg" alt="Dr Harvey Blue" class="expert-avatar" />
-                            <div>
-                                <div class="expert-name">Dr Harvey Blue</div>
-                                <div class="expert-title">Cybersecurity Specialist, 15+ years experience</div>
-                            </div>
-                        </div>
-                        
-                        <div class="session-details">
-                            <div class="detail-item">
-                                <span class="detail-icon">👥</span>
-                                <span>Up to 100 Participants</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">⏱️</span>
-                                <span>60 minutes + Q&A</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">💻</span>
-                                <span>Live via video call</span>
-                            </div>
-                        </div>
-                        
-                        <div class="session-footer">
-                            <div class="spots-remaining">
-                                <span class="spots-count">47</span> spots remaining
-                            </div>
-                            <a href="UserWebinarRegistration.aspx?sessionId=1" class="register-btn">Register Now</a>
-                        </div>
-                    </div>
-
-                    <!-- Session 2 -->
-                    <div class="session-card" runat="server" id="session2">
-                        <div class="session-header">
-                            <span class="session-date">📅 June 17, 2025</span>
-                            <span class="session-time">🕐 10:00 AM - 11:30 AM</span>
-                            <span class="session-type type-premium">PREMIUM</span>
-                        </div>
-                        
-                        <h3 class="session-title">Small Group: Latest Phone Scam Tactics</h3>
-                        <p class="session-description">
-                            Intimate session with max 10 participants. Deep dive into current phone scam methods with personalized Q&A time.
-                        </p>
-                        
-                        <div class="expert-info">
-                            <img src="/Images/expert3.jpg" alt="Officer James Wilson" class="expert-avatar" />
-                            <div>
-                                <div class="expert-name">Officer James Wilson</div>
-                                <div class="expert-title">Investigating phone and romance scams for 10+ years, helping victims recover</div>
-                            </div>
-                        </div>
-                        
-                        <div class="session-details">
-                            <div class="detail-item">
-                                <span class="detail-icon">👥</span>
-                                <span>Max 10 Participants</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">⏱️</span>
-                                <span>90 minutes</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">💡</span>
-                                <span>Personalized advice</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">📞</span>
-                                <span>Extended Q&A time</span>
-                            </div>
-                        </div>
-                        
-                        <div class="session-footer">
-                            <div>
-                                <div class="points-required">50 POINTS</div>
-                                <div class="spots-remaining">
-                                    Only <span class="spots-count">3</span> spots remaining
+                    <asp:Repeater ID="rptSessions" runat="server">
+                        <ItemTemplate>
+                            <div class="session-card">
+                                <div class="session-header">
+                                    <span class="session-date">📅 <%# Eval("SessionDate", "{0:MMMM dd, yyyy}") %></span>
+                                    <span class="session-time">🕐 <%# Eval("StartTime") %> - <%# Eval("EndTime") %></span>
+                                    <span class="session-type <%# GetSessionTypeClass(Eval("PointsRequired")) %>"><%# GetSessionTypeText(Eval("PointsRequired"), Eval("SessionType")) %></span>
+                                </div>
+                                
+                                <h3 class="session-title"><%# Eval("Title") %></h3>
+                                <p class="session-description"><%# Eval("Description") %></p>
+                                
+                                <div class="expert-info">
+                                    <img src="<%# GetExpertImage(Eval("SessionId")) %>" alt="<%# Eval("ExpertName") %>" class="expert-avatar" />
+                                    <div>
+                                        <div class="expert-name"><%# Eval("ExpertName") %></div>
+                                        <div class="expert-title"><%# Eval("ExpertTitle") %></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="session-details">
+                                    <div class="detail-item">
+                                        <span class="detail-icon">👥</span>
+                                        <span><%# GetParticipantText(Eval("CurrentRegistrations"), Eval("MaxParticipants")) %></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">⏱️</span>
+                                        <span>60 minutes + Q&A</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">💻</span>
+                                        <span>Live via video call</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="session-footer">
+                                    <div>
+                                        <asp:PlaceHolder ID="phPointsRequired" runat="server" Visible='<%# Convert.ToInt32(Eval("PointsRequired")) > 0 %>'>
+                                            <div class="points-required"><%# GetPointsText(Eval("PointsRequired"), Eval("SessionType")) %></div>
+                                        </asp:PlaceHolder>
+                                        <div class="spots-remaining">
+                                            <span class="spots-count"><%# Eval("AvailableSpots") %></span> spots remaining
+                                        </div>
+                                    </div>
+                                    <asp:PlaceHolder ID="phSessionButton" runat="server" Visible='<%# IsSessionAvailable(Eval("AvailableSpots")) %>'>
+                                        <a href='<%# "UserWebinarRegistration.aspx?sessionId=" + Eval("SessionId") %>' class='<%# GetButtonClass(Eval("AvailableSpots"), Eval("PointsRequired")) %>'><%# GetButtonText(Eval("AvailableSpots"), Eval("PointsRequired")) %></a>
+                                    </asp:PlaceHolder>
+                                    <asp:PlaceHolder ID="phDisabledButton" runat="server" Visible='<%# !IsSessionAvailable(Eval("AvailableSpots")) %>'>
+                                        <button class="need-points-btn" disabled><%# GetButtonText(Eval("AvailableSpots"), Eval("PointsRequired")) %></button>
+                                    </asp:PlaceHolder>
                                 </div>
                             </div>
-                            <a href="UserWebinarRegistration.aspx?sessionId=2" class="reserve-btn">Reserve Spot</a>
-                        </div>
-                    </div>
-
-                    <!-- Session 3 -->
-                    <div class="session-card" runat="server" id="session3">
-                        <div class="session-header">
-                            <span class="session-date">📅 June 19, 2025</span>
-                            <span class="session-time">🕐 3:00 PM - 4:00 PM</span>
-                            <span class="session-type type-premium">PREMIUM</span>
-                        </div>
-                        
-                        <h3 class="session-title">VIP One-on-One Safety Consultation</h3>
-                        <p class="session-description">
-                            Private consultation to review your personal digital security, analyze any suspicious communications, and create a personalized safety plan.
-                        </p>
-                        
-                        <div class="expert-info">
-                            <img src="/Images/expert1.jpg" alt="Maria Rodriguez" class="expert-avatar" />
-                            <div>
-                                <div class="expert-name">Maria Rodriguez</div>
-                                <div class="expert-title">Digital Safety Educator, Senior Specialist</div>
-                            </div>
-                        </div>
-                        
-                        <div class="session-details">
-                            <div class="detail-item">
-                                <span class="detail-icon">👤</span>
-                                <span>One-on-one session</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">⏱️</span>
-                                <span>60 minutes</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">📋</span>
-                                <span>Personal safety plan</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-icon">📞</span>
-                                <span>Follow-up support</span>
-                            </div>
-                        </div>
-                        
-                        <div class="session-footer">
-                            <div>
-                                <div class="points-required">100 POINTS</div>
-                                <div class="spots-remaining">
-                                    <span style="color: #dc3545; font-weight: 600;">Insufficient Points (Need 25 more)</span>
-                                </div>
-                            </div>
-                            <button class="need-points-btn" disabled>Need More Points</button>
-                        </div>
-                    </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </div>
             </div>
         </div>

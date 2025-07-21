@@ -1,229 +1,470 @@
-﻿<%@ Page Title="Expert Webinar Sessions" Language="C#" MasterPageFile="Staff.master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.Staff.StaffExpertWebinar" UnobtrusiveValidationMode="None" %>
+﻿<%@ Page Title="Webinar Management" Language="C#" MasterPageFile="Staff.master" AutoEventWireup="true" CodeBehind="StaffExpertWebinar.aspx.cs" Inherits="SpotTheScam.Staff.StaffExpertWebinar" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
-        .container-custom {
-            max-width: 1200px;
-            margin: 30px auto;
+        body, .management-container, .management-container *, .section-title, .tab-btn, .form-label, .filter-dropdown {
+            font-family: 'DM Sans', Arial, sans-serif !important;
+        }
+
+        .page-container {
+            margin-top: 24px;
+            margin-bottom: 32px;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #051D40 0%, #34495e 100%);
+            color: white;
+            padding: 32px 24px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .header-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+        }
+
+        .header-subtitle {
+            font-size: 1.08em;
+            margin: 12px 0 0 0;
+            opacity: 0.9;
+            color: white;
+        }
+
+        .management-tabs {
+            margin-bottom: 32px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .tab-btn {
+            background: #f8f9fa;
+            color: #051D40;
+            border: 1.5px solid #bfc5ce;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1.08em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .tab-btn.active {
+            background: #051D40;
+            color: white;
+            border-color: #051D40;
+        }
+
+        .tab-btn:hover {
+            background: #C46A1D;
+            color: white;
+            border-color: #C46A1D;
+        }
+
+        .management-section {
             background: white;
-            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 32px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            margin-bottom: 32px;
         }
 
-        .form-section {
-            background-color: #f9f9f9;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 0.2em;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .section-divider {
+            border: none;
+            border-top: 2px solid #222;
+            margin-bottom: 24px;
+            margin-top: 8px;
         }
 
-        label {
-            display: inline-block;
-            width: 120px;
-            font-weight: bold;
-            color: #333;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
-        input[type="date"], input[type="time"], .btn {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
+        .stat-card {
+            background: linear-gradient(135deg, #051D40 0%, #0056b3 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 10px;
+            text-align: center;
         }
 
-        .btn-add {
-            background-color: #e67e22;
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .session-card {
+            background: #f8f9fa;
+            border: 1.5px solid #e9ecef;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .session-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #051D40;
+            margin: 0;
+        }
+
+        .session-date {
+            color: #585252;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .participant-count {
+            background: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #051D40;
+            font-size: 1.08em;
+        }
+
+        .filter-dropdown {
+            padding: 10px 16px;
+            border: 1.5px solid #bfc5ce;
+            border-radius: 6px;
+            background: white;
+            font-size: 1.08em;
+            color: #585252;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-dropdown:focus {
+            border-color: #C46A1D;
+        }
+
+        .action-btn {
+            background: #051D40;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1em;
             cursor: pointer;
-            font-size: 14px;
-            margin-left: 10px;
+            transition: background-color 0.2s ease;
+            margin-right: 12px;
         }
 
-        .btn-add:hover {
-            background-color: #d35400;
+        .action-btn:hover {
+            background: #C46A1D;
         }
 
-        .btn-delete {
-            background-color: #e74c3c;
+        .action-btn.danger {
+            background: #dc3545;
+        }
+
+        .action-btn.danger:hover {
+            background: #c82333;
+        }
+
+        .export-btn {
+            background: #28a745;
             color: white;
             border: none;
-            padding: 5px 15px;
-            border-radius: 3px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1em;
             cursor: pointer;
-            font-size: 12px;
+            margin-left: auto;
         }
 
-        .btn-delete:hover {
-            background-color: #c0392b;
+        .export-btn:hover {
+            background: #218838;
         }
 
-        .sessions-table {
+        .participants-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            font-family: 'DM Sans', Arial, sans-serif;
         }
 
-        .sessions-table th, .sessions-table td {
-            border: 1px solid #ddd;
+        .participants-table th,
+        .participants-table td {
             padding: 12px;
             text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 1em;
         }
 
-        .sessions-table th {
-            background-color: #f8f8f8;
-            font-weight: bold;
+        .participants-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #051D40;
         }
 
-        .sessions-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .session-info-card {
+            background: #fff8e1;
+            border: 1.5px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
         }
 
-        .status-available {
-            color: #28a745;
-            font-weight: bold;
+        .session-info-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #051D40;
+            margin-bottom: 12px;
         }
 
-        .status-booked {
-            color: #007bff;
-            font-weight: bold;
+        .session-info-details {
+            color: #585252;
+            line-height: 1.6;
         }
 
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-            border-radius: 4px;
-        }
+        @media (max-width: 768px) {
+            .session-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-        .alert-success {
-            color: #155724;
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-        }
-
-        .alert-error {
-            color: #721c24;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-        }
-
-        h2 {
-            color: #e67e22;
-            border-bottom: 2px solid #e67e22;
-            padding-bottom: 10px;
-        }
-
-        h3 {
-            color: #e67e22;
-            margin-top: 0;
-        }
-
-        .hidden {
-            display: none;
+            .management-tabs {
+                flex-direction: column;
+            }
         }
     </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div class="container-custom">
-        <h2>Manage Expert Webinar Sessions</h2>
-
-        <!-- Add Time Slot Form -->
-        <div class="form-section">
-            <h3>Add Available Time Slots</h3>
-
-            <!-- Alert Panel -->
-            <asp:Panel ID="AlertPanel" runat="server" CssClass="hidden">
-                <asp:Label ID="AlertMessage" runat="server"></asp:Label>
-            </asp:Panel>
-
-            <div class="form-group">
-                <label for="SessionDate">Date:</label>
-                <asp:TextBox ID="SessionDate" runat="server" TextMode="Date" CssClass="form-control"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="DateValidator" runat="server" 
-                                            ControlToValidate="SessionDate" 
-                                            ErrorMessage="Date is required" 
-                                            ForeColor="Red" 
-                                            ValidationGroup="AddSession">
-                </asp:RequiredFieldValidator>
-            </div>
-
-            <div class="form-group">
-                <label for="StartTime">Start Time:</label>
-                <asp:TextBox ID="StartTime" runat="server" TextMode="Time" CssClass="form-control"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="StartTimeValidator" runat="server" 
-                                            ControlToValidate="StartTime" 
-                                            ErrorMessage="Start time is required" 
-                                            ForeColor="Red" 
-                                            ValidationGroup="AddSession">
-                </asp:RequiredFieldValidator>
-            </div>
-
-            <div class="form-group">
-                <label for="EndTime">End Time:</label>
-                <asp:TextBox ID="EndTime" runat="server" TextMode="Time" CssClass="form-control"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="EndTimeValidator" runat="server" 
-                                            ControlToValidate="EndTime" 
-                                            ErrorMessage="End time is required" 
-                                            ForeColor="Red" 
-                                            ValidationGroup="AddSession">
-                </asp:RequiredFieldValidator>
-            </div>
-
-            <asp:Button ID="AddTimeSlotButton" runat="server" 
-                       Text="Add Time Slot" 
-                       CssClass="btn-add" 
-                       OnClick="AddTimeSlotButton_Click" 
-                       ValidationGroup="AddSession" />
+    <div class="page-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">Webinar Session Management</h1>
+            <p class="header-subtitle">Monitor registrations, manage participants, and track attendance</p>
         </div>
 
-        <!-- Sessions Table -->
-        <div>
-            <h3>Available Time Slots</h3>
-            <asp:GridView ID="SessionsGridView" runat="server" 
-                         CssClass="sessions-table" 
-                         AutoGenerateColumns="False" 
-                         OnRowCommand="SessionsGridView_RowCommand"
-                         DataKeyNames="Id">
+        <!-- Management Tabs -->
+        <div class="management-tabs">
+            <asp:Button ID="btnOverviewTab" runat="server" CssClass="tab-btn active" 
+                Text="Overview" OnClick="TabButton_Click" CommandArgument="overview" />
+            <asp:Button ID="btnSessionsTab" runat="server" CssClass="tab-btn" 
+                Text="Session Details" OnClick="TabButton_Click" CommandArgument="sessions" />
+            <asp:Button ID="btnParticipantsTab" runat="server" CssClass="tab-btn" 
+                Text="All Participants" OnClick="TabButton_Click" CommandArgument="participants" />
+        </div>
+
+        <!-- Overview Section -->
+        <asp:Panel ID="pnlOverview" runat="server" CssClass="management-section">
+            <h2 class="section-title">System Overview</h2>
+            <hr class="section-divider" />
+            
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number"><asp:Literal ID="ltTotalSessions" runat="server">0</asp:Literal></div>
+                    <div class="stat-label">Total Sessions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number"><asp:Literal ID="ltTotalRegistrations" runat="server">0</asp:Literal></div>
+                    <div class="stat-label">Total Registrations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number"><asp:Literal ID="ltAvailableSpots" runat="server">0</asp:Literal></div>
+                    <div class="stat-label">Available Spots</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number"><asp:Literal ID="ltUpcomingSessions" runat="server">0</asp:Literal></div>
+                    <div class="stat-label">Upcoming Sessions</div>
+                </div>
+            </div>
+
+            <!-- Quick Session Overview -->
+            <h3 style="color: #051D40; margin-bottom: 16px; font-weight: 600;">Session Status</h3>
+            <asp:Repeater ID="rptSessionOverview" runat="server">
+                <ItemTemplate>
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div>
+                                <h4 class="session-title"><%# Eval("Title") %></h4>
+                                <div class="session-date">📅 <%# Eval("SessionDate", "{0:MMMM dd, yyyy}") %> at <%# Eval("StartTime") %></div>
+                            </div>
+                            <div>
+                                <span class="participant-count">
+                                    <%# Eval("CurrentRegistrations") %>/<%# Eval("MaxParticipants") %> participants
+                                </span>
+                            </div>
+                        </div>
+                        <div style="color: #585252;">
+                            <strong>Expert:</strong> <%# Eval("ExpertName") %><br>
+                            <strong>Type:</strong> <%# Eval("SessionType") %> 
+                            <%# Convert.ToInt32(Eval("PointsRequired")) > 0 ? "(" + Eval("PointsRequired") + " points)" : "" %>
+                        </div>
+                    </div>
+                </ItemTemplate>
+            </asp:Repeater>
+        </asp:Panel>
+
+        <!-- Session Details Section -->
+        <asp:Panel ID="pnlSessions" runat="server" CssClass="management-section" Visible="false">
+            <h2 class="section-title">Session Management</h2>
+            <hr class="section-divider" />
+            
+            <div class="filter-section">
+                <span class="filter-label">Filter by Session:</span>
+                <asp:DropDownList ID="ddlSessionFilter" runat="server" CssClass="filter-dropdown" 
+                    AutoPostBack="true" OnSelectedIndexChanged="ddlSessionFilter_SelectedIndexChanged">
+                </asp:DropDownList>
+                <asp:Button ID="btnExportSession" runat="server" CssClass="export-btn" 
+                    Text="Export to Excel" OnClick="btnExportSession_Click" />
+            </div>
+
+            <asp:Panel ID="pnlSessionDetails" runat="server">
+                <!-- Session Info -->
+                <div class="session-info-card">
+                    <h3 class="session-info-title">
+                        <asp:Literal ID="ltSelectedSessionTitle" runat="server"></asp:Literal>
+                    </h3>
+                    <div class="session-info-details">
+                        <strong>Date & Time:</strong> <asp:Literal ID="ltSelectedSessionDateTime" runat="server"></asp:Literal><br>
+                        <strong>Expert:</strong> <asp:Literal ID="ltSelectedSessionExpert" runat="server"></asp:Literal><br>
+                        <strong>Capacity:</strong> <asp:Literal ID="ltSelectedSessionCapacity" runat="server"></asp:Literal><br>
+                        <strong>Current Registrations:</strong> <asp:Literal ID="ltSelectedSessionRegistrations" runat="server"></asp:Literal>
+                    </div>
+                </div>
+
+                <!-- Participants List -->
+                <h4 style="color: #051D40; margin: 24px 0 16px 0; font-weight: 600;">Registered Participants</h4>
+                <asp:GridView ID="gvSessionParticipants" runat="server" CssClass="participants-table"
+                    AutoGenerateColumns="false" EmptyDataText="No participants registered yet."
+                    DataKeyNames="RegistrationId">
+                    <Columns>
+                        <asp:BoundField DataField="RegistrationId" HeaderText="ID" />
+                        <asp:BoundField DataField="FirstName" HeaderText="First Name" />
+                        <asp:BoundField DataField="LastName" HeaderText="Last Name" />
+                        <asp:BoundField DataField="Email" HeaderText="Email" />
+                        <asp:BoundField DataField="Phone" HeaderText="Phone" />
+                        <asp:BoundField DataField="RegistrationDate" HeaderText="Registration Date" DataFormatString="{0:MM/dd/yyyy HH:mm}" />
+                        <asp:TemplateField HeaderText="Attendance">
+                            <ItemTemplate>
+                                <asp:DropDownList ID="ddlAttendance" runat="server" 
+                                    CssClass="filter-dropdown"
+                                    SelectedValue='<%# Eval("AttendanceStatus") %>'
+                                    OnSelectedIndexChanged="ddlAttendance_SelectedIndexChanged"
+                                    AutoPostBack="true">
+                                    <asp:ListItem Value="Registered" Text="Registered" />
+                                    <asp:ListItem Value="Attended" Text="Attended" />
+                                    <asp:ListItem Value="No-Show" Text="No-Show" />
+                                </asp:DropDownList>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Actions">
+                            <ItemTemplate>
+                                <asp:Button ID="btnRemoveParticipant" runat="server" 
+                                    CssClass="action-btn danger" Text="Remove"
+                                    CommandArgument='<%# Eval("RegistrationId") %>'
+                                    OnClick="btnRemoveParticipant_Click"
+                                    OnClientClick="return confirm('Are you sure you want to remove this participant?');" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                </asp:GridView>
+            </asp:Panel>
+        </asp:Panel>
+
+        <!-- All Participants Section -->
+        <asp:Panel ID="pnlParticipants" runat="server" CssClass="management-section" Visible="false">
+            <h2 class="section-title">All Participants</h2>
+            <hr class="section-divider" />
+            
+            <div class="filter-section">
+                <span class="filter-label">Filter by Status:</span>
+                <asp:DropDownList ID="ddlStatusFilter" runat="server" CssClass="filter-dropdown" 
+                    AutoPostBack="true" OnSelectedIndexChanged="ddlStatusFilter_SelectedIndexChanged">
+                    <asp:ListItem Value="All" Text="All Status" Selected="True" />
+                    <asp:ListItem Value="Registered" Text="Registered" />
+                    <asp:ListItem Value="Attended" Text="Attended" />
+                    <asp:ListItem Value="No-Show" Text="No-Show" />
+                </asp:DropDownList>
+                
+                <span class="filter-label">Session:</span>
+                <asp:DropDownList ID="ddlParticipantSessionFilter" runat="server" CssClass="filter-dropdown" 
+                    AutoPostBack="true" OnSelectedIndexChanged="ddlParticipantSessionFilter_SelectedIndexChanged">
+                </asp:DropDownList>
+                
+                <asp:Button ID="btnExportAll" runat="server" CssClass="export-btn" 
+                    Text="Export All" OnClick="btnExportAll_Click" />
+            </div>
+
+            <asp:GridView ID="gvAllParticipants" runat="server" CssClass="participants-table"
+                AutoGenerateColumns="false" EmptyDataText="No participants found."
+                AllowPaging="true" PageSize="20" OnPageIndexChanging="gvAllParticipants_PageIndexChanging">
                 <Columns>
-                    <asp:BoundField DataField="SessionDate" HeaderText="Date" DataFormatString="{0:dd/MM/yyyy}" />
-                    <asp:BoundField DataField="StartTime" HeaderText="Start Time" DataFormatString="{0:hh\\:mm}" />
-                    <asp:BoundField DataField="EndTime" HeaderText="End Time" DataFormatString="{0:hh\\:mm}" />
+                    <asp:BoundField DataField="RegistrationId" HeaderText="ID" />
+                    <asp:BoundField DataField="SessionTitle" HeaderText="Session" />
+                    <asp:BoundField DataField="FirstName" HeaderText="First Name" />
+                    <asp:BoundField DataField="LastName" HeaderText="Last Name" />
+                    <asp:BoundField DataField="Email" HeaderText="Email" />
+                    <asp:BoundField DataField="Phone" HeaderText="Phone" />
+                    <asp:BoundField DataField="RegistrationDate" HeaderText="Registration Date" DataFormatString="{0:MM/dd/yyyy}" />
                     <asp:TemplateField HeaderText="Status">
                         <ItemTemplate>
-                            <span class='<%# Eval("Status").ToString() == "Available" ? "status-available" : "status-booked" %>'>
-                                <%# Eval("Status") %>
+                            <span style="background: #051D40; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">
+                                <%# Eval("AttendanceStatus") %>
                             </span>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:BoundField DataField="CustomerName" HeaderText="Customer Name" NullDisplayText="-" />
-                    <asp:BoundField DataField="CustomerPhone" HeaderText="Phone Number" NullDisplayText="-" />
-                    <asp:BoundField DataField="ScamConcerns" HeaderText="Scam Concerns" NullDisplayText="-" />
-                    <asp:TemplateField HeaderText="Actions">
-                        <ItemTemplate>
-                            <asp:Button ID="DeleteButton" runat="server" 
-                                       Text="Delete" 
-                                       CssClass="btn-delete" 
-                                       CommandName="DeleteSession" 
-                                       CommandArgument='<%# Eval("Id") %>'
-                                       OnClientClick="return confirm('Are you sure you want to delete this time slot?');" />
-                        </ItemTemplate>
-                    </asp:TemplateField>
                 </Columns>
-                <EmptyDataTemplate>
-                    <div style="text-align: center; padding: 20px; color: #666;">
-                        No sessions available. Add some time slots above.
-                    </div>
-                </EmptyDataTemplate>
+                <PagerStyle CssClass="pager" />
             </asp:GridView>
-        </div>
+        </asp:Panel>
     </div>
 </asp:Content>

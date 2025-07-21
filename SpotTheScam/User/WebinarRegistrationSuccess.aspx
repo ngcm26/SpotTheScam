@@ -215,7 +215,7 @@
             <div class="success-card">
                 <!-- Points Badge -->
                 <div class="points-badge">
-                    <span>Current Points: 75 ⭐</span>
+    <span>Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
                 </div>
                 
                 <!-- Success Icon -->

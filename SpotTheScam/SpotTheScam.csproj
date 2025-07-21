@@ -98,6 +98,8 @@
     <Content Include="Staff\IndividualBlogStafff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
+    <Content Include="Staff\StaffExpertWebinar.aspx" />
+    <Content Include="Staff\StaffVideoCallSession.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\AddBankAccounts.aspx" />
     <Content Include="User\CreateBlog.aspx" />
@@ -120,7 +122,6 @@
     <Content Include="User\ExpertWebinarHomepage.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
-    <Content Include="Staff\StaffExpertWebinar.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
     <Content Include="User\UserBankAccounts.aspx" />
     <Content Include="User\ScamChecker.aspx" />
@@ -171,6 +172,20 @@
     </Compile>
     <Compile Include="Staff\StaffAddModules.aspx.designer.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\StaffExpertWebinar.aspx.cs">
+      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
+      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\StaffVideoCallSession.aspx.cs">
+      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffVideoCallSession.aspx.designer.cs">
+      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\ViewModules.aspx.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
@@ -318,13 +333,6 @@
     </Compile>
     <Compile Include="Staff\StaffDashboard.aspx.designer.cs">
       <DependentUpon>StaffDashboard.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Staff\StaffExpertWebinar.aspx.cs">
-      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
-      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>

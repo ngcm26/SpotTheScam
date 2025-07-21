@@ -141,6 +141,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             transition: transform 0.3s ease;
+            position: relative;
         }
 
         .webinar-card:hover {
@@ -172,6 +173,55 @@
             line-height: 1.5;
         }
 
+        .session-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .session-type {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .free-session {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .premium-session {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .availability-status {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .session-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .session-limited {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .session-full {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         .register-btn {
             background-color: var(--brand-orange);
             color: white;
@@ -182,11 +232,17 @@
             transition: background-color 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            margin-top: 10px;
         }
 
         .register-btn:hover {
             background-color: #b45a22;
             color: white;
+        }
+
+        .register-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
         }
 
         .how-it-works {
@@ -269,6 +325,11 @@
             .expert-card {
                 padding: 20px;
             }
+
+            .session-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </asp:Content>
@@ -326,45 +387,40 @@
         </div>
     </div>
 
-    <!-- Upcoming Sessions Section -->
+    <!-- Upcoming Sessions Section - Now Dynamic -->
     <div class="upcoming-section">
         <div class="container">
             <div class="text-center">
                 <h2 class="section-title">Upcoming Sessions This Week</h2>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="webinar-card">
-                        <div class="webinar-date">June 15, 2024 PM</div>
-                        <div class="webinar-title">Protecting Your Online Banking</div>
-                        <div class="webinar-description">
-                            Learn secure banking practices and how to spot fraudulent banking websites with cybersecurity expert Dr. Harvey Blue
+                <asp:Repeater ID="rptUpcomingSessions" runat="server">
+                    <ItemTemplate>
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="webinar-card">
+                                <div class="webinar-date"><%# FormatSessionDate(Eval("SessionDate"), Eval("StartTime")) %></div>
+                                <div class="webinar-title"><%# Eval("Title") %></div>
+                                <div class="webinar-description">
+                                    <%# Eval("Description") %>
+                                </div>
+                                <div class="session-info">
+                                    <span class="session-type <%# GetSessionTypeClass(Eval("PointsRequired")) %>">
+                                        <%# GetSessionTypeText(Eval("PointsRequired"), Eval("SessionType")) %>
+                                    </span>
+                                    <span class="availability-status <%# GetAvailabilityClass(Eval("AvailableSpots")) %>">
+                                        <%# GetAvailabilityText(Eval("AvailableSpots"), Eval("MaxParticipants")) %>
+                                    </span>
+                                </div>
+                                <div class="expert-info" style="margin-top: 15px; font-size: 0.9rem; color: #666;">
+                                    <strong>Expert:</strong> <%# Eval("ExpertName") %>
+                                </div>
+                                <%# Convert.ToInt32(Eval("AvailableSpots")) > 0 ? 
+                                    $"<a href='UserWebinarRegistration.aspx?sessionId={Eval("SessionId")}' class='register-btn'>Register Now</a>" : 
+                                    "<button class='register-btn' disabled>Session Full</button>" %>
+                            </div>
                         </div>
-                        <a href="UserWebinarRegistration.aspx?sessionId=1" class="register-btn">Register Now</a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="webinar-card">
-                        <div class="webinar-date">June 17, 10:00 AM</div>
-                        <div class="webinar-title">Latest Phone Scam Tactics</div>
-                        <div class="webinar-description">
-                            Discover the newest phone scam methods and how to protect yourself with Officer James Wilson from the Police Fraud Division
-                        </div>
-                        <a href="UserWebinarRegistration.aspx?sessionId=2" class="register-btn">Register Now</a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="webinar-card">
-                        <div class="webinar-date">June 19, 2:00 PM</div>
-                        <div class="webinar-title">Safe Social Media for Seniors</div>
-                        <div class="webinar-description">
-                            Navigate Facebook, Instagram, and other platforms safely while avoiding scammers with digital educator Maria Rodriguez
-                        </div>
-                        <a href="UserWebinarRegistration.aspx?sessionId=3" class="register-btn">Register Now</a>
-                    </div>
-                </div>
+                    </ItemTemplate>
+                </asp:Repeater>
             </div>
             
             <div class="text-center">
