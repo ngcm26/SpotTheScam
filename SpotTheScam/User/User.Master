@@ -140,7 +140,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="CreateBlog.aspx">Blogs & Forum</a>
+                            <a class="nav-link" href="UserBlog.aspx">Blogs & Forum</a>
 
                         </li>
                         <li class="nav-item dropdown">
