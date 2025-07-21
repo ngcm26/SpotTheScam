@@ -139,9 +139,12 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="UserBlog.aspx">Blogs & Forum</a>
-
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="protectionDropdown" role="button">Blogs & Forum</a>
+                            <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
+                                <li><a class="dropdown-item" href="UserBlog.aspx">Blogs</a></li>
+                                <li><a class="dropdown-item" href="ForumPage.aspx">Forum</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management
