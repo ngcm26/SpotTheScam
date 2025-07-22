@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -18,6 +19,7 @@ namespace SpotTheScam.User
                 Response.Write("<script>alert('Please login to proceed!');</script>");
                 Response.Redirect("UserLogin.aspx");
             }
+            LoadDiscussions();
         }
 
         protected void btnToggleForm_Click(object sender, EventArgs e)
@@ -31,12 +33,6 @@ namespace SpotTheScam.User
             string content = tb_content.Text;
             int userId = Convert.ToInt32(Session["UserId"]);
             string imageFileName = null;
-            if (img_forum.HasFile)
-            {
-                imageFileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(img_forum.FileName);
-                string path = Server.MapPath("~/Uploads/forum_pictures/" + imageFileName);
-                img_forum.SaveAs(path);
-            }
 
 
 
@@ -59,7 +55,35 @@ namespace SpotTheScam.User
             tb_content.Text = "";
 
             pnlNewPost.Visible = false;
+            LoadDiscussions();
+
 
         }
+        private void LoadDiscussions()
+        {
+            string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                string query = @"
+            SELECT d.DiscussionId, d.Title, d.Description, d.CreatedAt,
+                   u.Username
+            FROM discussions d
+            JOIN Users u ON d.UserId = u.Id
+            ORDER BY d.CreatedAt DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    rptDiscussions.DataSource = dt;
+                    rptDiscussions.DataBind();
+                }
+            }
+        }
+
     }
 }

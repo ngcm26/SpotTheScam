@@ -141,6 +141,7 @@
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\FamilyGroupManagement.aspx" />
     <Content Include="User\ForumPage.aspx" />
+    <Content Include="User\IndividualForum.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
     <Content Include="User\PointsDebug.aspx" />
@@ -256,6 +257,13 @@
     </Compile>
     <Compile Include="User\ForumPage.aspx.designer.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\IndividualForum.aspx.cs">
+      <DependentUpon>IndividualForum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\IndividualForum.aspx.designer.cs">
+      <DependentUpon>IndividualForum.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ModuleInformation.aspx.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
