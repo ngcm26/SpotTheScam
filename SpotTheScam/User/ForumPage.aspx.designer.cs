@@ -11,61 +11,70 @@ namespace SpotTheScam.User
 {
 
 
-    public partial class ScamChecker
+    public partial class ForumPage
     {
 
         /// <summary>
-        /// form1 control.
+        /// btnToggleForm control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.Button btnToggleForm;
 
         /// <summary>
-        /// txtUserInput control.
+        /// pnlNewPost control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUserInput;
+        protected global::System.Web.UI.WebControls.Panel pnlNewPost;
 
         /// <summary>
-        /// btnCheckScam control.
+        /// tb_title control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCheckScam;
+        protected global::System.Web.UI.WebControls.TextBox tb_title;
 
         /// <summary>
-        /// lblResult control.
+        /// tb_content control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblResult;
+        protected global::System.Web.UI.WebControls.TextBox tb_content;
 
         /// <summary>
-        /// fileScreenshot control.
+        /// img_forum control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.FileUpload fileScreenshot;
+        protected global::System.Web.UI.WebControls.FileUpload img_forum;
 
         /// <summary>
-        /// btnCheckImage control.
+        /// btnSubmitPost control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCheckImage;
+        protected global::System.Web.UI.WebControls.Button btnSubmitPost;
+
+        /// <summary>
+        /// rptDiscussions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptDiscussions;
     }
 }

@@ -126,7 +126,7 @@
             </div>
 
             <div class="register-link">
-                Don't have an account? <a href="UserRegister.aspx">Sign Up</a>
+                Don't have an account? <a href="UserRegister.aspx">Sign Up </a>
             </div>
         </div>
     </div>

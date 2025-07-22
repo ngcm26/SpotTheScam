@@ -3,7 +3,7 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     Manage Blog Post<br />
-    <asp:GridView ID="gv_blog" runat="server" AutoGenerateColumns="False" OnDataBinding="gv_blog_DataBinding" OnSelectedIndexChanged="gv_blog_SelectedIndexChanged" Width="739px">
+    <asp:GridView ID="gv_blog" runat="server" AutoGenerateColumns="False" DataKeyNames="post_id" OnDataBinding="gv_blog_DataBinding" OnSelectedIndexChanged="gv_blog_SelectedIndexChanged" Width="739px" OnRowDeleting="gv_blog_RowDeleting">
         <Columns>
             <asp:BoundField DataField="post_id" HeaderText="Post ID" />
             <asp:BoundField DataField="user_id" HeaderText="User ID" />
@@ -11,6 +11,7 @@
             <asp:BoundField DataField="created_at" HeaderText="Created At" />
             <asp:BoundField DataField="isApproved" HeaderText="Approval" />
             <asp:CommandField ShowSelectButton="True" />
+            <asp:CommandField ShowDeleteButton="True" />
         </Columns>
     </asp:GridView>
     <br />
