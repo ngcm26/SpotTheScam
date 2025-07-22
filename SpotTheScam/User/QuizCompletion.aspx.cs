@@ -24,6 +24,14 @@ namespace SpotTheScam.User
                     return;
                 }
 
+                System.Diagnostics.Debug.WriteLine($"=== QuizCompletion Page_Load ===");
+                System.Diagnostics.Debug.WriteLine($"Session Username: {Session["Username"]}");
+
+                // Add cache-busting headers to prevent caching of old points data
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetExpires(DateTime.UtcNow.AddHours(-1));
+                Response.Cache.SetNoStore();
+
                 // Load completion data from query parameters
                 LoadCompletionData();
             }
@@ -40,8 +48,7 @@ namespace SpotTheScam.User
                 int totalQuestions = int.Parse(Request.QueryString["total"] ?? "10");
                 int currentPointsFromJS = int.Parse(Request.QueryString["currentPoints"] ?? "0");
 
-                System.Diagnostics.Debug.WriteLine($"=== QuizCompletion Page Load ===");
-                System.Diagnostics.Debug.WriteLine($"Session Username: {Session["Username"]}");
+                System.Diagnostics.Debug.WriteLine($"=== QuizCompletion Data ===");
                 System.Diagnostics.Debug.WriteLine($"Quiz: {quizName}");
                 System.Diagnostics.Debug.WriteLine($"Points earned from quiz: {pointsEarnedFromQuiz}");
                 System.Diagnostics.Debug.WriteLine($"Correct answers: {correctAnswers}");
@@ -61,147 +68,96 @@ namespace SpotTheScam.User
                     lblAccuracy.Text = accuracy.ToString();
                 }
 
-                // Use the current points passed from JavaScript if available, otherwise load from database
-                if (currentPointsFromJS > 0)
-                {
-                    lblCurrentPoints.Text = currentPointsFromJS.ToString();
-                    System.Diagnostics.Debug.WriteLine($"Using current points from JavaScript: {currentPointsFromJS}");
-                }
-                else
-                {
-                    // Fallback to loading from database
-                    LoadUserCurrentPointsWithRetry();
-                }
+                // CRITICAL: Always load the FRESH current points from database, not from JavaScript
+                LoadUserCurrentPointsWithRetry();
 
                 // Generate achievement badges based on performance
                 GenerateAchievementBadges(correctAnswers, totalQuestions, pointsEarnedFromQuiz);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error in LoadCompletionData: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                System.Diagnostics.Debug.WriteLine($"Error loading completion data: {ex.Message}");
                 // Set default values on error
                 lblQuizName.Text = "Quiz";
                 lblPointsEarned.Text = "0";
                 lblCorrectAnswers.Text = "0";
-                lblTotalQuestions.Text = "10";
+                lblTotalQuestions.Text = "0";
                 lblAccuracy.Text = "0";
                 lblCurrentPoints.Text = "0";
             }
         }
+
+        // FIXED METHOD: Load user's current total points from database with retry logic
+
+        // CORRECTED LoadUserCurrentPointsWithRetry method for QuizCompletion.aspx.cs
+        // Replace the existing method with this:
 
         private void LoadUserCurrentPointsWithRetry()
         {
             try
             {
                 System.Diagnostics.Debug.WriteLine($"=== LoadUserCurrentPointsWithRetry START ===");
-                System.Diagnostics.Debug.WriteLine($"Session Username: {Session["Username"]}");
 
                 string connectionString = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Get UserID from Username using correct column name (Id instead of UserId)
-                    string getUserIdQuery = "SELECT Id FROM Users WHERE Username = @Username";
+                    // Get UserID
                     int userId = 0;
-
-                    using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
+                    if (Session["UserID"] != null)
                     {
-                        cmd.Parameters.AddWithValue("@Username", Session["Username"]);
-                        object userIdResult = cmd.ExecuteScalar();
-                        if (userIdResult != null)
+                        userId = Convert.ToInt32(Session["UserID"]);
+                    }
+                    else
+                    {
+                        string getUserIdQuery = "SELECT Id FROM Users WHERE Username = @Username";
+                        using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
                         {
-                            userId = Convert.ToInt32(userIdResult);
-                            System.Diagnostics.Debug.WriteLine($"User ID found: {userId}");
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("User ID not found in database");
-                            lblCurrentPoints.Text = "0";
-                            return;
+                            cmd.Parameters.AddWithValue("@Username", Session["Username"].ToString());
+                            object userIdResult = cmd.ExecuteScalar();
+                            if (userIdResult != null)
+                            {
+                                userId = Convert.ToInt32(userIdResult);
+                                Session["UserID"] = userId;
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("User not found in database");
+                                lblCurrentPoints.Text = "0";
+                                return;
+                            }
                         }
                     }
 
-                    if (userId > 0)
+                    // CRITICAL: Load from PointsTransactions table (same as other pages)
+                    string getPointsQuery = @"
+                SELECT ISNULL(SUM(Points), 0) as TotalPoints 
+                FROM PointsTransactions 
+                WHERE UserId = @UserId";
+
+                    using (SqlCommand cmd = new SqlCommand(getPointsQuery, conn))
                     {
-                        // Try multiple times to get the latest points (in case of database delay)
-                        int currentTotalPoints = 0;
-                        int maxRetries = 3;
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        object result = cmd.ExecuteScalar();
 
-                        for (int retry = 0; retry < maxRetries; retry++)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Attempt {retry + 1} to get current points...");
+                        int currentTotalPoints = result != null ? Convert.ToInt32(result) : 0;
 
-                            // Get the current total points from the database
-                            string query = @"
-                                SELECT ISNULL(SUM(Points), 0) as TotalPoints 
-                                FROM PointsTransactions 
-                                WHERE UserId = @UserId";
-
-                            using (SqlCommand cmd = new SqlCommand(query, conn))
-                            {
-                                cmd.Parameters.AddWithValue("@UserId", userId);
-                                object result = cmd.ExecuteScalar();
-
-                                if (result != null)
-                                {
-                                    currentTotalPoints = Convert.ToInt32(result);
-                                    System.Diagnostics.Debug.WriteLine($"Attempt {retry + 1}: Current total points: {currentTotalPoints}");
-
-                                    // If we have points, break out of retry loop
-                                    if (currentTotalPoints > 0)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // If this isn't the last retry, wait a bit before trying again
-                            if (retry < maxRetries - 1)
-                            {
-                                System.Threading.Thread.Sleep(1000); // Wait 1 second
-                            }
-                        }
-
+                        // Set the label text with TOTAL points
                         lblCurrentPoints.Text = currentTotalPoints.ToString();
-                        System.Diagnostics.Debug.WriteLine($"Final current points set to: {currentTotalPoints}");
+                        Session["CurrentPoints"] = currentTotalPoints;
 
-                        // Debug: Show recent transactions for this user
-                        string debugQuery = @"
-                            SELECT TOP 10 TransactionType, Points, Description, TransactionDate
-                            FROM PointsTransactions 
-                            WHERE UserId = @UserId
-                            ORDER BY TransactionDate DESC";
-
-                        using (SqlCommand cmd = new SqlCommand(debugQuery, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@UserId", userId);
-                            using (SqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                System.Diagnostics.Debug.WriteLine("=== Recent Transactions ===");
-                                int transactionCount = 0;
-                                while (reader.Read())
-                                {
-                                    transactionCount++;
-                                    System.Diagnostics.Debug.WriteLine($"{transactionCount}. {reader["TransactionType"]}: {reader["Points"]} points - {reader["Description"]} ({reader["TransactionDate"]})");
-                                }
-                                System.Diagnostics.Debug.WriteLine($"Total transactions shown: {transactionCount}");
-                            }
-                        }
+                        System.Diagnostics.Debug.WriteLine($"✅ Loaded TOTAL points from PointsTransactions: {currentTotalPoints}");
+                        System.Diagnostics.Debug.WriteLine($"✅ Set lblCurrentPoints.Text to: '{lblCurrentPoints.Text}'");
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"=== LoadUserCurrentPointsWithRetry END - lblCurrentPoints.Text: {lblCurrentPoints.Text} ===");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading current points: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-                // Log error but don't break the page
+                System.Diagnostics.Debug.WriteLine($"❌ Error loading current points: {ex.Message}");
                 lblCurrentPoints.Text = "0";
             }
         }
-
         private void GenerateAchievementBadges(int correctAnswers, int totalQuestions, int pointsEarned)
         {
             var badges = new List<string>();
@@ -209,53 +165,70 @@ namespace SpotTheScam.User
             // Calculate accuracy
             double accuracy = totalQuestions > 0 ? (double)correctAnswers / totalQuestions * 100 : 0;
 
-            // Perfect score badge
-            if (correctAnswers == totalQuestions)
+            // Points Master badge - earned points in this quiz
+            if (pointsEarned >= 100)
             {
-                badges.Add("🏆 Perfect Score!");
+                badges.Add("Points Master!");
             }
-            // High accuracy badges
-            else if (accuracy >= 90)
+
+            // Quiz Completed badge - always earned for completing
+            badges.Add("Quiz Completed!");
+
+            // Perfect Score badge
+            if (accuracy == 100)
             {
-                badges.Add("⭐ Excellent Performance!");
+                badges.Add("Perfect Score!");
             }
+
+            // High Scorer badge
             else if (accuracy >= 80)
             {
-                badges.Add("👍 Great Job!");
-            }
-            else if (accuracy >= 70)
-            {
-                badges.Add("📈 Good Progress!");
+                badges.Add("High Scorer!");
             }
 
-            // Points-based badges
-            if (pointsEarned >= 150)
-            {
-                badges.Add("💎 High Scorer!");
-            }
-            else if (pointsEarned >= 100)
-            {
-                badges.Add("🎯 Points Master!");
-            }
-
-            // Special badges
-            if (correctAnswers >= 8)
-            {
-                badges.Add("🛡️ Scam Detector!");
-            }
-
-            // Quiz completion badge
-            badges.Add("🎉 Quiz Completed!");
+            // First Timer badge (you might want to check if this is their first quiz)
+            // This would require checking UserQuizSessions table for previous completed quizzes
 
             // Generate HTML for badges
-            string badgeHtml = "";
-            foreach (string badge in badges)
+            if (badges.Count > 0)
             {
-                badgeHtml += $"<div class='badge-item'>{badge}</div>";
-            }
+                string badgeHtml = "<div class='achievements-container'>";
+                foreach (string badge in badges)
+                {
+                    string badgeClass = GetBadgeClass(badge);
+                    badgeHtml += $"<span class='achievement-badge {badgeClass}'>";
+                    badgeHtml += $"<i class='badge-icon'></i> {badge}";
+                    badgeHtml += "</span>";
+                }
+                badgeHtml += "</div>";
 
-            // Set the innerHTML of the achievement badges container
-            achievementBadges.InnerHtml = badgeHtml;
+                // Add to page
+                achievementBadges.InnerHtml = badgeHtml;
+            }
+        }
+
+        private string GetBadgeClass(string badgeName)
+        {
+            switch (badgeName.ToLower())
+            {
+                case "points master!":
+                    return "badge-gold";
+                case "perfect score!":
+                    return "badge-platinum";
+                case "high scorer!":
+                    return "badge-silver";
+                case "quiz completed!":
+                    return "badge-bronze";
+                default:
+                    return "badge-default";
+            }
+        }
+
+        // NEW METHOD: Get current points as string for use in markup
+        public string GetCurrentPointsText()
+        {
+            int currentPoints = Session["CurrentPoints"] != null ? Convert.ToInt32(Session["CurrentPoints"]) : 0;
+            return currentPoints.ToString();
         }
     }
 }

@@ -34,14 +34,15 @@
         <asp:Repeater ID="rptDiscussions" runat="server">
             <ItemTemplate>
                 <div class="card mb-3">
+                    <a href='<%# "IndividualForum.aspx?DiscussionId=" + (int)Eval("DiscussionId") %>'></a>
                     <div class="card-body">
-                        <h5 class="card-title"><%# Eval("title") %></h5>
+                        <h5 class="card-title"><%# Eval("Title") %></h5>
                         <p class="card-text">
-                            <%# Eval("description").ToString().Length > 100 
-                            ? Eval("description").ToString().Substring(0, 100) + "..." 
-                            : Eval("description").ToString() %>
+                            <%# Eval("Description").ToString().Length > 100 
+                            ? Eval("Description").ToString().Substring(0, 100) + "..." 
+                            : Eval("Description").ToString() %>
                         </p>
-                        <p class="card-text text-muted">By <%# Eval("username") %> - <%# Eval("created_at") %></p>
+                        <p class="card-text text-muted">By <%# Eval("Username") %> - <%# Eval("CreatedAt") %></p>
                     </div>
                 </div>
             </ItemTemplate>

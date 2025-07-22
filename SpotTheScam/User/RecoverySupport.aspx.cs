@@ -63,6 +63,8 @@ namespace SpotTheScam.User
         }
 
         // Method to handle scam type selection (if implementing server-side handling)
+        // This method is not currently being used since we're using JavaScript for navigation
+        // But it's kept here as a reference for server-side implementation if needed
         protected void HandleScamTypeSelection(string scamType)
         {
             // This method could be called via AJAX or postback
@@ -71,40 +73,40 @@ namespace SpotTheScam.User
             switch (scamType.ToLower())
             {
                 case "banking":
-                    // Redirect to banking scam specific guidance
-                    Response.Redirect("~/User/BankingScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with banking type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=banking");
                     break;
                 case "tech":
-                    // Redirect to tech scam specific guidance
-                    Response.Redirect("~/User/TechScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with tech type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=tech");
                     break;
                 case "shopping":
-                    // Redirect to shopping scam specific guidance
-                    Response.Redirect("~/User/ShoppingScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with shopping type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=shopping");
                     break;
                 case "romance":
-                    // Redirect to romance scam specific guidance
-                    Response.Redirect("~/User/RomanceScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with romance type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=romance");
                     break;
                 case "phishing":
-                    // Redirect to phishing scam specific guidance
-                    Response.Redirect("~/User/PhishingScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with phishing type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=phishing");
                     break;
                 case "employment":
-                    // Redirect to employment scam specific guidance
-                    Response.Redirect("~/User/EmploymentScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with employment type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=employment");
                     break;
                 case "medical":
-                    // Redirect to medical scam specific guidance
-                    Response.Redirect("~/User/MedicalScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with medical type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=medical");
                     break;
                 case "lottery":
-                    // Redirect to lottery scam specific guidance
-                    Response.Redirect("~/User/LotteryScamGuidance.aspx");
+                    // Redirect to ScamRecoveryGuidance with lottery type
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=lottery");
                     break;
                 default:
                     // Redirect to general guidance
-                    Response.Redirect("~/User/GeneralScamGuidance.aspx");
+                    Response.Redirect("~/User/ScamRecoveryGuidance.aspx?type=other");
                     break;
             }
         }
@@ -141,6 +143,24 @@ namespace SpotTheScam.User
             // - Escalation to human support during business hours
 
             Response.Redirect("~/User/ChatSupport.aspx");
+        }
+
+        // Method to track scam type selections for analytics
+        protected void TrackScamTypeSelection(string scamType)
+        {
+            try
+            {
+                // Track which scam types users are selecting most often
+                // This can help understand trends and improve content
+                DateTime selectionTime = DateTime.Now;
+                string ipAddress = GetClientIP();
+
+                // Example: LogScamTypeSelection(scamType, ipAddress, selectionTime);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error tracking scam type selection: " + ex.Message);
+            }
         }
     }
 }

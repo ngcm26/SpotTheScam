@@ -73,159 +73,181 @@
             justify-content: center;
             align-items: center;
             gap: 20px;
-            margin-bottom: 25px;
         }
 
         .points-display {
-            background: var(--brand-orange);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 2rem;
+            font-size: 3rem;
             font-weight: 700;
-            min-width: 150px;
+            color: #28a745;
+            margin: 0;
         }
 
         .points-label {
-            color: var(--brand-navy);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            color: #333;
             font-weight: 600;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin: 30px 0;
+            margin-top: 20px;
         }
 
         .stat-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px 20px;
-            border-left: 4px solid var(--brand-orange);
             text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--brand-navy);
+            color: var(--brand-orange);
             margin-bottom: 5px;
         }
 
         .stat-label {
-            color: #6c757d;
-            font-weight: 500;
             font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
         }
 
         .achievement-section {
-            background: #fff3cd;
+            background: #f8f9fa;
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
-            text-align: left;
         }
 
         .achievement-title {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--brand-navy);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .achievement-title::before {
-            content: "🏆";
-            margin-right: 8px;
-            font-size: 1.2rem;
-        }
-
-        .achievement-badges {
+        .achievements-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 15px;
-            flex-wrap: wrap;
         }
 
-        .badge-item {
-            background: #ffd700;
-            color: #8b7500;
-            padding: 10px 20px;
-            border-radius: 25px;
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-weight: 600;
             font-size: 0.9rem;
-            display: flex;
-            align-items: center;
             gap: 8px;
         }
 
+        .badge-gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-platinum {
+            background: linear-gradient(135deg, #E5E4E2, #C0C0C0);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.2);
+        }
+
+        .badge-bronze {
+            background: linear-gradient(135deg, #CD7F32, #B87333);
+            color: white;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.2);
+        }
+
+        .badge-default {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .badge-icon::before {
+            content: "🏆";
+        }
+
         .motivational-section {
-            background: #f8f9fa;
-            border-left: 4px solid var(--brand-orange);
-            padding: 20px;
+            background: linear-gradient(135deg, var(--brand-orange), #E8814B);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
             margin-bottom: 30px;
-            border-radius: 0 8px 8px 0;
         }
 
         .motivational-text {
-            font-size: 0.95rem;
-            color: #333;
+            font-size: 1.1rem;
+            line-height: 1.6;
             margin: 0;
+            text-align: center;
         }
 
         .action-buttons {
             display: flex;
-            justify-content: center;
             gap: 20px;
-            margin-top: 40px;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
         .btn-primary-custom {
-            background: var(--brand-orange);
+            background: linear-gradient(135deg, var(--brand-orange), #E8814B);
             color: white;
+            padding: 12px 30px;
             border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            transition: background-color 0.3s ease;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
         }
 
         .btn-primary-custom:hover {
-            background: #b45a22;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(211, 111, 45, 0.3);
             color: white;
             text-decoration: none;
         }
 
         .btn-secondary-custom {
             background: white;
-            border: 2px solid var(--brand-navy);
-            color: var(--brand-navy);
-            padding: 15px 30px;
-            border-radius: 10px;
+            color: var(--brand-orange);
+            padding: 12px 30px;
+            border: 2px solid var(--brand-orange);
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 1.1rem;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s ease;
+            font-size: 1rem;
         }
 
         .btn-secondary-custom:hover {
-            background: var(--brand-navy);
+            background: var(--brand-orange);
             color: white;
             text-decoration: none;
+            transform: translateY(-2px);
         }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
             .success-card {
                 padding: 25px;
@@ -281,7 +303,7 @@
     <div class="page-container">
         <div class="container">
             <div class="success-card">
-                <!-- Current Points Badge -->
+                <!-- Current Points Badge - FIXED: No hardcoded values -->
                 <div class="current-points-badge">
                     <span>Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
                 </div>
@@ -348,4 +370,98 @@
             </div>
         </div>
     </div>
+
+    <!-- ENHANCED JavaScript to handle points display and any hardcoded values -->
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('=== QuizCompletion Points Update START ===');
+            
+            // Get the actual current points from the server-side label
+            var lblCurrentPoints = document.getElementById('<%= lblCurrentPoints.ClientID %>');
+            var actualCurrentPoints = lblCurrentPoints ? lblCurrentPoints.textContent : '0';
+            
+            console.log('Server-side current points:', actualCurrentPoints);
+            
+            // COMPREHENSIVE search and replace for any hardcoded "30" values
+            var allElements = document.querySelectorAll('*');
+            var replacementCount = 0;
+            
+            for (var i = 0; i < allElements.length; i++) {
+                var element = allElements[i];
+                if (element.children.length === 0) { // Only leaf text elements
+                    var text = element.textContent;
+                    if (text) {
+                        var trimmedText = text.trim();
+                        
+                        // Replace exact hardcoded matches
+                        if (trimmedText === 'Current Points: 30') {
+                            element.innerHTML = 'Current Points: ' + actualCurrentPoints;
+                            replacementCount++;
+                            console.log('Replaced exact match: Current Points: 30 -> Current Points: ' + actualCurrentPoints);
+                        }
+                        else if (trimmedText === '30') {
+                            var parent = element.parentElement;
+                            // Check if this is a points display based on parent context
+                            if (parent && (parent.className.includes('points') || 
+                                         parent.className.includes('badge') ||
+                                         parent.textContent.includes('Current Points'))) {
+                                element.textContent = actualCurrentPoints;
+                                replacementCount++;
+                                console.log('Replaced standalone 30 in points context -> ' + actualCurrentPoints);
+                            }
+                        }
+                        // Check for partial matches in longer text
+                        else if (text.includes('Current Points: 30')) {
+                            element.innerHTML = text.replace('Current Points: 30', 'Current Points: ' + actualCurrentPoints);
+                            replacementCount++;
+                            console.log('Replaced partial match: ' + text);
+                        }
+                    }
+                }
+            }
+            
+            // Specific badge update
+            var badgeSpans = document.querySelectorAll('.current-points-badge span, .points-badge span');
+            for (var j = 0; j < badgeSpans.length; j++) {
+                var originalText = badgeSpans[j].textContent;
+                if (originalText.includes('30') || originalText.includes('Points: 0')) {
+                    badgeSpans[j].innerHTML = 'Current Points: ' + actualCurrentPoints + ' ⭐';
+                    console.log('Updated badge span: ' + originalText + ' -> Current Points: ' + actualCurrentPoints + ' ⭐');
+                }
+            }
+            
+            console.log('Total QuizCompletion replacements made: ' + replacementCount);
+            console.log('=== QuizCompletion Points Update END ===');
+            
+            // Delayed check for any dynamically loaded content
+            setTimeout(function() {
+                console.log('Running delayed QuizCompletion points check...');
+                var delayedElements = document.querySelectorAll('*');
+                var delayedReplacements = 0;
+                
+                for (var k = 0; k < delayedElements.length; k++) {
+                    var element = delayedElements[k];
+                    if (element.children.length === 0) {
+                        var text = element.textContent;
+                        if (text && (text.trim() === '30' || text.trim() === 'Current Points: 30')) {
+                            var parent = element.parentElement;
+                            if (parent && (parent.className.includes('points') || 
+                                         parent.className.includes('badge'))) {
+                                if (text.trim() === '30') {
+                                    element.textContent = actualCurrentPoints;
+                                } else {
+                                    element.textContent = 'Current Points: ' + actualCurrentPoints;
+                                }
+                                delayedReplacements++;
+                            }
+                        }
+                    }
+                }
+                
+                if (delayedReplacements > 0) {
+                    console.log('Made ' + delayedReplacements + ' delayed QuizCompletion replacements');
+                }
+            }, 2000);
+        });
+    </script>
 </asp:Content>

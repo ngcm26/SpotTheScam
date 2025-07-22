@@ -443,7 +443,7 @@
                 <div class="support-card">
                     <h5>Report via i-Witness</h5>
                     <div class="phone">police.gov.sg/i-Witness</div>
-                    <p class="description">24/7 emotional support</p>
+                    <p class="description">24/7 online reporting</p>
                 </div>
 
                 <!-- ScamShield App -->
@@ -458,9 +458,8 @@
 
     <script>
         function selectScamType(type) {
-            // You can implement navigation to specific guidance pages here
-            alert('Selected scam type: ' + type + '\nRedirecting to specific guidance...');
-            // Example: window.location.href = 'ScamGuidance.aspx?type=' + type;
+            // Redirect to ScamRecoveryGuidance.aspx with the scam type as a query parameter
+            window.location.href = 'ScamRecoveryGuidance.aspx?type=' + type;
         }
 
         function openChat() {

@@ -9,11 +9,8 @@
 
 namespace SpotTheScam.User
 {
-
-
     public partial class UserWebinarSessionListing
     {
-
         /// <summary>
         /// btnAllSessions control.
         /// </summary>
@@ -51,30 +48,21 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.DropDownList ddlTopics;
 
         /// <summary>
-        /// session1 control.
+        /// lblCurrentPoints control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl session1;
+        protected global::System.Web.UI.WebControls.Label lblCurrentPoints;
 
         /// <summary>
-        /// session2 control.
+        /// rptSessions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl session2;
-
-        /// <summary>
-        /// session3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl session3;
+        protected global::System.Web.UI.WebControls.Repeater rptSessions;
     }
 }

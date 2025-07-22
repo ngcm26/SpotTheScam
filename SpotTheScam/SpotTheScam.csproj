@@ -51,6 +51,15 @@
     <Reference Include="HtmlSanitizer, Version=9.0.0.0, Culture=neutral, PublicKeyToken=61c49a1a9e79cc28, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlSanitizer.9.0.886\lib\net47\HtmlSanitizer.dll</HintPath>
     </Reference>
+    <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AngleSharp.Css, Version=0.17.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.Css.0.17.0\lib\net472\AngleSharp.Css.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlSanitizer, Version=9.0.0.0, Culture=neutral, PublicKeyToken=61c49a1a9e79cc28, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlSanitizer.9.0.886\lib\net47\HtmlSanitizer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -58,6 +67,25 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\lib\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=9.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.9.0.1\lib\net462\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.6.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=8.0.0.2, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.8.0.2\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
@@ -171,6 +199,8 @@
     <Content Include="Staff\IndividualBlogStafff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
+    <Content Include="Staff\StaffExpertWebinar.aspx" />
+    <Content Include="Staff\StaffVideoCallSession.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\AddBankAccounts.aspx" />
     <Content Include="User\CreateBlog.aspx" />
@@ -178,6 +208,7 @@
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\FamilyGroupManagement.aspx" />
     <Content Include="User\ForumPage.aspx" />
+    <Content Include="User\IndividualForum.aspx" />
     <Content Include="User\LinkChecker.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
@@ -196,7 +227,6 @@
     <Content Include="User\ExpertWebinarHomepage.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
-    <Content Include="Staff\StaffExpertWebinar.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
     <Content Include="User\UserBankAccounts.aspx" />
     <Content Include="User\UserHome.aspx" />
@@ -254,6 +284,20 @@
     <Compile Include="Staff\StaffAddModules.aspx.designer.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Staff\StaffExpertWebinar.aspx.cs">
+      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
+      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\StaffVideoCallSession.aspx.cs">
+      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffVideoCallSession.aspx.designer.cs">
+      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Staff\ViewModules.aspx.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -302,6 +346,13 @@
     </Compile>
     <Compile Include="User\ForumPage.aspx.designer.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\IndividualForum.aspx.cs">
+      <DependentUpon>IndividualForum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\IndividualForum.aspx.designer.cs">
+      <DependentUpon>IndividualForum.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\LinkChecker.aspx.cs">
       <DependentUpon>LinkChecker.aspx</DependentUpon>
@@ -428,13 +479,6 @@
     </Compile>
     <Compile Include="Staff\StaffDashboard.aspx.designer.cs">
       <DependentUpon>StaffDashboard.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Staff\StaffExpertWebinar.aspx.cs">
-      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
-      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>

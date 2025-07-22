@@ -74,36 +74,42 @@
         }
 
         .points-notification {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
         .points-notification.correct {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: #4CAF50;
         }
 
-        .points-notification.correct-no-hint {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+        .points-notification.incorrect {
+            background-color: #f44336;
+        }
+
+        .points-notification.show {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .quiz-card {
             background: white;
             border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
 
         .question-number {
-            background: #4caf50;
+            background: var(--brand-orange);
             color: white;
             border-radius: 50%;
             width: 40px;
@@ -112,226 +118,201 @@
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .question-text {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--brand-navy);
-            margin-bottom: 15px;
-        }
-
-        .scenario-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
             margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
-        .scenario-text {
-            font-size: 0.95rem;
-            color: #856404;
-            margin: 0;
-        }
-
-        .answer-option {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .answer-option:hover {
-            border-color: #4caf50;
-            background: #f0fff0;
-        }
-
-        .answer-option.selected {
-            border-color: #4caf50;
-            background: #e8f5e8;
-        }
-
-        .answer-option.correct {
-            border-color: #4caf50;
-            background: #d4edda;
-        }
-
-        .answer-option.incorrect {
-            border-color: #dc3545;
-            background: #f8d7da;
-        }
-
-        .option-letter {
-            background: #6c757d;
-            color: white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .answer-option.correct .option-letter {
-            background: #28a745;
-        }
-
-        .answer-option.incorrect .option-letter {
-            background: #dc3545;
-        }
-
-        .option-text {
-            flex: 1;
-            font-size: 0.95rem;
-        }
-
-        .feedback-icon {
-            margin-left: 10px;
-            font-size: 1.2rem;
-        }
-
-        .quiz-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .btn-back {
-            background: var(--brand-orange);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-back:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .btn-hint {
-            background: var(--brand-orange);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .btn-hint:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .feedback-section {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .feedback-section.show {
-            display: block;
-        }
-
-        .feedback-section.correct {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-        }
-
-        .feedback-section.incorrect {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-        }
-
-        .feedback-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .feedback-title.correct {
-            color: #155724;
-        }
-
-        .feedback-title.incorrect {
-            color: #721c24;
-        }
-
-        .feedback-text {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-
-        .feedback-text.correct {
-            color: #155724;
-        }
-
-        .feedback-text.incorrect {
-            color: #721c24;
-        }
-
-        .continue-btn {
-            background: var(--brand-orange);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .hint-section {
-            background: #e3f2fd;
-            border: 1px solid #bbdefb;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .hint-section.show {
-            display: block;
-        }
-
-        .hint-title {
-            font-weight: 600;
-            color: #1565c0;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-
-        .hint-text {
-            color: #1565c0;
-            font-size: 0.9rem;
             line-height: 1.4;
         }
 
-        .click-feedback {
-            color: #dc3545;
-            font-size: 0.85rem;
-            margin-left: 10px;
+        .scenario-box {
+            background: #fff8e1;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .scenario-text {
+            margin: 0;
+            font-style: italic;
+            color: #333;
+        }
+
+        .options-container {
+            margin-bottom: 25px;
+        }
+
+        .option-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
             cursor: pointer;
-            text-decoration: underline;
+        }
+
+        .option-item:hover {
+            border-color: var(--brand-orange);
+            background: #fff;
+        }
+
+        .option-item.selected {
+            border-color: var(--brand-orange);
+            background: #fff3e0;
+        }
+
+        .option-item input[type="radio"] {
+            display: none;
+        }
+
+        .option-label {
+            display: block;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .option-letter {
+            background: var(--brand-orange);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .hint-container {
+            margin-bottom: 25px;
+        }
+
+        .hint-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .hint-btn:hover:not(:disabled) {
+            background: #138496;
+        }
+
+        .hint-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .hint-content {
+            background: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 0 8px 8px 0;
+            display: none;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .btn-primary-custom {
+            background: var(--brand-orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary-custom:hover:not(:disabled) {
+            background: #b8591f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(211, 111, 45, 0.3);
+        }
+
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary-custom:hover:not(:disabled) {
+            background: #545b62;
+        }
+
+        .btn-primary-custom:disabled,
+        .btn-secondary-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .exit-quiz-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .exit-quiz-btn:hover {
+            background: #c82333;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid;
+            display: none;
+        }
+
+        .feedback.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .feedback-icon {
+            font-weight: bold;
+            margin-right: 10px;
         }
 
         .disabled {
@@ -346,7 +327,7 @@
         <!-- Quiz Header -->
         <div class="quiz-header">
             <div class="current-points">
-                Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="75" />
+                Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" />
             </div>
             <div class="quiz-title">
                 <div class="quiz-icon">📞</div>
@@ -364,11 +345,6 @@
             </div>
         </div>
 
-        <!-- Points Notification -->
-        <div id="pointsNotification" class="points-notification">
-            <span id="pointsText"></span>
-        </div>
-
         <!-- Quiz Card -->
         <div class="quiz-card">
             <div class="question-number" id="questionNumber">1</div>
@@ -378,399 +354,535 @@
                 <p class="scenario-text" id="scenarioText">📧 Scenario: You receive a call from someone saying, "This John from ABC Bank. We've detected suspicious activity on your account and we need to verify your information immediately"</p>
             </div>
 
-            <div id="answerOptions">
-                <div class="answer-option" onclick="selectAnswer('A')" id="optionA">
-                    <div class="option-letter">A</div>
-                    <div class="option-text">Give them your account number and PIN to verify your identity</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
+            <!-- Answer Options -->
+            <div class="options-container">
+                <div class="option-item" onclick="selectOption('A')">
+                    <input type="radio" id="optionA" name="quizAnswer" value="A">
+                    <label class="option-label" for="optionA">
+                        <span class="option-letter">A</span>
+                        <span id="optionAText">Give them your account number and PIN to verify your identity</span>
+                    </label>
                 </div>
-                <div class="answer-option" onclick="selectAnswer('B')" id="optionB">
-                    <div class="option-letter">B</div>
-                    <div class="option-text">Hang up and call your bank directly using the number on your card or statement</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
+
+                <div class="option-item" onclick="selectOption('B')">
+                    <input type="radio" id="optionB" name="quizAnswer" value="B">
+                    <label class="option-label" for="optionB">
+                        <span class="option-letter">B</span>
+                        <span id="optionBText">Hang up and call your bank directly using the number on your card or statement</span>
+                    </label>
                 </div>
-                <div class="answer-option" onclick="selectAnswer('C')" id="optionC">
-                    <div class="option-letter">C</div>
-                    <div class="option-text">Ask them to call you back in 10 minutes to give you the time to find your information</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
+
+                <div class="option-item" onclick="selectOption('C')">
+                    <input type="radio" id="optionC" name="quizAnswer" value="C">
+                    <label class="option-label" for="optionC">
+                        <span class="option-letter">C</span>
+                        <span id="optionCText">Ask them to call you back in 10 minutes to give you time to find your information</span>
+                    </label>
                 </div>
-                <div class="answer-option" onclick="selectAnswer('D')" id="optionD">
-                    <div class="option-letter">D</div>
-                    <div class="option-text">Transfer the call to a family member who is better with technology</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
+
+                <div class="option-item" onclick="selectOption('D')">
+                    <input type="radio" id="optionD" name="quizAnswer" value="D">
+                    <label class="option-label" for="optionD">
+                        <span class="option-letter">D</span>
+                        <span id="optionDText">Transfer the call to a family member who is better with technology</span>
+                    </label>
                 </div>
             </div>
 
             <!-- Hint Section -->
-            <div class="hint-section" id="hintSection">
-                <div class="hint-title">🔍 Hint</div>
-                <div class="hint-text" id="hintText">Real banks will never ask you to give them information they already have. When in doubt, hang up and call the number on your card yourself!</div>
+            <div class="hint-container">
+                <button type="button" id="hintBtn" class="hint-btn" onclick="showHint()">💡 Show Hint</button>
+                <div id="hintContent" class="hint-content">
+                    <strong>💡 Hint:</strong> <span id="hintText">Legitimate banks have security procedures that don't require you to provide sensitive information over unsolicited calls.</span>
+                </div>
             </div>
 
             <!-- Feedback Section -->
-            <div class="feedback-section" id="feedbackSection">
-                <div class="feedback-title" id="feedbackTitle">
-                    <span id="feedbackIcon"></span>
-                    <span id="feedbackTitleText"></span>
-                </div>
-                <div class="feedback-text" id="feedbackText"></div>
-                <button class="continue-btn" onclick="nextQuestion(); return false;">Continue Learning</button>
+            <div id="feedback" class="feedback">
+                <span id="feedbackIcon" class="feedback-icon"></span>
+                <span id="feedbackText"></span>
             </div>
 
-            <div class="quiz-buttons">
-                <button class="btn-back" onclick="goBack()">← Back</button>
-                <button class="btn-hint" id="hintBtn" onclick="showHint()">Hint</button>
+            <!-- Navigation Buttons -->
+            <div class="navigation-buttons">
+                <button type="button" id="backBtn" class="btn-secondary-custom" onclick="previousQuestion()">← Back</button>
+                <button type="button" class="exit-quiz-btn" onclick="exitQuiz()">Exit Quiz</button>
+                <button type="button" id="nextBtn" class="btn-primary-custom" onclick="nextQuestion()" disabled>Next Question →</button>
             </div>
         </div>
     </div>
 
-    <!-- Hidden fields to store data -->
+    <!-- Hidden Fields for State Management -->
     <asp:HiddenField ID="hdnCurrentQuestionIndex" runat="server" Value="0" />
-    <asp:HiddenField ID="hdnSelectedAnswer" runat="server" />
+    <asp:HiddenField ID="hdnSelectedAnswer" runat="server" Value="" />
     <asp:HiddenField ID="hdnHintUsed" runat="server" Value="false" />
     <asp:HiddenField ID="hdnQuizData" runat="server" />
 
-    <script>
+    <script type="text/javascript">
+        // Quiz data and state variables
         let currentQuestionIndex = 0;
-        let selectedAnswer = '';
+        let answeredQuestions = [];
         let hintUsed = false;
-        let totalPoints = parseInt('<%= lblCurrentPoints.Text %>');
-        let questionAnswered = false;
-        let answeredQuestions = []; // Track which questions have been answered
-        let correctAnswersCount = 0; // Track number of correct answers
 
-        // Quiz data with 10 questions
+        // Points tracking variables
+        let userStartingPoints = 0;
+        let totalPointsEarnedFromQuiz = 0;
+        let totalCurrentPoints = 0;
+        let correctAnswersCount = 0;
+
+        // Track all question results for debugging
+        let questionResults = [];
+
+        // Quiz session management
+        let isNewQuizSession = true;
+
+        // Quiz data - Complete set of questions
         const quizData = [
             {
                 question: "What should you do if someone calls claiming to be from your bank?",
-                scenario: "📧 Scenario: You receive a call from someone saying, \"This John from ABC Bank. We've detected suspicious activity on your account and we need to verify your information immediately\"",
+                scenario: "You receive a call from someone saying, \"This John from ABC Bank. We've detected suspicious activity on your account and we need to verify your information immediately\"",
                 options: {
                     A: "Give them your account number and PIN to verify your identity",
                     B: "Hang up and call your bank directly using the number on your card or statement",
-                    C: "Ask them to call you back in 10 minutes to give you the time to find your information",
+                    C: "Ask them to call you back in 10 minutes to give you time to find your information",
                     D: "Transfer the call to a family member who is better with technology"
                 },
-                correctAnswer: "B",
-                hint: "Real banks will never ask you to give them information they already have. When in doubt, hang up and call the number on your card yourself!",
+                correct: "B",
+                explanation: "Banks will never ask for sensitive information over the phone. Always hang up and call your bank directly using official numbers.",
                 feedback: {
-                    A: "❌ Never give personal information over the phone. Scammers want your PIN to access your money!",
-                    B: "✅ Correct! This is the safest approach. Real banks already have your details.",
-                    C: "❌ This gives scammers time to prepare better lies. Hang up instead!",
-                    D: "❌ Don't involve family members in potential scams. Handle it yourself by hanging up."
+                    A: "Never give personal information to unsolicited callers, even if they claim to be from your bank.",
+                    C: "Scammers will often agree to call back to seem legitimate. Always verify independently.",
+                    D: "This doesn't solve the problem - the caller could still be a scammer."
                 },
-                explanation: "Real banks already have your information and will never ask for your PIN over the phone. Always hang up and call back using official numbers."
+                hint: "Legitimate banks have security procedures that don't require you to provide sensitive information over unsolicited calls."
             },
             {
-                question: "You receive a call saying you've won a prize but need to pay fees first. What should you do?",
-                scenario: "📞 Scenario: \"Congratulations! You've won $10,000 in our lottery! To claim your prize, you just need to pay $500 in processing fees first.\"",
+                question: "Someone calls claiming you've won a prize, but asks for payment to claim it. What do you do?",
+                scenario: "You receive a call: \"Congratulations! You've won $10,000 in our sweepstakes! To claim your prize, we just need a $200 processing fee via gift card.\"",
                 options: {
-                    A: "Pay the fees immediately to claim your prize",
-                    B: "Ask for their company details and call them back later",
-                    C: "Hang up immediately - legitimate prizes never require upfront payments",
-                    D: "Negotiate to pay smaller fees first"
+                    A: "Pay the fee immediately to claim your prize",
+                    B: "Ask for their company information and hang up to verify",
+                    C: "Negotiate a lower processing fee",
+                    D: "Give them your credit card information for the fee"
                 },
-                correctAnswer: "C",
-                hint: "Remember: If you have to pay to receive money, it's always a scam. Real prizes are free!",
+                correct: "B",
+                explanation: "Legitimate prizes never require upfront payments. This is a classic scam tactic.",
                 feedback: {
-                    A: "❌ This is a classic advance fee scam. You'll lose your money and get nothing.",
-                    B: "❌ Even calling back gives scammers another chance to convince you.",
-                    C: "✅ Correct! Legitimate prizes never require any upfront payment.",
-                    D: "❌ Any payment request for a 'prize' is a red flag. Don't negotiate with scammers."
+                    A: "Real contests never require payment to claim prizes. This is always a scam.",
+                    C: "Any request for payment to claim a prize is fraudulent, regardless of the amount.",
+                    D: "Never give payment information to unsolicited callers claiming you've won something."
                 },
-                explanation: "Legitimate sweepstakes and contests never require winners to pay fees, taxes, or charges upfront to claim prizes."
+                hint: "Real sweepstakes and contests are free to enter and free to win."
             },
             {
-                question: "Someone calls claiming to be from the IRS saying you owe taxes. What's the correct response?",
-                scenario: "📞 Scenario: \"This is Agent Smith from the IRS. You owe $3,000 in back taxes and must pay immediately or face arrest.\"",
+                question: "A caller claims to be from the IRS and threatens immediate arrest. What's your response?",
+                scenario: "Caller says: \"This is the IRS. You owe $5,000 in back taxes. Pay immediately or we'll have you arrested within the hour.\"",
                 options: {
-                    A: "Provide your SSN to verify your identity",
-                    B: "Ask for payment options to resolve the issue quickly",
-                    C: "Hang up - the IRS doesn't call about taxes owed",
-                    D: "Transfer them to your accountant"
+                    A: "Pay immediately to avoid arrest",
+                    B: "Hang up - the IRS doesn't make threatening calls",
+                    C: "Ask them to mail you the bill",
+                    D: "Give them your Social Security number to verify"
                 },
-                correctAnswer: "C",
-                hint: "The IRS always contacts taxpayers by mail first, never by phone for initial contact about owed taxes.",
+                correct: "B",
+                explanation: "The IRS never calls to demand immediate payment or threaten arrest. They communicate through official mail.",
                 feedback: {
-                    A: "❌ Never give your SSN over the phone. The IRS already has this information.",
-                    B: "❌ You're falling for the scam. The IRS doesn't demand immediate payment over the phone.",
-                    C: "✅ Correct! The IRS contacts people by mail, not phone, for tax issues.",
-                    D: "❌ Don't involve others in potential scams. Just hang up."
+                    A: "The IRS never threatens immediate arrest or demands instant payment over the phone.",
+                    C: "While asking for written documentation is good practice, this caller is definitely a scammer.",
+                    D: "Never give your SSN to unsolicited callers, especially threatening ones."
                 },
-                explanation: "The IRS never calls taxpayers to demand immediate payment or threatens arrest. They always send official notices by mail first."
+                hint: "Government agencies follow proper procedures and don't make threatening phone calls."
             },
             {
-                question: "A caller says your computer has viruses and offers to fix it remotely. What should you do?",
-                scenario: "📞 Scenario: \"This is Microsoft support. We've detected viruses on your computer. Allow us remote access to fix the problem immediately.\"",
+                question: "Someone calls about your 'expired' car warranty. How do you handle this?",
+                scenario: "\"We're calling about your car's extended warranty that's about to expire. Press 1 to speak with an agent or press 2 to be removed from our list.\"",
                 options: {
-                    A: "Give them remote access to fix the problem",
-                    B: "Ask for their employee ID and callback number",
-                    C: "Hang up - tech companies don't make unsolicited calls",
-                    D: "Ask them to prove they're from Microsoft"
+                    A: "Press 1 to learn more about the warranty",
+                    B: "Press 2 to be removed from the list",
+                    C: "Hang up without pressing anything",
+                    D: "Stay on the line to tell them you're not interested"
                 },
-                correctAnswer: "C",
-                hint: "Microsoft, Apple, and other tech companies never call customers unsolicited about computer problems.",
+                correct: "C",
+                explanation: "Pressing any number confirms your phone number is active and leads to more scam calls. Just hang up.",
                 feedback: {
-                    A: "❌ This gives scammers full access to steal your personal information and money.",
-                    B: "❌ Scammers can provide fake credentials. Don't engage with them.",
-                    C: "✅ Correct! Legitimate tech companies never make unsolicited support calls.",
-                    D: "❌ Don't give scammers opportunities to convince you with fake 'proof'."
+                    A: "These warranty calls are almost always scams designed to steal your information.",
+                    B: "Pressing any number, even to 'opt out,' confirms your number is active and increases scam calls.",
+                    D: "Engaging with scammers in any way can lead to more aggressive tactics and calls."
                 },
-                explanation: "Tech support scams are common. Real companies like Microsoft never call customers unsolicited about computer problems."
+                hint: "Interacting with robocalls in any way often leads to more unwanted calls."
             },
             {
-                question: "You get a call about suspicious activity on your credit card. What's the safest action?",
-                scenario: "📞 Scenario: \"We're calling from Visa security. There's been suspicious activity on your card ending in 1234. We need to verify some transactions.\"",
+                question: "A caller offers a great deal on home security but needs your address to 'check availability.' What do you do?",
+                scenario: "\"We're offering 50% off home security systems in your area today only! What's your address so I can check if we service your location?\"",
                 options: {
-                    A: "Provide the full card number to verify it's yours",
-                    B: "Give them the CVV code to confirm your identity",
-                    C: "Hang up and call the number on the back of your card",
-                    D: "Ask them to text you the suspicious transactions"
+                    A: "Give them your address since it's for a legitimate service check",
+                    B: "Give them your zip code instead of full address",
+                    C: "Ask for their company details and research them first",
+                    D: "Tell them you'll call them back and ask for their number"
                 },
-                correctAnswer: "C",
-                hint: "Even if they know some card details, always verify by calling the official number yourself.",
+                correct: "C",
+                explanation: "Legitimate companies can be researched and verified. Never give personal information to unsolicited callers.",
                 feedback: {
-                    A: "❌ Never give your full card number over the phone, even if they seem legitimate.",
-                    B: "❌ Your CVV code should never be shared over the phone with callers.",
-                    C: "✅ Correct! Always call the official number to verify any card issues.",
-                    D: "❌ Don't give scammers your phone number or continue the conversation."
+                    A: "Your address is personal information that can be used for identity theft or burglary planning.",
+                    B: "Even partial address information can be dangerous when given to unverified callers.",
+                    D: "Scammers often provide fake callback numbers or refuse to give them at all."
                 },
-                explanation: "Even if callers know some of your card details, always hang up and call the official customer service number to verify any issues."
+                hint: "Real businesses have verifiable contact information and don't pressure for immediate decisions."
             },
             {
-                question: "Someone calls offering a great investment opportunity with guaranteed returns. Your response?",
-                scenario: "📞 Scenario: \"I'm calling with an exclusive investment opportunity. Guaranteed 20% returns in just 30 days. But you must decide now!\"",
+                question: "Someone calls claiming your computer has a virus and offers to fix it. What's your response?",
+                scenario: "\"This is Microsoft support. We've detected malicious software on your computer. Allow us remote access to fix it immediately.\"",
                 options: {
-                    A: "Ask for more details about the investment",
-                    B: "Request written information to review",
-                    C: "Hang up - guaranteed high returns don't exist",
-                    D: "Ask to speak with their supervisor"
+                    A: "Let them access your computer to fix the virus",
+                    B: "Hang up - Microsoft doesn't make unsolicited calls",
+                    C: "Ask them to prove they're from Microsoft",
+                    D: "Pay them to remove the virus"
                 },
-                correctAnswer: "C",
-                hint: "All investments carry risk. Anyone promising guaranteed high returns is lying.",
+                correct: "B",
+                explanation: "Microsoft and other tech companies never make unsolicited calls about computer problems.",
                 feedback: {
-                    A: "❌ Engaging gives scammers more opportunity to pressure you into investing.",
-                    B: "❌ Scammers can provide fake documents. Don't continue the conversation.",
-                    C: "✅ Correct! No legitimate investment guarantees high returns without risk.",
-                    D: "❌ Don't waste time with scammers. Their 'supervisor' is just another scammer."
+                    A: "Giving remote access allows scammers to steal personal information and install actual malware.",
+                    C: "Scammers have convincing fake credentials. The key is that real tech support doesn't call you.",
+                    D: "This is a scam - you'd be paying for nothing and potentially giving them payment information."
                 },
-                explanation: "Legitimate investments always carry risk. Anyone promising guaranteed high returns with no risk is running a scam."
+                hint: "Legitimate tech companies only provide support when you contact them first."
             },
             {
-                question: "A caller claims to be from your utility company threatening service disconnection. What should you do?",
-                scenario: "📞 Scenario: \"This is City Electric. Your power will be shut off in 2 hours unless you pay $400 immediately with a prepaid card.\"",
+                question: "A caller claims to be from your utility company threatening disconnection. What do you do?",
+                scenario: "\"Your electricity will be shut off in 2 hours unless you pay $300 immediately via prepaid card. Call this number: 555-SCAM now!\"",
                 options: {
-                    A: "Rush to buy a prepaid card to avoid disconnection",
-                    B: "Give them your bank account information for payment",
-                    C: "Hang up and call your utility company directly",
-                    D: "Ask for a supervisor to negotiate payment terms"
+                    A: "Pay immediately to avoid having power shut off",
+                    B: "Call your utility company directly using the number on your bill",
+                    C: "Ask the caller for a payment plan",
+                    D: "Give them your bank account information for automatic payment"
                 },
-                correctAnswer: "C",
-                hint: "Utility companies send written notices before disconnection and accept multiple payment methods, not just prepaid cards.",
+                correct: "B",
+                explanation: "Utility companies provide written notice before disconnection and accept standard payment methods, not gift cards.",
                 feedback: {
-                    A: "❌ Prepaid cards are a red flag. Legitimate companies don't demand this payment method.",
-                    B: "❌ Never give bank details over the phone to unexpected callers.",
-                    C: "✅ Correct! Always verify with your utility company using their official number.",
-                    D: "❌ Don't negotiate with scammers. Verify the situation through official channels."
+                    A: "Real utility companies don't demand immediate payment via gift cards or threaten same-day disconnection.",
+                    C: "While payment plans exist, this caller is a scammer based on their tactics and payment demands.",
+                    D: "Never give banking information to callers threatening immediate disconnection."
                 },
-                explanation: "Utility companies send written notices before disconnection and offer multiple payment options. Demanding immediate payment with prepaid cards is a scam tactic."
+                hint: "Utility companies have official procedures and don't require gift card payments."
             },
             {
-                question: "You receive a call about a family member in trouble needing bail money. What's your first step?",
-                scenario: "📞 Scenario: \"Your grandson is in jail and needs $2,000 bail money immediately. Don't tell his parents - he's embarrassed. Send money right away!\"",
+                question: "Someone calls offering a free cruise but asks for your credit card for 'taxes and fees.' What do you do?",
+                scenario: "\"You've qualified for a FREE 7-day Caribbean cruise! We just need your credit card for $199 in port fees and taxes.\"",
                 options: {
-                    A: "Send the money immediately to help your grandson",
-                    B: "Ask for the jail's phone number to call directly",
-                    C: "Hang up and contact your family member directly",
-                    D: "Ask the caller to put your grandson on the phone"
+                    A: "Provide your credit card since it's just for fees",
+                    B: "Ask to pay the fees when you arrive at the port",
+                    C: "Hang up - free cruises requiring payment aren't free",
+                    D: "Ask for written confirmation before paying"
                 },
-                correctAnswer: "C",
-                hint: "Scammers use emotional urgency and secrecy to prevent you from verifying the story. Always verify independently.",
+                correct: "C",
+                explanation: "If something is truly free, you shouldn't need to pay anything upfront. This is a classic scam.",
                 feedback: {
-                    A: "❌ This is likely a grandparent scam. Your family member is probably safe at home.",
-                    B: "❌ Scammers can provide fake numbers. Contact your family member directly instead.",
-                    C: "✅ Correct! Always verify emergencies by contacting family members directly.",
-                    D: "❌ Scammers often have accomplices who can pretend to be your family member."
+                    A: "Once scammers have your credit card, they can make unauthorized charges beyond the stated fees.",
+                    B: "The cruise doesn't exist - this is just a way to steal your payment information.",
+                    D: "Scammers can create fake documents. The red flag is requiring payment for something 'free.'"
                 },
-                explanation: "The 'grandparent scam' uses emotional manipulation and urgency. Always verify emergencies by contacting family members directly using numbers you know."
+                hint: "Anything that's truly 'free' shouldn't require upfront payment."
             },
             {
-                question: "A caller offers to lower your credit card interest rates. What should you do?",
-                scenario: "📞 Scenario: \"This is your final notice! We can lower your credit card interest rates to 0%. Press 1 to speak with an agent about this limited-time offer.\"",
+                question: "A caller claims you have unpaid debt and threatens legal action. How do you respond?",
+                scenario: "\"You owe $2,000 to ABC Collections. Pay now or we'll garnish your wages and ruin your credit score.\"",
                 options: {
-                    A: "Press 1 to learn about the offer",
-                    B: "Give them your credit card information to check eligibility",
-                    C: "Hang up - legitimate card companies don't make these calls",
-                    D: "Ask which credit card company they represent"
+                    A: "Pay immediately to protect your credit",
+                    B: "Ask for written verification of the debt",
+                    C: "Give them your Social Security number to verify the debt",
+                    D: "Negotiate a payment plan over the phone"
                 },
-                correctAnswer: "C",
-                hint: "Credit card companies contact customers through mail or secure online messages, not unsolicited phone calls.",
+                correct: "B",
+                explanation: "Legitimate debt collectors must provide written verification when requested. Scammers often can't or won't.",
                 feedback: {
-                    A: "❌ Pressing buttons confirms your number is active and leads to more scam calls.",
-                    B: "❌ Never give credit card details to unsolicited callers.",
-                    C: "✅ Correct! These are always scams designed to steal your card information.",
-                    D: "❌ Don't engage with scammers. They'll claim to represent whatever company you mention."
+                    A: "Real debt has a paper trail. Paying without verification could mean paying for fake debt.",
+                    C: "Never give your SSN to verify debt - legitimate collectors already have your information.",
+                    D: "Don't negotiate until you've verified the debt is real and the collector is legitimate."
                 },
-                explanation: "Credit card interest rate reduction calls are common scams. Legitimate card companies don't make unsolicited offers over the phone."
+                hint: "Legitimate debt collectors are required by law to provide written verification when requested."
             },
             {
-                question: "Someone calls claiming you're eligible for a government grant. What's the appropriate response?",
-                scenario: "📞 Scenario: \"Congratulations! You qualify for a $9,000 government grant that never needs to be repaid. We just need your bank details to deposit it.\"",
+                question: "Someone calls claiming to be your grandchild in trouble and needs money. What do you do?",
+                scenario: "\"Grandma/Grandpa, it's me! I'm in jail and need $1,000 for bail. Please don't tell my parents. Can you wire the money right away?\"",
                 options: {
-                    A: "Provide your bank account information for the deposit",
-                    B: "Ask for documentation to be mailed to you",
-                    C: "Hang up - the government doesn't call about grants",
-                    D: "Ask for their government employee ID number"
+                    A: "Wire the money immediately to help your grandchild",
+                    B: "Hang up and call your grandchild's known phone number",
+                    C: "Ask the caller detailed questions about family",
+                    D: "Call other family members to verify the situation"
                 },
-                correctAnswer: "C",
-                hint: "Government agencies communicate through official mail and websites, not unsolicited phone calls about grants.",
+                correct: "B",
+                explanation: "This is a common 'grandparent scam.' Always verify by calling the person directly at their known number.",
                 feedback: {
-                    A: "❌ This gives scammers direct access to your bank account to steal money.",
-                    B: "❌ Don't give scammers your address or continue the conversation.",
-                    C: "✅ Correct! Government agencies don't call people about grants out of the blue.",
-                    D: "❌ Scammers can make up fake ID numbers. Don't engage with them."
+                    A: "Scammers prey on grandparents' love and urgency. Always verify before sending money.",
+                    C: "Scammers research families on social media and may know personal details.",
+                    D: "While involving family is good, directly calling the supposed person in trouble is most efficient."
                 },
-                explanation: "Government grant scams are common. Real government agencies communicate through official channels and don't call unsolicited about grants."
+                hint: "Family emergency scams rely on emotion and urgency. Take time to verify independently."
             }
         ];
 
-        // Enhanced saveQuizCompletion with better error reporting
-        function saveQuizCompletion(totalPointsEarned, correctAnswers) {
-            console.log("=== SAVING QUIZ COMPLETION ===");
-            console.log("Total points earned:", totalPointsEarned, "Correct answers:", correctAnswers);
+        function selectOption(answer) {
+            console.log('selectOption called with: ' + answer);
 
-            return new Promise((resolve, reject) => {
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'PhoneScamsQuiz.aspx/CompleteQuiz', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-
-                var data = JSON.stringify({
-                    totalPointsEarned: totalPointsEarned,
-                    correctAnswers: correctAnswers
-                });
-
-                console.log("Sending completion data:", data);
-
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        console.log("Completion AJAX Response Status:", xhr.status);
-                        console.log("Completion AJAX Response Text:", xhr.responseText);
-
-                        if (xhr.status === 200) {
-                            try {
-                                var response = JSON.parse(xhr.responseText);
-                                console.log("Completion response:", response);
-
-                                if (response.d) {
-                                    console.log("Server completion response:", response.d);
-                                    if (response.d.indexOf("Error") !== -1) {
-                                        console.error("Server error during completion:", response.d);
-                                        reject(response.d);
-                                    } else {
-                                        console.log("Quiz completion saved successfully");
-                                        resolve(response.d);
-                                    }
-                                } else {
-                                    resolve("Success");
-                                }
-                            } catch (e) {
-                                console.error("Error parsing completion response:", e);
-                                console.error("Raw response was:", xhr.responseText);
-                                reject(`JSON Parse Error: ${e.message}`);
-                            }
-                        } else {
-                            console.error('Error saving quiz completion. Status:', xhr.status);
-                            console.error('Response headers:', xhr.getAllResponseHeaders());
-                            console.error('Response text:', xhr.responseText);
-                            reject(`HTTP Error ${xhr.status}: ${xhr.responseText}`);
-                        }
-                    }
-                };
-
-                xhr.onerror = function () {
-                    console.error("Network error during completion");
-                    console.error("XHR object:", xhr);
-                    reject("Network error - check your internet connection");
-                };
-
-                xhr.ontimeout = function () {
-                    console.error("Request timeout during completion");
-                    reject("Request timeout - please try again");
-                };
-
-                xhr.timeout = 30000; // 30 second timeout
-
-                try {
-                    xhr.send(data);
-                } catch (sendError) {
-                    console.error("Error sending request:", sendError);
-                    reject(`Send Error: ${sendError.message}`);
-                }
+            // Remove previous selections
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
             });
+
+            // Select current option
+            document.querySelector('#option' + answer).checked = true;
+            document.querySelector('#option' + answer).closest('.option-item').classList.add('selected');
+
+            // Store selected answer
+            var hdnSelectedAnswer = document.getElementById('<%= hdnSelectedAnswer.ClientID %>');
+            if (hdnSelectedAnswer) {
+                hdnSelectedAnswer.value = answer;
+            }
+
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+
+            // Auto-submit answer after a short delay to show selection
+            setTimeout(function () {
+                checkAnswer(answer);
+            }, 500);
         }
 
-        // Complete quiz function with proper total points calculation
+        function checkAnswer(answer) {
+            console.log('checkAnswer called for question ' + (currentQuestionIndex + 1) + ' with answer: ' + answer);
+
+            // Prevent multiple answers for the same question in one session
+            if (answeredQuestions[currentQuestionIndex]) {
+                console.log("Question already answered in this session");
+                return;
+            }
+
+            const question = quizData[currentQuestionIndex];
+            const isCorrect = answer === question.correct;
+
+            console.log('Question ' + (currentQuestionIndex + 1) + ': Answer ' + answer + ', Correct answer: ' + question.correct + ', Is correct: ' + isCorrect);
+
+            // Mark question as answered for this session
+            answeredQuestions[currentQuestionIndex] = true;
+
+            // Track results properly
+            questionResults[currentQuestionIndex] = {
+                questionNumber: currentQuestionIndex + 1,
+                selectedAnswer: answer,
+                correctAnswer: question.correct,
+                isCorrect: isCorrect,
+                hintUsed: hintUsed
+            };
+
+            // Calculate points for this question
+            let pointsEarned = 0;
+            if (isCorrect) {
+                pointsEarned = hintUsed ? 10 : 15; // 10 points + 5 bonus for no hint
+                totalPointsEarnedFromQuiz += pointsEarned; // Add to quiz total
+                totalCurrentPoints = userStartingPoints + totalPointsEarnedFromQuiz; // Recalculate total
+                correctAnswersCount++; // CRITICAL: Increment correct count
+
+                console.log('CORRECT! Points earned: ' + pointsEarned);
+                console.log('Total correct answers so far: ' + correctAnswersCount);
+                console.log('Total points earned from quiz: ' + totalPointsEarnedFromQuiz);
+                console.log('Total current points: ' + totalCurrentPoints);
+
+                showPointsNotification(pointsEarned, true);
+                showFeedback(true, question.explanation);
+            } else {
+                console.log('WRONG! No points earned');
+                showPointsNotification(0, false);
+                showFeedback(false, question.feedback[answer]);
+            }
+
+            // Update points display immediately with current total
+            var lblCurrentPoints = document.getElementById('<%= lblCurrentPoints.ClientID %>');
+            if (lblCurrentPoints) {
+                lblCurrentPoints.textContent = totalCurrentPoints;
+            }
+
+            // Save progress to database
+            saveQuizProgress(currentQuestionIndex + 1, answer, isCorrect, hintUsed, pointsEarned);
+
+            // Disable hint button and options for this viewing
+            document.getElementById('hintBtn').disabled = true;
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.style.pointerEvents = 'none';
+            });
+
+            // Update navigation buttons
+            updateNavigationButtons();
+        }
+
         function completeQuiz() {
             console.log("=== COMPLETING QUIZ ===");
+            console.log('Final Results:');
+            console.log('- Correct answers: ' + correctAnswersCount + ' out of ' + quizData.length);
+            console.log('- Total points earned from quiz: ' + totalPointsEarnedFromQuiz);
+            console.log('- Current total points: ' + totalCurrentPoints);
+            console.log('- Question results:', questionResults);
 
-            // Get the ACTUAL starting points from when the page first loaded
-            const actualStartingPoints = parseInt(document.getElementById('<%= lblCurrentPoints.ClientID %>').getAttribute('data-starting-points') || '<%= lblCurrentPoints.Text %>');
+            // Validate the data before sending
+            if (correctAnswersCount < 0 || correctAnswersCount > quizData.length) {
+                console.error("ERROR: Invalid correctAnswersCount:", correctAnswersCount);
+                correctAnswersCount = Math.max(0, Math.min(correctAnswersCount, quizData.length));
+            }
 
-            // Calculate ONLY the points earned from questions in this session
-            const pointsFromQuestions = totalPoints - actualStartingPoints;
+            if (totalPointsEarnedFromQuiz < 0) {
+                console.error("ERROR: Invalid totalPointsEarnedFromQuiz:", totalPointsEarnedFromQuiz);
+                totalPointsEarnedFromQuiz = Math.max(0, totalPointsEarnedFromQuiz);
+            }
 
-            console.log("Starting points:", actualStartingPoints);
-            console.log("Current total points:", totalPoints);
-            console.log("Points from questions:", pointsFromQuestions);
-            console.log("Correct answers:", correctAnswersCount);
+            // Call server-side method to complete quiz
+            fetch('<%= ResolveUrl("~/User/PhoneScamsQuiz.aspx/CompleteQuiz") %>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    totalPointsEarned: totalPointsEarnedFromQuiz,
+                    correctAnswers: correctAnswersCount
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Quiz completion saved:", data);
 
-            // Save completion with just the question points - bonuses are handled server-side
-            saveQuizCompletion(pointsFromQuestions, correctAnswersCount)
-                .then(() => {
-                    // Calculate the total points earned including bonuses
-                    const totalPointsEarned = pointsFromQuestions + getBonusPoints(correctAnswersCount);
-
-                    // Redirect to completion page with all necessary parameters
+                    // Pass correct data to completion page
                     const params = new URLSearchParams({
-                        quiz: "Phone Scams Quiz",
-                        points: totalPointsEarned, // Total points earned from this quiz
-                        correct: correctAnswersCount,
-                        total: quizData.length,
-                        currentPoints: totalPoints // Pass the current total points
+                        quiz: 'Phone Scams Quiz',
+                        points: totalPointsEarnedFromQuiz,  // Points earned THIS quiz
+                        correct: correctAnswersCount,       // ACTUAL correct answers
+                        total: quizData.length,            // Total questions (10)
+                        currentPoints: totalCurrentPoints   // User's total points after quiz
                     });
 
-                    window.location.href = `QuizCompletion.aspx?${params.toString()}`;
+                    console.log("Redirecting with params:", params.toString());
+                    window.location.href = 'QuizCompletion.aspx?' + params.toString();
                 })
                 .catch(error => {
                     console.error("Error completing quiz:", error);
-                    alert("There was an error completing the quiz. Please try again.");
+                    alert("Error completing quiz. Please try again.");
                 });
         }
 
-        // Helper function to calculate bonus points for display
-        function getBonusPoints(correctAnswers) {
-            let bonusPoints = 0;
+        function loadQuestion() {
+            console.log('Loading question ' + (currentQuestionIndex + 1) + ' of ' + quizData.length);
+            const question = quizData[currentQuestionIndex];
 
-            // These should match the server-side bonus calculation
-            bonusPoints += 10; // Completion bonus
-            bonusPoints += 20; // First time bonus (we'll assume first time for display)
-
-            if (correctAnswers === 10) {
-                bonusPoints += 50; // Perfect score bonus
+            // Update question display
+            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
+            var lblCurrentQuestion = document.getElementById('<%= lblCurrentQuestion.ClientID %>');
+            if (lblCurrentQuestion) {
+                lblCurrentQuestion.textContent = (currentQuestionIndex + 1).toString();
             }
 
-            return bonusPoints;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('scenarioText').textContent = question.scenario;
+            document.getElementById('hintText').textContent = question.hint;
+
+            // Load options
+            const options = ['A', 'B', 'C', 'D'];
+            options.forEach(option => {
+                document.getElementById('option' + option + 'Text').textContent = question.options[option];
+                document.getElementById('option' + option).checked = false;
+            });
+
+            // Reset option styles
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+                item.style.pointerEvents = 'auto';
+            });
+
+            // Update progress bar
+            const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+            document.querySelector('.progress-fill').style.width = progressPercent + '%';
+
+            // Reset hint state for new question
+            hintUsed = false;
+            document.getElementById('hintBtn').disabled = false;
+            document.getElementById('hintContent').style.display = 'none';
+
+            // Clear previous feedback
+            const feedbackDiv = document.getElementById('feedback');
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'none';
+            }
+
+            // Update navigation buttons
+            updateNavigationButtons();
+
+            // Reset the answered status for this question view
+            answeredQuestions[currentQuestionIndex] = false;
+        }
+
+        function nextQuestion() {
+            if (!answeredQuestions[currentQuestionIndex]) {
+                alert("Please answer the current question before proceeding.");
+                return;
+            }
+
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                // Quiz completed
+                completeQuiz();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function showHint() {
+            hintUsed = true;
+            document.getElementById('hintContent').style.display = 'block';
+            document.getElementById('hintBtn').disabled = true;
+            var hdnHintUsed = document.getElementById('<%= hdnHintUsed.ClientID %>');
+            if (hdnHintUsed) {
+                hdnHintUsed.value = 'true';
+            }
+        }
+
+        function showPointsNotification(points, isCorrect) {
+            const notification = document.createElement('div');
+            notification.className = 'points-notification ' + (isCorrect ? 'correct' : 'incorrect');
+            notification.textContent = isCorrect ? '+' + points + ' points!' : 'No points earned';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(function() {
+                notification.classList.remove('show');
+                setTimeout(function() {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 2000);
+        }
+
+        function showFeedback(isCorrect, message) {
+            const feedbackDiv = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedbackText');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+
+            if (feedbackDiv && feedbackText && feedbackIcon) {
+                feedbackText.textContent = message;
+                feedbackIcon.textContent = isCorrect ? '✓' : '✗';
+                feedbackDiv.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                feedbackDiv.style.display = 'block';
+            }
         }
 
         function saveQuizProgress(questionNumber, selectedAnswer, isCorrect, hintUsed, pointsEarned) {
-            console.log("=== SAVING QUIZ PROGRESS ===");
-            console.log("Question:", questionNumber, "Answer:", selectedAnswer, "Correct:", isCorrect, "Points:", pointsEarned);
-
-            // Make AJAX call to save progress
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'PhoneScamsQuiz.aspx/SaveQuizProgress', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            var data = JSON.stringify({
+            console.log("Saving progress:", {
                 questionNumber: questionNumber,
                 selectedAnswer: selectedAnswer,
                 isCorrect: isCorrect,
@@ -778,423 +890,79 @@
                 pointsEarned: pointsEarned
             });
 
-            console.log("Sending data:", data);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    console.log("AJAX Response Status:", xhr.status);
-                    console.log("AJAX Response Text:", xhr.responseText);
-
-                    if (xhr.status === 200) {
-                        try {
-                            var response = JSON.parse(xhr.responseText);
-                            console.log("Parsed response:", response);
-
-                            if (response.d) {
-                                console.log("Server response:", response.d);
-                                if (response.d.indexOf("Error") !== -1) {
-                                    console.error("Server error:", response.d);
-                                } else {
-                                    console.log("Progress saved successfully");
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Error parsing response:", e);
-                        }
-                    } else {
-                        console.error('Error saving progress. Status:', xhr.status, 'Response:', xhr.responseText);
-                    }
-                }
-            };
-
-            xhr.onerror = function () {
-                console.error("Network error occurred");
-            };
-
-            xhr.send(data);
-        }
-
-        function selectAnswer(answer) {
-            if (questionAnswered) return;
-
-            console.log("Answer selected:", answer);
-            selectedAnswer = answer;
-            const question = quizData[currentQuestionIndex];
-
-            // Mark as answered
-            questionAnswered = true;
-            answeredQuestions[currentQuestionIndex] = true;
-
-            // Update hidden field
-            document.getElementById('<%= hdnSelectedAnswer.ClientID %>').value = answer;
-
-            // Disable further selections and remove onclick events
-            document.querySelectorAll('.answer-option').forEach(option => {
-                option.onclick = null;
-                option.style.pointerEvents = 'none';
-
-                const letter = option.querySelector('.option-letter').textContent;
-                const feedbackLink = option.querySelector('.click-feedback');
-
-                // Show and enable feedback links
-                feedbackLink.style.display = 'inline';
-                feedbackLink.style.pointerEvents = 'auto';
-                feedbackLink.onclick = function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    showOptionFeedback(letter);
-                };
-
-                // Color code the answers
-                if (letter === question.correctAnswer) {
-                    option.classList.add('correct');
-                } else {
-                    option.classList.add('incorrect');
-                }
+            fetch('<%= ResolveUrl("~/User/PhoneScamsQuiz.aspx/SaveQuizProgress") %>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    questionNumber: questionNumber,
+                    selectedAnswer: selectedAnswer,
+                    isCorrect: isCorrect,
+                    hintUsed: hintUsed,
+                    pointsEarned: pointsEarned
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Progress saved:", data);
+            })
+            .catch(error => {
+                console.error("Error saving progress:", error);
             });
+        }
 
-            // Calculate and show points
-            let pointsEarned = 0;
-            const isCorrect = (answer === question.correctAnswer);
+        function updateNavigationButtons() {
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
 
-            if (isCorrect) {
-                pointsEarned = hintUsed ? 10 : 15;
-                totalPoints += pointsEarned;
-                correctAnswersCount++;
-                console.log("Points earned:", pointsEarned, "Total points:", totalPoints, "Correct answers:", correctAnswersCount);
-
-                // Store updated points and correct answers in session storage
-                sessionStorage.setItem('quizPoints', totalPoints.toString());
-                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
-
-                showPointsNotification(pointsEarned, true);
-                showFeedback(true, question.explanation);
-            } else {
-                console.log("Wrong answer, no points earned");
-                showPointsNotification(0, false);
-                showFeedback(false, question.feedback[answer]);
-
-                // Still update session storage for correct answers count
-                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
+            if (backBtn) {
+                backBtn.disabled = currentQuestionIndex === 0;
             }
 
-            // Update total points display immediately
-            document.getElementById('<%= lblCurrentPoints.ClientID %>').textContent = totalPoints;
-
-            // Save progress to database
-            saveQuizProgress(currentQuestionIndex + 1, answer, isCorrect, hintUsed, pointsEarned);
-
-            // Disable hint button
-            document.getElementById('hintBtn').disabled = true;
-
-            // Update back button state
-            updateBackButtonState();
-        }
-
-        function loadQuestion() {
-            console.log("Loading question:", currentQuestionIndex + 1, "of", quizData.length);
-            const question = quizData[currentQuestionIndex];
-
-            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
-            document.getElementById('questionText').textContent = question.question;
-            document.getElementById('scenarioText').textContent = question.scenario;
-            document.getElementById('hintText').textContent = question.hint;
-
-            // Update question info
-            document.getElementById('<%= lblCurrentQuestion.ClientID %>').textContent = currentQuestionIndex + 1;
-
-            // Update progress bar
-            const progress = ((currentQuestionIndex + 1) / quizData.length) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-
-            // Load answer options
-            const options = question.options;
-            const answerOptionsHtml = `
-                <div class="answer-option" onclick="selectAnswer('A')" id="optionA">
-                    <div class="option-letter">A</div>
-                    <div class="option-text">${options.A}</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
-                </div>
-                <div class="answer-option" onclick="selectAnswer('B')" id="optionB">
-                    <div class="option-letter">B</div>
-                    <div class="option-text">${options.B}</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
-                </div>
-                <div class="answer-option" onclick="selectAnswer('C')" id="optionC">
-                    <div class="option-letter">C</div>
-                    <div class="option-text">${options.C}</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
-                </div>
-                <div class="answer-option" onclick="selectAnswer('D')" id="optionD">
-                    <div class="option-letter">D</div>
-                    <div class="option-text">${options.D}</div>
-                    <span class="click-feedback" style="display: none;">Click to see feedback</span>
-                </div>
-            `;
-
-            document.getElementById('answerOptions').innerHTML = answerOptionsHtml;
-
-            // Reset states
-            resetQuestion();
-
-            // Update hidden field to sync with JavaScript
-            document.getElementById('<%= hdnCurrentQuestionIndex.ClientID %>').value = currentQuestionIndex;
-
-            // CRITICAL: Maintain points display - don't let it reset to server value
-            console.log("Maintaining points display:", totalPoints);
-            document.getElementById('<%= lblCurrentPoints.ClientID %>').textContent = totalPoints;
-
-            // Update back button state
-            updateBackButtonState();
-        }
-
-        function resetQuestion() {
-            // Reset selections and states
-            selectedAnswer = '';
-            hintUsed = false;
-            questionAnswered = false;
-
-            // Reset UI
-            document.querySelectorAll('.answer-option').forEach(option => {
-                option.className = 'answer-option';
-                option.querySelector('.click-feedback').style.display = 'none';
-                // Re-enable onclick for answer selection
-                const letter = option.querySelector('.option-letter').textContent;
-                option.onclick = function () { selectAnswer(letter); };
-            });
-
-            document.getElementById('hintSection').classList.remove('show');
-            document.getElementById('feedbackSection').classList.remove('show', 'correct', 'incorrect');
-            document.getElementById('pointsNotification').style.display = 'none';
-            document.getElementById('hintBtn').disabled = false;
-
-            // Enable answer options
-            document.getElementById('answerOptions').classList.remove('disabled');
-
-            // Update hidden fields
-            document.getElementById('<%= hdnSelectedAnswer.ClientID %>').value = '';
-            document.getElementById('<%= hdnHintUsed.ClientID %>').value = 'false';
-        }
-
-        function showHint() {
-            if (questionAnswered || hintUsed) return;
-
-            hintUsed = true;
-            document.getElementById('hintSection').classList.add('show');
-            document.getElementById('hintBtn').disabled = true;
-            
-            // Update hidden field
-            document.getElementById('<%= hdnHintUsed.ClientID %>').value = 'true';
-        }
-
-        function showPointsNotification(points, isCorrect) {
-            const notification = document.getElementById('pointsNotification');
-            const pointsText = document.getElementById('pointsText');
-
-            if (isCorrect) {
-                if (hintUsed) {
-                    notification.className = 'points-notification correct';
-                    pointsText.innerHTML = '🎯 +10 points! Correct Answer';
+            if (nextBtn) {
+                if (currentQuestionIndex === quizData.length - 1) {
+                    nextBtn.textContent = 'Complete Quiz';
                 } else {
-                    notification.className = 'points-notification correct-no-hint';
-                    pointsText.innerHTML = '🏆 +15 points! (No hints bonus!)';
+                    nextBtn.textContent = 'Next Question →';
                 }
-            } else {
-                notification.className = 'points-notification';
-                notification.style.background = '#f8d7da';
-                notification.style.color = '#721c24';
-                notification.style.border = '1px solid #f5c6cb';
-                pointsText.innerHTML = '❌ 0 points - Try again next time!';
-            }
-
-            notification.style.display = 'block';
-        }
-
-        function showFeedback(isCorrect, feedbackText) {
-            const feedbackSection = document.getElementById('feedbackSection');
-            const feedbackTitle = document.getElementById('feedbackTitle');
-            const feedbackTitleText = document.getElementById('feedbackTitleText');
-            const feedbackIcon = document.getElementById('feedbackIcon');
-            const feedbackTextEl = document.getElementById('feedbackText');
-
-            feedbackSection.classList.add('show');
-
-            if (isCorrect) {
-                feedbackSection.classList.add('correct');
-                feedbackTitle.classList.add('correct');
-                feedbackTextEl.classList.add('correct');
-                feedbackIcon.innerHTML = '✅';
-                feedbackTitleText.textContent = '+10 points! Correct Answer';
-                if (!hintUsed) {
-                    feedbackTitleText.textContent = '+15 points! Correct Answer';
-                }
-            } else {
-                feedbackSection.classList.add('incorrect');
-                feedbackTitle.classList.add('incorrect');
-                feedbackTextEl.classList.add('incorrect');
-                feedbackIcon.innerHTML = '❌';
-                feedbackTitleText.textContent = "Let's Learn Together!";
-            }
-
-            feedbackTextEl.textContent = feedbackText;
-        }
-
-        function showOptionFeedback(option) {
-            const question = quizData[currentQuestionIndex];
-            const feedbackText = question.feedback[option];
-
-            // Create a modal or alert with the specific feedback
-            alert(feedbackText);
-        }
-
-        function nextQuestion() {
-            console.log("nextQuestion called - current index:", currentQuestionIndex, "total questions:", quizData.length);
-            
-            // Check if this is the last question (index 9 for 10 questions)
-            if (currentQuestionIndex >= quizData.length - 1) {
-                console.log("This is the last question - completing quiz");
-                completeQuiz();
-                return false;
-            }
-            
-            // Move to next question
-            currentQuestionIndex++;
-            console.log("Moving to question:", currentQuestionIndex + 1);
-            
-            loadQuestion();
-            
-            // Maintain points display
-            document.getElementById('<%= lblCurrentPoints.ClientID %>').textContent = totalPoints;
-            
-            return false; // Prevent any form submission
-        }
-
-        function updateBackButtonState() {
-            const backButton = document.querySelector('.btn-back');
-            
-            // Check if any previous question has been answered
-            let canGoBack = false;
-            for (let i = 0; i < currentQuestionIndex; i++) {
-                if (!answeredQuestions[i]) {
-                    canGoBack = true;
-                    break;
-                }
-            }
-            
-            // If we're on question 1 OR if the current question is answered OR if all previous questions are answered
-            if (currentQuestionIndex === 0 || questionAnswered || !canGoBack) {
-                backButton.disabled = true;
-                backButton.style.opacity = '0.5';
-                backButton.style.cursor = 'not-allowed';
-                backButton.innerHTML = '← Back (Disabled)';
-            } else {
-                backButton.disabled = false;
-                backButton.style.opacity = '1';
-                backButton.style.cursor = 'pointer';
-                backButton.innerHTML = '← Back';
+                nextBtn.disabled = !answeredQuestions[currentQuestionIndex];
             }
         }
 
-        function goBack() {
-            // Multiple layers of protection against going back
-            
-            // Check if current question is answered
-            if (questionAnswered) {
-                alert("You cannot go back after answering a question. Please continue to the next question.");
-                return false;
-            }
-            
-            // Check if any previous questions have been answered
-            for (let i = 0; i < currentQuestionIndex; i++) {
-                if (answeredQuestions[i]) {
-                    alert("You cannot go back to questions you have already answered. Please continue forward.");
-                    return false;
-                }
-            }
-            
-            // Only allow going back if we're not on the first question and no questions have been answered
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                loadQuestion();
-            } else {
-                // Go back to quiz selection only if no questions answered
-                if (answeredQuestions.length === 0 || !answeredQuestions.some(answered => answered)) {
-                    if (confirm("Are you sure you want to exit the quiz? Your progress will be lost.")) {
-                        window.location.href = 'Quizzes.aspx';
-                    }
-                } else {
-                    alert("You cannot exit the quiz after answering questions. Please complete the quiz.");
-                }
+        function exitQuiz() {
+            if (confirm("Are you sure you want to exit the quiz?")) {
+                window.location.href = 'Quizzes.aspx';
             }
         }
 
-        // Define beforeUnloadHandler as a named function so we can remove it
-        function beforeUnloadHandler(e) {
-            if (answeredQuestions.some(answered => answered)) {
-                e.preventDefault();
-                e.returnValue = 'Are you sure you want to leave? Your quiz progress may be lost.';
-                return e.returnValue;
-            }
-        }
-
-        // Window onload to properly handle dynamic starting points
+        // Window onload to properly initialize points tracking
         window.onload = function () {
-            // Check if we have a stored question index from server
-            var storedIndex = document.getElementById('<%= hdnCurrentQuestionIndex.ClientID %>').value;
-            if (storedIndex && storedIndex !== '') {
-                currentQuestionIndex = parseInt(storedIndex);
-            }
+            console.log("=== QUIZ INITIALIZATION ===");
             
-            // Check if hint was used from server
-            var storedHintUsed = document.getElementById('<%= hdnHintUsed.ClientID %>').value;
-            if (storedHintUsed === 'true') {
-                hintUsed = true;
-            }
-            
-            // Get the user's ACTUAL current points from the server (loaded from database)
-            const userActualPoints = parseInt('<%= lblCurrentPoints.Text %>');
-            console.log("User's actual points from database:", userActualPoints);
+            // Get the user's ACTUAL current points from the server
+            var serverPointsLabel = document.getElementById('<%= lblCurrentPoints.ClientID %>');
+            var serverPoints = serverPointsLabel ? parseInt(serverPointsLabel.textContent) : 0;
+            console.log("User's actual points from server:", serverPoints);
 
-            // Store the starting points as a data attribute for later reference
-            document.getElementById('<%= lblCurrentPoints.ClientID %>').setAttribute('data-starting-points', userActualPoints);
+            // Initialize points tracking properly
+            userStartingPoints = serverPoints; // User's starting balance
+            totalPointsEarnedFromQuiz = 0; // Points earned in this quiz session
+            totalCurrentPoints = serverPoints; // Current total (starting + earned)
+            correctAnswersCount = 0; // Reset correct answers count
 
-            // CRITICAL: Points management with dynamic starting points
-            var storedPoints = sessionStorage.getItem('quizPoints');
-            var storedCorrectAnswers = sessionStorage.getItem('correctAnswers');
+            // Reset quiz state
+            answeredQuestions = new Array(quizData.length).fill(false);
+            questionResults = new Array(quizData.length);
+            currentQuestionIndex = 0;
 
-            if (storedPoints && currentQuestionIndex > 0) {
-                // Restore from session storage if we're not on the first question
-                totalPoints = parseInt(storedPoints);
-                correctAnswersCount = parseInt(storedCorrectAnswers || '0');
-                console.log("Restored points from session:", totalPoints, "Correct answers:", correctAnswersCount);
-            } else if (currentQuestionIndex === 0) {
-                // Use the user's actual current points from database as starting point
-                totalPoints = userActualPoints;
-                correctAnswersCount = 0;
-                sessionStorage.setItem('quizPoints', totalPoints.toString());
-                sessionStorage.setItem('correctAnswers', correctAnswersCount.toString());
-                console.log("Initial load - using user's actual points:", totalPoints);
-            }
-
-            // Initialize answered questions array based on current question index
-            answeredQuestions = [];
-            for (let i = 0; i < currentQuestionIndex; i++) {
-                answeredQuestions[i] = true;
-            }
+            console.log("Points initialization:");
+            console.log("- Starting points:", userStartingPoints);
+            console.log("- Quiz points earned:", totalPointsEarnedFromQuiz);
+            console.log("- Current total:", totalCurrentPoints);
+            console.log("- Correct answers:", correctAnswersCount);
 
             loadQuestion();
         };
-
-        // Add beforeunload protection only when user has answered questions
-        window.addEventListener('beforeunload', beforeUnloadHandler);
-
-        // Prevent browser history navigation during quiz
-        window.addEventListener('popstate', function (e) {
-            if (answeredQuestions.some(answered => answered)) {
-                e.preventDefault();
-                alert("Please use the quiz navigation buttons to move through the questions.");
-                history.pushState(null, null, window.location.href);
-            }
-        });
     </script>
 </asp:Content>
