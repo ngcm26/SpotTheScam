@@ -15,93 +15,219 @@ namespace SpotTheScam.Staff
     {
 
         /// <summary>
-        /// AlertPanel control.
+        /// btnOverviewTab control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel AlertPanel;
+        protected global::System.Web.UI.WebControls.Button btnOverviewTab;
 
         /// <summary>
-        /// AlertMessage control.
+        /// btnSessionsTab control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label AlertMessage;
+        protected global::System.Web.UI.WebControls.Button btnSessionsTab;
 
         /// <summary>
-        /// SessionDate control.
+        /// btnParticipantsTab control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox SessionDate;
+        protected global::System.Web.UI.WebControls.Button btnParticipantsTab;
 
         /// <summary>
-        /// DateValidator control.
+        /// pnlOverview control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator DateValidator;
+        protected global::System.Web.UI.WebControls.Panel pnlOverview;
 
         /// <summary>
-        /// StartTime control.
+        /// ltTotalSessions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox StartTime;
+        protected global::System.Web.UI.WebControls.Literal ltTotalSessions;
 
         /// <summary>
-        /// StartTimeValidator control.
+        /// ltTotalRegistrations control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator StartTimeValidator;
+        protected global::System.Web.UI.WebControls.Literal ltTotalRegistrations;
 
         /// <summary>
-        /// EndTime control.
+        /// ltAvailableSpots control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox EndTime;
+        protected global::System.Web.UI.WebControls.Literal ltAvailableSpots;
 
         /// <summary>
-        /// EndTimeValidator control.
+        /// ltUpcomingSessions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator EndTimeValidator;
+        protected global::System.Web.UI.WebControls.Literal ltUpcomingSessions;
 
         /// <summary>
-        /// AddTimeSlotButton control.
+        /// rptSessionOverview control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button AddTimeSlotButton;
+        protected global::System.Web.UI.WebControls.Repeater rptSessionOverview;
 
         /// <summary>
-        /// SessionsGridView control.
+        /// pnlSessions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView SessionsGridView;
+        protected global::System.Web.UI.WebControls.Panel pnlSessions;
+
+        /// <summary>
+        /// ddlSessionFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSessionFilter;
+
+        /// <summary>
+        /// btnExportSession control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnExportSession;
+
+        /// <summary>
+        /// pnlSessionDetails control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlSessionDetails;
+
+        /// <summary>
+        /// ltSelectedSessionTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltSelectedSessionTitle;
+
+        /// <summary>
+        /// ltSelectedSessionDateTime control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltSelectedSessionDateTime;
+
+        /// <summary>
+        /// ltSelectedSessionExpert control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltSelectedSessionExpert;
+
+        /// <summary>
+        /// ltSelectedSessionCapacity control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltSelectedSessionCapacity;
+
+        /// <summary>
+        /// ltSelectedSessionRegistrations control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltSelectedSessionRegistrations;
+
+        /// <summary>
+        /// gvSessionParticipants control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvSessionParticipants;
+
+        /// <summary>
+        /// pnlParticipants control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlParticipants;
+
+        /// <summary>
+        /// ddlStatusFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlStatusFilter;
+
+        /// <summary>
+        /// ddlParticipantSessionFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlParticipantSessionFilter;
+
+        /// <summary>
+        /// btnExportAll control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnExportAll;
+
+        /// <summary>
+        /// gvAllParticipants control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvAllParticipants;
     }
 }
