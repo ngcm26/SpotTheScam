@@ -382,7 +382,7 @@
             
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <div class="result-section hidden" id="resultSection">
+                    <div class="result-section hidden" id="resultSection" data-resulttype="">
                         <div class="result-title">Result</div>
                         <asp:Label ID="lblResult" runat="server" CssClass="result-content"></asp:Label>
                     </div>
@@ -527,9 +527,12 @@
             var text = label.innerText || label.textContent || '';
             var yesMatch = /\b(is this a scam\?\s*)?yes\b/i.test(text);
             var noMatch = /\b(is this a scam\?\s*)?no\b/i.test(text);
+            // If the result is a scam, use danger; if not, use success
             if (yesMatch) {
                 box.classList.add('result-danger');
             } else if (noMatch) {
+                box.classList.add('result-success');
+            } else if (text.toLowerCase().includes('no scam detected') || text.toLowerCase().includes('does not appear to contain a message')) {
                 box.classList.add('result-success');
             }
         }
