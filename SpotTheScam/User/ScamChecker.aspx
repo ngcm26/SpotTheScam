@@ -256,6 +256,12 @@
             margin-left: auto;
             margin-right: auto;
         }
+        .result-section b {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-size: 1.08rem;
+        }
         .result-success {
             background: rgba(151, 207, 151, 0.5);
             border: 1.5px solid #3C6E3C;
@@ -277,6 +283,19 @@
             line-height: 1.6;
             font-size: 1rem;
             color: #4a5568;
+        }
+        .result-danger-box {
+            background: rgba(236, 119, 119, 0.5);
+            border: 1.5px solid #A22424;
+            color: #A22424;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto 0 auto;
+            font-size: 1.08rem;
+            box-sizing: border-box;
+            text-align: left;
         }
         
         /* Responsive Design */

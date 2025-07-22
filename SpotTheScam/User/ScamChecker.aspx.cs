@@ -55,15 +55,26 @@ namespace SpotTheScam.User
             byte[] imageBytes = fileScreenshot.FileBytes;
             string base64Image = Convert.ToBase64String(imageBytes);
 
-            string prompt = @"Please help check if this image contains a scam message. 
-If there is text, extract it and analyze if it is a scam. 
-Explain your answer in a simple and friendly way that is easy for elderly people to understand.
-Your response should include:
-1. A clear answer: Is this a scam? (Yes or No)
-2. Simple signs to look out for in the message
-3. A short explanation of why it might be dangerous (if it is)
-4. What the person should do next (like ignore, delete, or report it)
-Avoid technical words. Use everyday language that even someone with little internet experience can understand.";
+            string prompt = @"Please check if this image contains a scam message. Respond in this exact format:
+
+1. Yes/No: Is it a scam?
+
+2. Signs to look out for
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+3. Why it might be dangerous
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+4. What to do next
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+Use simple language for elderly users. Do not add extra sections or explanations. If there is text, extract it and analyze if it is a scam.";
 
             lblResult.Text = "🔄 Sending image to AI service...";
             btnCheckScam.Enabled = false;
@@ -110,9 +121,7 @@ Avoid technical words. Use everyday language that even someone with little inter
                         var result = json["choices"]?[0]?["message"]?["content"]?.ToString();
                         if (!string.IsNullOrWhiteSpace(result))
                         {
-                            string cleaned = Server.HtmlEncode(result).Replace("\n", "<br/>");
-                            // Add paragraph breaks between numbered points
-                            string formatted = AddParagraphBreaksToNumberedList(cleaned);
+                            string formatted = FormatScamResultToHtml(result);
                             lblResult.Text = formatted;
                             Page.ClientScript.RegisterStartupScript(this.GetType(), "ShowResultSection", "document.getElementById('resultSection').classList.remove('hidden');document.querySelector('.checker-main-bg').classList.add('expanded');setResultBoxStyle();", true);
                         }
@@ -186,15 +195,26 @@ Avoid technical words. Use everyday language that even someone with little inter
             byte[] imageBytes = fileScreenshot.FileBytes;
             string base64Image = Convert.ToBase64String(imageBytes);
 
-            string prompt = @"Please help check if this image contains a scam message. 
-If there is text, extract it and analyze if it is a scam. 
-Explain your answer in a simple and friendly way that is easy for elderly people to understand.
-Your response should include:
-1. A clear answer: Is this a scam? (Yes or No)
-2. Simple signs to look out for in the message
-3. A short explanation of why it might be dangerous (if it is)
-4. What the person should do next (like ignore, delete, or report it)
-Avoid technical words. Use everyday language that even someone with little internet experience can understand.";
+            string prompt = @"Please check if this image contains a scam message. Respond in this exact format:
+
+1. Yes/No: Is it a scam?
+
+2. Signs to look out for
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+3. Why it might be dangerous
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+4. What to do next
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+Use simple language for elderly users. Do not add extra sections or explanations.";
 
             lblResult.Text = "🔄 Sending image to AI service...";
             btnCheckScam.Enabled = false;
@@ -241,9 +261,7 @@ Avoid technical words. Use everyday language that even someone with little inter
                         var result = json["choices"]?[0]?["message"]?["content"]?.ToString();
                         if (!string.IsNullOrWhiteSpace(result))
                         {
-                            string cleaned = Server.HtmlEncode(result).Replace("\n", "<br/>");
-                            // Add paragraph breaks between numbered points
-                            string formatted = AddParagraphBreaksToNumberedList(cleaned);
+                            string formatted = FormatScamResultToHtml(result);
                             lblResult.Text = formatted;
                             Page.ClientScript.RegisterStartupScript(this.GetType(), "ShowResultSection", "document.getElementById('resultSection').classList.remove('hidden');document.querySelector('.checker-main-bg').classList.add('expanded');setResultBoxStyle();", true);
                         }
@@ -295,18 +313,29 @@ Avoid technical words. Use everyday language that even someone with little inter
             // At the start of analysis, hide result and reset background
             Page.ClientScript.RegisterStartupScript(this.GetType(), "HideResultSection", "document.getElementById('resultSection').classList.add('hidden');document.querySelector('.checker-main-bg').classList.remove('expanded');", true);
 
-            string prompt = $@"Please help check if this message is a scam. Explain your answer in a simple and friendly way that is easy for elderly people to understand.
+            string prompt = $@"Please check if this message is a scam. Respond in this exact format:
 
-Your response should include:
-1. A clear answer: Is this a scam? (Yes or No)
-2. Simple signs to look out for in the message
-3. A short explanation of why it might be dangerous (if it is)
-4. What the person should do next (like ignore, delete, or report it)
+1. Yes/No: Is it a scam?
+
+2. Signs to look out for
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+3. Why it might be dangerous
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
+
+4. What to do next
+- (bullet point 1)
+- (bullet point 2)
+- (bullet point 3)
 
 Here is the message to check:
 {userInput}
 
-Avoid technical words. Use everyday language that even someone with little internet experience can understand.";
+Use simple language for elderly users. Do not add extra sections or explanations.";
 
             try
             {
@@ -324,9 +353,8 @@ Avoid technical words. Use everyday language that even someone with little inter
                 if (completion != null && completion.Value != null && completion.Value.Content.Count > 0)
                 {
                     string analysis = completion.Value.Content[0].Text.Trim();
-                    string cleaned = ConvertMarkdownBoldToHtml(analysis);
-                    string formatted = AddParagraphBreaksToNumberedList(cleaned);
-                    this.lblResult.Text = formatted.Replace("\n", "<br/>");
+                    string formatted = FormatScamResultToHtml(analysis);
+                    this.lblResult.Text = formatted;
                     Page.ClientScript.RegisterStartupScript(this.GetType(), "ShowResultSection", "document.getElementById('resultSection').classList.remove('hidden');document.querySelector('.checker-main-bg').classList.add('expanded');setResultBoxStyle();", true);
                 }
                 else
@@ -362,6 +390,22 @@ Avoid technical words. Use everyday language that even someone with little inter
             if (string.IsNullOrEmpty(input)) return input;
             // Add <br><br> before each number (except the first)
             return System.Text.RegularExpressions.Regex.Replace(input, @"(\d+\.)", m => (m.Index > 0 ? "<br><br>" : "") + m.Value);
+        }
+
+        // Format result to HTML with bold section headers and bullet lists
+        private string FormatScamResultToHtml(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            // Bold numbered section headers (e.g., 1. Yes it is a scam)
+            string formatted = System.Text.RegularExpressions.Regex.Replace(input, @"(^|<br\s*/?>|\n)(\d+\.\s.*)", "$1<b>$2</b>");
+            // Convert dash lists to <ul><li>...</li></ul>
+            // Step 1: Convert - lines to <li>
+            formatted = System.Text.RegularExpressions.Regex.Replace(formatted, @"(?:^|\n|<br\s*/?>)-\s?(.*)", "<li>$1</li>");
+            // Step 2: Wrap consecutive <li> in <ul>
+            formatted = System.Text.RegularExpressions.Regex.Replace(formatted, @"((<li>.*?</li>\s*)+)", m => $"<ul>{m.Value}</ul>");
+            // Replace newlines with <br>
+            formatted = formatted.Replace("\n", "<br/>");
+            return formatted;
         }
     }
 }

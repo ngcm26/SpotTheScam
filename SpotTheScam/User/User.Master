@@ -102,6 +102,17 @@
         footer {
             background-color: var(--brand-navy);
         }
+
+        .dropdown-item.text-danger {
+            color: #051D40 !important;
+            font-weight: 600;
+            background: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .dropdown-item.text-danger:hover, .dropdown-item.text-danger:focus {
+            background: #dc3545 !important;
+            color: #fff !important;
+        }
     </style>
 
     <asp:ContentPlaceHolder ID="head" runat="server" />
@@ -133,7 +144,7 @@
                             <a class="nav-link dropdown-toggle" href="#" id="protectionDropdown" role="button">Protection against scam
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
-                                <li><a class="dropdown-item" href="ScamChecker.aspx">Anti Scam Checker</a></li>
+                                <li><a class="dropdown-item" href="LinkChecker.aspx">Anti Scam Checker</a></li>
                                 <li><a class="dropdown-item" href="UserModules.aspx">Education Modules</a></li>
                                 <li><a class="dropdown-item" href="Quizzes.aspx">Quizzes</a></li>
                             </ul>
@@ -147,8 +158,7 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management
-  </a>
+                            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management</a>
                             <ul class="dropdown-menu" aria-labelledby="accountDropdown">
                                 <li><a class="dropdown-item" href="UserTransactionLogs.aspx">Transaction Logs</a></li>
                                 <li><a class="dropdown-item" href="UserBankAccounts.aspx">Bank Accounts & Cards</a></li>
@@ -181,7 +191,6 @@
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
                                     <li><a class="dropdown-item" href="UserProfile.aspx">Profile Settings</a></li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="UserLogout.aspx">Logout</a></li>
                                 </ul>
                             </li>

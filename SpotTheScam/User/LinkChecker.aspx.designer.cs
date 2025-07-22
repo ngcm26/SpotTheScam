@@ -13,5 +13,19 @@ namespace SpotTheScam.User
 
     public partial class LinkChecker
     {
+        /// <summary>
+        /// txtUrlInput control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.TextBox txtUrlInput;
+
+        /// <summary>
+        /// btnCheckLink control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnCheckLink;
+
+        /// <summary>
+        /// lblResult control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblResult;
     }
 }

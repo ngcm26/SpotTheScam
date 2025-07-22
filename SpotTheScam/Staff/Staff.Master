@@ -46,6 +46,18 @@
             color: var(--brand-orange);
         }
 
+        .navbar-nav .btn-danger {
+            background-color: #D36F2D;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            transition: background 0.2s, color 0.2s;
+        }
+        .navbar-nav .btn-danger:hover, .navbar-nav .btn-danger:focus {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
         footer {
             background-color: var(--brand-navy);
         }

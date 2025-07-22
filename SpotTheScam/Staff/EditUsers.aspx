@@ -99,8 +99,11 @@
             background: #C46A1D;
             color: white;
         }
-        .btn-primary:hover {
+        .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
             background: #a85a1a;
+            color: white;
+            outline: none !important;
+            box-shadow: none !important;
         }
         .btn-secondary {
             background: #6c757d;
@@ -155,18 +158,6 @@
     </div>
 
     <div class="edit-user-container">
-        <!-- Left: User Avatar Section -->
-        <div class="user-avatar-section">
-            <div class="user-avatar">
-                <asp:Image ID="imgUserAvatar" runat="server" Visible="false" />
-                <span id="noAvatar" runat="server" style="color: #bcbcbc; font-size: 1.2em;" visible="true">
-                    <i class="fa fa-user" style="font-size: 3em;"></i>
-                </span>
-            </div>
-            <asp:FileUpload ID="fuUserAvatar" runat="server" CssClass="form-input" style="display:none;" />
-            <label for="<%= fuUserAvatar.ClientID %>" class="user-avatar-label" style="cursor:pointer;">Change avatar</label>
-        </div>
-        
         <!-- Right: User Information -->
         <div class="user-info-section">
             <div class="user-info-title">User Information</div>
