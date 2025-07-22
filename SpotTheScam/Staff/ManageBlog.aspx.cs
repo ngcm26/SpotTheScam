@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Configuration;
 
 namespace SpotTheScam.Staff
 {
@@ -22,6 +23,11 @@ namespace SpotTheScam.Staff
 
         protected void gv_blog_SelectedIndexChanged(object sender, EventArgs e)
         {
+            GridViewRow row = gv_blog.SelectedRow;
+            int postID = int.Parse(row.Cells[0].Text);
+
+            Response.Redirect("IndividualBlogStafff.aspx?postID=" + postID);
+
 
         }
 
@@ -47,6 +53,28 @@ namespace SpotTheScam.Staff
                 }
 
             }
+        }
+
+        protected void gv_blog_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            int postId = Convert.ToInt32(gv_blog.DataKeys[e.RowIndex].Value);
+
+            string connectionString = ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string sql = "DELETE FROM posts WHERE post_id = @PostId";
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@PostId", postId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+                }
+            }
+
+            // Rebind the GridView to show updated data
+            bind();
         }
     }
 }
