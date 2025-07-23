@@ -367,6 +367,6 @@ FodyWeavers.xsd
 # Ignore App_Data folder by default
 App_Data/
 
-# EXCEPTION: Do NOT ignore database files in SpotTheScam/App_Data/
-!SpotTheScam/SpotTheScam/SpotTheScam/Database/*.mdf
-!SpotTheScam/SpotTheScam/SpotTheScam/Database/*.ldf
+# EXCEPTION: Do NOT ignore database files in SpotTheScam/Database/
+!SpotTheScam/SpotTheScam/Database/*.mdf
+!SpotTheScam/SpotTheScam/Database/*.ldf
