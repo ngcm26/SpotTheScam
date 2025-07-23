@@ -20,6 +20,7 @@ namespace SpotTheScam.User
                 if (int.TryParse(Request.QueryString["module_id"], out moduleId))
                 {
                     LoadModuleInformation(moduleId);
+                    CheckAndSetModuleCompletion(moduleId);
                 }
             }
         }
@@ -137,6 +138,80 @@ namespace SpotTheScam.User
                     }
                 }
             }
+        }
+
+        private void CheckAndSetModuleCompletion(int moduleId)
+        {
+            if (Session["UserId"] == null) return;
+            int userId = Convert.ToInt32(Session["UserId"]);
+            bool isCompleted = false;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT status FROM UserModuleProgress WHERE user_id = @user_id AND module_id = @module_id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@user_id", userId);
+                    cmd.Parameters.AddWithValue("@module_id", moduleId);
+                    var result = cmd.ExecuteScalar();
+                    if (result != null && result.ToString() == "completed")
+                        isCompleted = true;
+                }
+            }
+            btnCompleteModule.Visible = !isCompleted;
+            lblCompleteMessage.Visible = isCompleted;
+            if (isCompleted)
+            {
+                lblCompleteMessage.Text = "You have completed this module.";
+            }
+            else
+            {
+                lblCompleteMessage.Text = "";
+            }
+        }
+
+        protected void btnCompleteModule_Click(object sender, EventArgs e)
+        {
+            if (Session["UserId"] == null || Request.QueryString["module_id"] == null) return;
+            int userId = Convert.ToInt32(Session["UserId"]);
+            int moduleId = Convert.ToInt32(Request.QueryString["module_id"]);
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                // Check if record exists
+                string checkQuery = "SELECT COUNT(*) FROM UserModuleProgress WHERE user_id = @user_id AND module_id = @module_id";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@user_id", userId);
+                    checkCmd.Parameters.AddWithValue("@module_id", moduleId);
+                    int count = (int)checkCmd.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        // Update to completed
+                        string updateQuery = "UPDATE UserModuleProgress SET status = 'completed', date_completed = GETDATE() WHERE user_id = @user_id AND module_id = @module_id";
+                        using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                        {
+                            updateCmd.Parameters.AddWithValue("@user_id", userId);
+                            updateCmd.Parameters.AddWithValue("@module_id", moduleId);
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        // Insert new record
+                        string insertQuery = "INSERT INTO UserModuleProgress (user_id, module_id, status, date_started, date_completed) VALUES (@user_id, @module_id, 'completed', GETDATE(), GETDATE())";
+                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@user_id", userId);
+                            insertCmd.Parameters.AddWithValue("@module_id", moduleId);
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+            lblCompleteMessage.Text = "Module marked as complete!";
+            lblCompleteMessage.Visible = true;
+            btnCompleteModule.Visible = false;
         }
     }
 }

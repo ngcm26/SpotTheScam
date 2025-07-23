@@ -77,6 +77,58 @@
             .article-container { padding: 12px 2vw 18px 2vw; }
             .article-title { font-size: 1.5rem; }
         }
+    .complete-btn {
+        background: #64C35C;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        width: 260px;
+        margin: 32px auto 0 auto;
+        display: block;
+        text-align: center;
+        transition: background 0.2s;
+    }
+    .complete-btn[disabled], .complete-btn:disabled {
+        background: #4ea94e;
+        color: #fff;
+        opacity: 0.8;
+    }
+    .complete-message {
+        background: #64C35C;
+        color: #fff;
+        border-radius: 8px;
+        padding: 12px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        width: 260px;
+        margin: 32px auto 0 auto;
+        display: block;
+        text-align: center;
+        font-family: 'DM Sans', Arial, sans-serif;
+    }
+    .back-to-modules-btn {
+        display: block;
+        width: 260px;
+        margin: 18px auto 0 auto;
+        background: #D36F2D;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: background 0.2s;
+        font-family: 'DM Sans', Arial, sans-serif;
+    }
+    .back-to-modules-btn:hover {
+        background: #b95a22;
+        color: #fff;
+    }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -100,5 +152,8 @@
         <asp:Label ID="lblHeader4Text" runat="server" CssClass="article-section-text" Visible="false" />
         <asp:Label ID="lblHeader5" runat="server" CssClass="article-section-title" Visible="false" />
         <asp:Label ID="lblHeader5Text" runat="server" CssClass="article-section-text" Visible="false" />
+        <asp:Label ID="lblCompleteMessage" runat="server" CssClass="complete-message" />
+        <asp:Button ID="btnCompleteModule" runat="server" Text="Mark Module as Complete" OnClick="btnCompleteModule_Click" Visible="false" CssClass="complete-btn" />
+        <a href="UserModules.aspx" class="back-to-modules-btn">Back to Modules</a>
     </div>
 </asp:Content>
