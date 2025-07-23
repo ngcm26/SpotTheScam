@@ -156,10 +156,16 @@
                                 <!-- Add more related features here as needed -->
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="ExpertWebinarHomepage.aspx">Expert Webinar Session</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="expertWebinarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Expert Webinar Session
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="expertWebinarDropdown">
+                                <li><a class="dropdown-item" href="ExpertWebinarHomepage.aspx">Expert Webinar Session</a></li>
+                                <li><a class="dropdown-item" href="UserMySessions.aspx">My Sessions</a></li>
+                            </ul>
                         </li>
-                    </ul>
+                                            </ul>
 
                     <!-- Right Buttons -->
                     <ul class="navbar-nav ms-auto d-flex align-items-center">

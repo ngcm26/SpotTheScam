@@ -1,5 +1,4 @@
-﻿<%@ Page Title="Register for Webinar" Language="C#" MasterPageFile="User.Master" AutoEventWireup="true" CodeBehind="UserWebinarRegistration.aspx.cs" Inherits="SpotTheScam.User.UserWebinarRegistration" %>
-
+﻿<%@ Page Title="Register for Webinar" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserWebinarRegistration.aspx.cs" Inherits="SpotTheScam.User.UserWebinarRegistration" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .header-section {
@@ -285,8 +284,7 @@
         <div class="header-section">
             <div class="container">
                 <div class="points-badge">
-                    <span>Current Points:</span>
-                    <span>75 ⭐</span>
+                    <span>Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
                 </div>
                 <h1 class="header-title">Register for expert sessions</h1>
                 <p class="header-subtitle">Secure your spot with our cybersecurity experts</p>

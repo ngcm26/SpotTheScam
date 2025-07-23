@@ -2,9 +2,25 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #f8f9fa;
+        /* Back button container */
+        .back-button-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 0 1.5rem;
+        }
+
+        /* Immediate actions container */
+        .immediate-actions-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        /* Recovery guidelines container - wider */
+        .recovery-guidelines-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem 1.5rem;
         }
 
         .back-btn {
@@ -17,7 +33,7 @@
             font-weight: 500;
             text-decoration: none;
             display: inline-block;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .back-btn:hover {
@@ -26,20 +42,20 @@
             text-decoration: none;
         }
 
-        /* Immediate Actions Section */
+        /* Immediate Actions Section - Made more compact */
         .immediate-actions {
             background-color: #f8d7da;
             border: 1px solid #f5c6cb;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
         .immediate-actions h3 {
             color: #721c24;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.875rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -47,15 +63,15 @@
 
         .immediate-actions .alert-icon {
             color: #dc3545;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .action-item {
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
+            gap: 0.625rem;
+            margin-bottom: 0.75rem;
+            padding: 0.625rem;
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 6px;
         }
@@ -67,67 +83,67 @@
         .action-number {
             background-color: #dc3545;
             color: white;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             flex-shrink: 0;
         }
 
         .action-content h4 {
-            font-size: 0.875rem;
+            font-size: 0.825rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
             color: #721c24;
         }
 
         .action-content p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #721c24;
             margin: 0;
-            line-height: 1.4;
+            line-height: 1.3;
         }
 
-        /* Recovery Guidelines Section */
+        /* Recovery Guidelines Section - Made wider */
         .recovery-section {
             background-color: white;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 2rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .recovery-section h3 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #051D40;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .section-icon {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background-color: #007bff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .guidelines-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .csa-btn {
@@ -151,7 +167,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .step-card {
@@ -164,69 +180,81 @@
         .step-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            gap: 0.625rem;
+            margin-bottom: 0.875rem;
         }
 
         .step-number {
             background-color: #007bff;
             color: white;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
         }
 
         .step-title {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #051D40;
             margin: 0;
         }
 
         .step-description {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #666;
-            margin-bottom: 1rem;
-            line-height: 1.4;
+            margin-bottom: 0.875rem;
+            line-height: 1.3;
         }
 
         .step-action {
             background-color: #e7f3ff;
             border-left: 3px solid #007bff;
-            padding: 0.75rem;
+            padding: 0.625rem;
             border-radius: 0 6px 6px 0;
         }
 
         .step-action strong {
             color: #007bff;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .step-action p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #666;
-            margin: 0.25rem 0 0 0;
+            margin: 0.2rem 0 0 0;
         }
 
         /* Center step */
         .center-step {
             grid-column: 1 / -1;
             justify-self: center;
-            max-width: 400px;
+            max-width: 450px;
         }
 
-        /* Timeline Section */
+        /* Timeline Section - Full width */
         .timeline-section {
             background-color: #fff3cd;
             border: 1px solid #ffeaa7;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 2rem;
             margin-bottom: 2rem;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            box-sizing: border-box;
+        }
+
+        .timeline-section .timeline-content {
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .timeline-section h3 {
@@ -305,17 +333,24 @@
             text-decoration: none;
         }
 
-        /* Protection Section */
+        /* Protection Section - separate container */
+        .protection-section-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem 1.5rem;
+        }
+
+        /* Protection Section - Made wider with bigger fonts */
         .protection-section {
             background-color: white;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 2rem;
+            padding: 2.5rem;
             margin-bottom: 2rem;
         }
 
         .protection-section h3 {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: #051D40;
             margin-bottom: 1.5rem;
@@ -325,21 +360,21 @@
         }
 
         .protection-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background-color: #17a2b8;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
         .protection-tips {
             display: flex;
             justify-content: space-between;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         .tips-column {
@@ -350,13 +385,13 @@
             background-color: #fff3cd;
             border: 1px solid #ffeaa7;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 2rem;
             margin-bottom: 1.5rem;
         }
 
         .tips-box h4 {
             color: #856404;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
             margin-bottom: 1rem;
             display: flex;
@@ -371,11 +406,12 @@
         }
 
         .tips-box li {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #856404;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
             padding-left: 1rem;
             position: relative;
+            line-height: 1.4;
         }
 
         .tips-box li:before {
@@ -389,12 +425,12 @@
             background-color: #d1ecf1;
             border: 1px solid #bee5eb;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
         .security-box h4 {
             color: #0c5460;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
             margin-bottom: 1rem;
             display: flex;
@@ -409,11 +445,12 @@
         }
 
         .security-box li {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #0c5460;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
             padding-left: 1rem;
             position: relative;
+            line-height: 1.4;
         }
 
         .security-box li:before {
@@ -443,6 +480,14 @@
         }
 
         @media (max-width: 768px) {
+            .back-button-section,
+            .immediate-actions-section,
+            .recovery-guidelines-section,
+            .protection-section-container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
             .step-grid {
                 grid-template-columns: 1fr;
             }
@@ -459,11 +504,13 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div class="container-fluid">
-        <!-- Back Button -->
+    <!-- Back Button Section -->
+    <div class="back-button-section">
         <a href="RecoverySupport.aspx" class="back-btn">Back to Scam Types</a>
+    </div>
 
-        <!-- Immediate Actions Section -->
+    <!-- Immediate Actions Section -->
+    <div class="immediate-actions-section">
         <div class="immediate-actions">
             <h3>
                 <span class="alert-icon">⚠️</span>
@@ -502,8 +549,10 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Complete Recovery Guidelines Section -->
+    <!-- Complete Recovery Guidelines Section -->
+    <div class="recovery-guidelines-section">
         <div class="recovery-section">
             <div class="guidelines-header">
                 <h3>
@@ -580,9 +629,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Recovery Timeline Section -->
-        <div class="timeline-section">
+    <!-- Recovery Timeline Section -->
+    <div class="timeline-section">
+        <div class="timeline-content">
             <h3>
                 <span class="alert-icon">📅</span>
                 Recovery Timeline
@@ -620,8 +671,10 @@
             
             <a href="#" class="view-timeline-btn">View Full Timeline</a>
         </div>
+    </div>
 
-        <!-- Protection Section -->
+    <!-- Protection Section -->
+    <div class="protection-section-container">
         <div class="protection-section">
             <h3>
                 <span class="protection-icon">🛡️</span>

@@ -265,6 +265,15 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
+        .support-card .phone a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .support-card .phone a:hover {
+            text-decoration: underline;
+        }
+
         .support-card .description {
             font-size: 0.875rem;
             color: #666;
@@ -310,20 +319,20 @@
             <div class="assistance-card">
                 <div class="text-center">
                     <h3>Need immediate assistance?</h3>
-                    <button class="hotline-btn">Call Singapore Scam Hotline: 1799</button>
+                    <button class="hotline-btn" onclick="window.open('tel:1799')">Call Singapore Scam Hotline: 1799</button>
                 </div>
                 
                 <div class="emergency-section">
                     <div class="emergency-box">
                         <div class="icon">🚨</div>
                         <div class="title">Emergency</div>
-                        <div class="number">999</div>
+                        <div class="number"><a href="tel:999" style="color: #dc3545; text-decoration: none;">999</a></div>
                         <div class="description">If you feel unsafe right now</div>
                     </div>
                     <div class="emergency-box report-box">
                         <div class="icon">📞</div>
                         <div class="title">Report Scam</div>
-                        <div class="number">1800-255-0000</div>
+                        <div class="number"><a href="tel:1800-255-0000" style="color: #007bff; text-decoration: none;">1800-255-0000</a></div>
                         <div class="description">Call to file a report after being scammed</div>
                     </div>
                 </div>
@@ -428,28 +437,31 @@
                 <!-- Samaritans of Singapore -->
                 <div class="support-card">
                     <h5>Samaritans of Singapore</h5>
-                    <div class="phone">1800-221-4444</div>
+                    <div class="phone"><a href="tel:1800-221-4444">1800-221-4444</a></div>
                     <p class="description">24/7 emotional support</p>
                 </div>
 
                 <!-- Silver Ribbon Singapore -->
                 <div class="support-card">
                     <h5>Silver Ribbon Singapore</h5>
-                    <div class="phone">6386 1928</div>
+                    <div class="phone"><a href="tel:6386-1928">6386 1928</a></div>
                     <p class="description">Mental health support for seniors</p>
                 </div>
 
                 <!-- Report via i-Witness -->
                 <div class="support-card">
                     <h5>Report via i-Witness</h5>
-                    <div class="phone">police.gov.sg/i-Witness</div>
+                    <div class="phone"><a href="https://www.police.gov.sg/i-witness" target="_blank">police.gov.sg/i-Witness</a></div>
                     <p class="description">24/7 online reporting</p>
                 </div>
 
                 <!-- ScamShield App -->
                 <div class="support-card">
                     <h5>ScamShield App</h5>
-                    <div class="phone">Download from App Store/Google Play</div>
+                    <div class="phone">
+                        <a href="https://apps.apple.com/sg/app/scamshield/id1497144087" target="_blank">App Store</a> | 
+                        <a href="https://play.google.com/store/apps/details?id=sg.gov.scamshield" target="_blank">Google Play</a>
+                    </div>
                     <p class="description">Block scam calls & messages</p>
                 </div>
             </div>

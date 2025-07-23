@@ -1,5 +1,4 @@
-﻿<%@ Page Title="Registration Successful" Language="C#" MasterPageFile="User.Master" AutoEventWireup="true" CodeBehind="WebinarRegistrationSuccess.aspx.cs" Inherits="SpotTheScam.User.WebinarRegistrationSuccess" %>
-
+﻿<%@ Page Title="Registration Successful" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="WebinarRegistrationSuccess.aspx.cs" Inherits="SpotTheScam.User.WebinarRegistrationSuccess" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .points-badge {
@@ -53,6 +52,59 @@
             font-size: 1rem;
             color: #666;
             margin-bottom: 40px;
+        }
+
+        .session-link-section {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .link-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--brand-navy);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .link-title::before {
+            content: "🔗";
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .session-link {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin: 15px 0;
+            color: #495057;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .copy-button {
+            background: var(--brand-orange);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .copy-button:hover {
+            background: #b45a22;
         }
 
         .info-section {
@@ -164,7 +216,7 @@
             transition: background-color 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            margin-top: 20px;
+            margin: 10px;
         }
 
         .home-btn:hover {
@@ -186,6 +238,10 @@
             margin: 0;
         }
 
+        .btn-group {
+            margin-top: 20px;
+        }
+
         @media (max-width: 768px) {
             .success-card {
                 padding: 25px;
@@ -198,12 +254,18 @@
                 margin-bottom: 20px;
             }
             
-            .info-section, .preparation-section {
+            .info-section, .preparation-section, .session-link-section {
                 padding: 20px;
             }
             
             .page-container {
                 padding: 20px 0 40px 0;
+            }
+
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -215,7 +277,7 @@
             <div class="success-card">
                 <!-- Points Badge -->
                 <div class="points-badge">
-    <span>Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
+                    <span>Current Points: <asp:Label ID="lblCurrentPoints" runat="server" Text="0" /> ⭐</span>
                 </div>
                 
                 <!-- Success Icon -->
@@ -235,6 +297,19 @@
                         <strong>Expert:</strong> <asp:Literal ID="ltExpertName" runat="server">Dr Harvey Blue</asp:Literal>
                     </p>
                 </div>
+
+                <!-- Session Link Section -->
+                <div class="session-link-section">
+                    <h3 class="link-title">Your Personal Session Link</h3>
+                    <p><strong>Important:</strong> Save this link to join your session. You can also find it in "My Sessions".</p>
+                    <div class="session-link" id="sessionLinkText">
+                        <asp:Label ID="lblSessionLink" runat="server"></asp:Label>
+                    </div>
+                    <button type="button" class="copy-button" onclick="copySessionLink()">📋 Copy Link</button>
+                    <p style="margin-top: 10px; font-size: 0.85rem; color: #666;">
+                        💡 <strong>Tip:</strong> You can join 10 minutes before the session starts
+                    </p>
+                </div>
                 
                 <!-- How to Join Instructions -->
                 <div class="info-section">
@@ -242,15 +317,19 @@
                     <ul class="step-list">
                         <li class="step-item">
                             <span class="step-number">1</span>
-                            <span>Return to this website 10 minutes before your session</span>
+                            <span>Click your session link 10 minutes before the session time</span>
                         </li>
                         <li class="step-item">
                             <span class="step-number">2</span>
-                            <span>Enter your phone number when prompted</span>
+                            <span>Or go to "My Sessions" and click "Join Session Now"</span>
                         </li>
                         <li class="step-item">
                             <span class="step-number">3</span>
-                            <span>Click "Join Session" - we'll find you automatically!</span>
+                            <span>Allow camera and microphone access when prompted</span>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-number">4</span>
+                            <span>Wait for the expert to connect and start your session!</span>
                         </li>
                     </ul>
                 </div>
@@ -267,11 +346,37 @@
                     </ul>
                 </div>
                 
-                <!-- Back to Home Button -->
-                <asp:HyperLink ID="lnkBackToHome" runat="server" 
-                    NavigateUrl="~/User/UserHome.aspx" 
-                    CssClass="home-btn">Back to Home</asp:HyperLink>
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <asp:HyperLink ID="lnkMySession" runat="server" 
+                        NavigateUrl="~/User/UserMySessions.aspx" 
+                        CssClass="home-btn">📅 View My Sessions</asp:HyperLink>
+                        
+                    <asp:HyperLink ID="lnkBackToHome" runat="server" 
+                        NavigateUrl="~/User/UserHome.aspx" 
+                        CssClass="home-btn">🏠 Back to Home</asp:HyperLink>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function copySessionLink() {
+            var linkElement = document.getElementById('sessionLinkText');
+            var linkText = linkElement.innerText || linkElement.textContent;
+            
+            navigator.clipboard.writeText(linkText).then(function() {
+                alert('Session link copied to clipboard! 📋✅');
+            }, function() {
+                // Fallback for older browsers
+                var textArea = document.createElement('textarea');
+                textArea.value = linkText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Session link copied to clipboard! 📋✅');
+            });
+        }
+    </script>
 </asp:Content>

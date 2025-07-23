@@ -1,5 +1,4 @@
-﻿<%@ Page Title="Webinar Sessions" Language="C#" MasterPageFile="User.Master" AutoEventWireup="true" CodeBehind="UserWebinarSessionListing.aspx.cs" Inherits="SpotTheScam.User.UserWebinarSessionListing" %>
-
+﻿<%@ Page Title="Webinar Sessions" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserWebinarSessionListing.aspx.cs" Inherits="SpotTheScam.User.UserWebinarSessionListing" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .header-section {

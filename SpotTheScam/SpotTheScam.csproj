@@ -198,8 +198,9 @@
     <Content Include="Staff\IndividualBlogStafff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
-    <Content Include="Staff\StaffExpertWebinar.aspx" />
-    <Content Include="Staff\StaffVideoCallSession.aspx" />
+    <Content Include="Staff\StaffManageParticipants.aspx" />
+    <Content Include="Staff\StaffManageSessions.aspx" />
+    <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\AddBankAccounts.aspx" />
     <Content Include="User\CreateBlog.aspx" />
@@ -207,6 +208,7 @@
     <Content Include="User\FakeUOBLogin.aspx" />
     <Content Include="User\FamilyGroupManagement.aspx" />
     <Content Include="User\ForumPage.aspx" />
+    <Content Include="User\JoinSession.aspx" />
     <Content Include="User\LinkChecker.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
@@ -219,6 +221,7 @@
     <Content Include="User\TransactionDetails.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
+    <Content Include="User\UserMySessions.aspx" />
     <Content Include="User\UserProfile.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
@@ -233,6 +236,7 @@
     <Content Include="User\UserLogout.aspx" />
     <Content Include="User\UserRegister.aspx" />
     <Content Include="User\UserTransactionLogs.aspx" />
+    <Content Include="User\VideoCall.aspx" />
     <Content Include="Web.config" />
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
@@ -275,19 +279,26 @@
     <Compile Include="Staff\StaffAddModules.aspx.designer.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Staff\StaffExpertWebinar.aspx.cs">
-      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+    <Compile Include="Staff\StaffManageParticipants.aspx.cs">
+      <DependentUpon>StaffManageParticipants.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Staff\StaffExpertWebinar.aspx.designer.cs">
-      <DependentUpon>StaffExpertWebinar.aspx</DependentUpon>
+    <Compile Include="Staff\StaffManageParticipants.aspx.designer.cs">
+      <DependentUpon>StaffManageParticipants.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Staff\StaffVideoCallSession.aspx.cs">
-      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+    <Compile Include="Staff\StaffManageSessions.aspx.cs">
+      <DependentUpon>StaffManageSessions.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Staff\StaffVideoCallSession.aspx.designer.cs">
-      <DependentUpon>StaffVideoCallSession.aspx</DependentUpon>
+    <Compile Include="Staff\StaffManageSessions.aspx.designer.cs">
+      <DependentUpon>StaffManageSessions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\StaffVideoCall.aspx.cs">
+      <DependentUpon>StaffVideoCall.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\StaffVideoCall.aspx.designer.cs">
+      <DependentUpon>StaffVideoCall.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\ViewModules.aspx.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
@@ -337,6 +348,13 @@
     </Compile>
     <Compile Include="User\ForumPage.aspx.designer.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\JoinSession.aspx.cs">
+      <DependentUpon>JoinSession.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\JoinSession.aspx.designer.cs">
+      <DependentUpon>JoinSession.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\LinkChecker.aspx.cs">
       <DependentUpon>LinkChecker.aspx</DependentUpon>
@@ -421,6 +439,13 @@
     </Compile>
     <Compile Include="User\UserModules.aspx.designer.cs">
       <DependentUpon>UserModules.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserMySessions.aspx.cs">
+      <DependentUpon>UserMySessions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserMySessions.aspx.designer.cs">
+      <DependentUpon>UserMySessions.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserProfile.aspx.cs">
       <DependentUpon>UserProfile.aspx</DependentUpon>
@@ -527,6 +552,13 @@
     </Compile>
     <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
       <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\VideoCall.aspx.cs">
+      <DependentUpon>VideoCall.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\VideoCall.aspx.designer.cs">
+      <DependentUpon>VideoCall.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\WebinarRegistrationSuccess.aspx.cs">
       <DependentUpon>WebinarRegistrationSuccess.aspx</DependentUpon>

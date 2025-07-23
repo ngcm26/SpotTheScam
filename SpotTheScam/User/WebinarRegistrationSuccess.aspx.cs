@@ -28,6 +28,7 @@ namespace SpotTheScam.User
 
                 LoadUserCurrentPoints();
                 LoadSessionDetails();
+                LoadSessionLink();
                 SetBackToHomeLink();
                 UpdatePointsDisplay();
             }
@@ -83,6 +84,104 @@ namespace SpotTheScam.User
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Error loading points on success page: {ex.Message}");
                 currentUserPoints = 0;
+            }
+        }
+
+        private void LoadSessionLink()
+        {
+            try
+            {
+                string sessionIdStr = Request.QueryString["sessionId"];
+
+                if (!string.IsNullOrEmpty(sessionIdStr) && int.TryParse(sessionIdStr, out int sessionId))
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+
+                        // Get the session link from VideoCallBookings
+                        string linkQuery = @"
+                            SELECT SessionLink 
+                            FROM VideoCallBookings 
+                            WHERE SessionId = @SessionId AND UserId = @UserId 
+                            AND BookingStatus = 'Confirmed'";
+
+                        using (SqlCommand cmd = new SqlCommand(linkQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                            cmd.Parameters.AddWithValue("@UserId", userId);
+
+                            object linkResult = cmd.ExecuteScalar();
+                            if (linkResult != null && !string.IsNullOrEmpty(linkResult.ToString()))
+                            {
+                                lblSessionLink.Text = linkResult.ToString();
+                                System.Diagnostics.Debug.WriteLine($"✅ Session link loaded: {linkResult}");
+                            }
+                            else
+                            {
+                                // Generate a new session link if one doesn't exist
+                                string newSessionLink = GenerateSessionLink(sessionId, userId);
+                                UpdateSessionLink(sessionId, userId, newSessionLink);
+                                lblSessionLink.Text = newSessionLink;
+                                System.Diagnostics.Debug.WriteLine($"✅ New session link generated: {newSessionLink}");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Fallback - generate a basic link
+                    lblSessionLink.Text = "Session link will be provided in My Sessions page";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error loading session link: {ex.Message}");
+                lblSessionLink.Text = "Session link will be available in My Sessions page";
+            }
+        }
+
+        private string GenerateSessionLink(int sessionId, int userId)
+        {
+            string baseUrl = Request.Url.Scheme + "://" + Request.Url.Authority;
+            string token = GenerateSecureToken(sessionId, userId);
+            return $"{baseUrl}/User/JoinSession.aspx?sessionId={sessionId}&userId={userId}&token={token}";
+        }
+
+        private string GenerateSecureToken(int sessionId, int userId)
+        {
+            // Simple token generation - you might want to make this more secure
+            string data = $"{sessionId}-{userId}-{DateTime.Now.Ticks}";
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(data))
+                   .Replace("=", "").Replace("+", "-").Replace("/", "_").Substring(0, 16);
+        }
+
+        private void UpdateSessionLink(int sessionId, int userId, string sessionLink)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string updateQuery = @"
+                        UPDATE VideoCallBookings 
+                        SET SessionLink = @SessionLink 
+                        WHERE SessionId = @SessionId AND UserId = @UserId";
+
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionLink", sessionLink);
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error updating session link: {ex.Message}");
             }
         }
 
@@ -218,8 +317,9 @@ namespace SpotTheScam.User
 
         private void SetBackToHomeLink()
         {
-            // Set the navigation URL for the back to home button
+            // Set the navigation URLs
             lnkBackToHome.NavigateUrl = "~/User/UserHome.aspx";
+            lnkMySession.NavigateUrl = "~/User/UserMySessions.aspx";
         }
     }
 }

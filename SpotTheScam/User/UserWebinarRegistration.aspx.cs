@@ -26,6 +26,11 @@ namespace SpotTheScam.User
             set
             {
                 ViewState["CurrentUserPoints"] = value;
+                // Update the label immediately when points change
+                if (lblCurrentPoints != null)
+                {
+                    lblCurrentPoints.Text = value.ToString();
+                }
             }
         }
 
@@ -44,7 +49,7 @@ namespace SpotTheScam.User
                 if (string.IsNullOrEmpty(Request.QueryString["sessionId"]))
                 {
                     ShowErrorMessage("Please select a session from the listings page.");
-                    ShowGoBackButton();
+                    AddGoBackButton();
                     return;
                 }
 
@@ -52,11 +57,6 @@ namespace SpotTheScam.User
                 LoadSessionDetails();
                 ValidatePointsRequirement();
                 UpdatePointsDisplay();
-            }
-            else
-            {
-                // On postback, reload points to ensure we have current data
-                LoadUserCurrentPoints();
             }
         }
 
@@ -130,7 +130,7 @@ namespace SpotTheScam.User
                 {
                     System.Diagnostics.Debug.WriteLine("❌ Invalid session ID format");
                     ShowErrorMessage("Invalid session ID format.");
-                    ShowGoBackButton();
+                    AddGoBackButton();
                     return;
                 }
 
@@ -149,7 +149,7 @@ namespace SpotTheScam.User
                         {
                             System.Diagnostics.Debug.WriteLine($"❌ Session {sessionId} does not exist in database");
                             ShowErrorMessage($"Session {sessionId} not found. Please select a session from the available listings.");
-                            ShowGoBackButton();
+                            AddGoBackButton();
                             return;
                         }
                     }
@@ -175,7 +175,7 @@ namespace SpotTheScam.User
                                 {
                                     System.Diagnostics.Debug.WriteLine($"❌ Session {sessionId} is not available (Status: {status})");
                                     ShowErrorMessage("This session is no longer available for registration.");
-                                    ShowGoBackButton();
+                                    AddGoBackButton();
                                     return;
                                 }
 
@@ -227,7 +227,7 @@ namespace SpotTheScam.User
                             {
                                 System.Diagnostics.Debug.WriteLine($"❌ Session {sessionId} not found in query results");
                                 ShowErrorMessage("Session details could not be loaded.");
-                                ShowGoBackButton();
+                                AddGoBackButton();
                             }
                         }
                     }
@@ -237,7 +237,7 @@ namespace SpotTheScam.User
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Error loading session details: {ex.Message}");
                 ShowErrorMessage("Error loading session details. Please try again.");
-                ShowGoBackButton();
+                AddGoBackButton();
             }
         }
 
@@ -286,28 +286,35 @@ namespace SpotTheScam.User
 
         private void UpdatePointsDisplay()
         {
-            // Update the points display dynamically on the client side
+            // Set the label text directly on server side first
+            if (lblCurrentPoints != null)
+            {
+                lblCurrentPoints.Text = CurrentUserPoints.ToString();
+            }
+
+            // Update the points display dynamically on the client side as backup
             string script = $@"
                 document.addEventListener('DOMContentLoaded', function() {{
-                    // Find and update points badge
-                    var pointsBadge = document.querySelector('.points-badge');
-                    if (pointsBadge) {{
-                        pointsBadge.innerHTML = '<span>Current Points: {CurrentUserPoints} ⭐</span>';
+                    console.log('Updating points display to: {CurrentUserPoints}');
+                    
+                    // Find and update the label control
+                    var pointsLabel = document.getElementById('{lblCurrentPoints.ClientID}');
+                    if (pointsLabel) {{
+                        pointsLabel.textContent = '{CurrentUserPoints}';
+                        console.log('Updated points label directly');
                     }}
                     
-                    // Update any other points displays
+                    // Also update any other points displays as backup
                     var pointsElements = document.querySelectorAll('.current-points, .points-display');
                     for (var i = 0; i < pointsElements.length; i++) {{
                         pointsElements[i].textContent = 'Current Points: {CurrentUserPoints}';
                     }}
-                    
-                    console.log('Points display updated to: {CurrentUserPoints}');
                 }});
             ";
             ClientScript.RegisterStartupScript(this.GetType(), "UpdatePointsDisplay", script, true);
         }
 
-        private void ShowGoBackButton()
+        private void AddGoBackButton()
         {
             string script = @"
                 document.addEventListener('DOMContentLoaded', function() {
@@ -319,62 +326,47 @@ namespace SpotTheScam.User
                     var container = document.querySelector('.container') || document.body;
                     container.appendChild(btn);
                 });";
-            ClientScript.RegisterStartupScript(this.GetType(), "ShowGoBackButton", script, true);
+            ClientScript.RegisterStartupScript(this.GetType(), "AddGoBackButton", script, true);
         }
 
-        private void CreateExpertSessionRegistrationsTable(SqlConnection conn)
-        {
-            try
-            {
-                string createTableQuery = @"
-                    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'ExpertSessionRegistrations')
-                    CREATE TABLE ExpertSessionRegistrations (
-                        Id int IDENTITY(1,1) PRIMARY KEY,
-                        UserId int NOT NULL,
-                        SessionId int NOT NULL,
-                        RegistrationDate datetime NOT NULL,
-                        Status nvarchar(50) NOT NULL DEFAULT 'Confirmed',
-                        PointsSpent int NOT NULL DEFAULT 0,
-                        FirstName nvarchar(100) NULL,
-                        LastName nvarchar(100) NULL,
-                        Email nvarchar(255) NULL,
-                        Phone nvarchar(50) NULL,
-                        CreatedDate datetime DEFAULT GETDATE(),
-                        FOREIGN KEY (UserId) REFERENCES Users(Id),
-                        FOREIGN KEY (SessionId) REFERENCES ExpertSessions(Id)
-                    )";
-
-                using (SqlCommand cmd = new SqlCommand(createTableQuery, conn))
-                {
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("✅ ExpertSessionRegistrations table created successfully");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ Error creating ExpertSessionRegistrations table: {ex.Message}");
-            }
-        }
+        // Updated btnRegister_Click method in UserWebinarRegistration.aspx.cs
+        // Replace your existing registration code with this more robust version:
 
         protected void btnRegister_Click(object sender, EventArgs e)
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine("=== REGISTRATION BUTTON CLICKED ===");
+
                 if (ViewState["SessionId"] == null)
                 {
+                    System.Diagnostics.Debug.WriteLine("❌ ViewState SessionId is null");
                     ShowErrorMessage("Session information not found. Please try again.");
                     return;
                 }
 
-                // CRITICAL FIX: Reload current points before validation
+                // Reload current points before validation
                 LoadUserCurrentPoints();
 
                 int sessionId = Convert.ToInt32(ViewState["SessionId"]);
                 int pointsRequired = Convert.ToInt32(ViewState["PointsRequired"] ?? 0);
                 int userId = Convert.ToInt32(Session["UserID"]);
 
-                System.Diagnostics.Debug.WriteLine($"🔄 Processing registration: SessionId={sessionId}, UserId={userId}, PointsRequired={pointsRequired}");
-                System.Diagnostics.Debug.WriteLine($"🔄 Current user points at registration: {CurrentUserPoints}");
+                System.Diagnostics.Debug.WriteLine($"🔄 Processing registration:");
+                System.Diagnostics.Debug.WriteLine($"   - SessionId: {sessionId}");
+                System.Diagnostics.Debug.WriteLine($"   - UserId: {userId}");
+                System.Diagnostics.Debug.WriteLine($"   - PointsRequired: {pointsRequired}");
+                System.Diagnostics.Debug.WriteLine($"   - Current user points: {CurrentUserPoints}");
+
+                // Validate form fields
+                if (string.IsNullOrEmpty(txtFirstName.Text.Trim()) ||
+                    string.IsNullOrEmpty(txtLastName.Text.Trim()) ||
+                    string.IsNullOrEmpty(txtEmail.Text.Trim()) ||
+                    string.IsNullOrEmpty(txtPhone.Text.Trim()))
+                {
+                    ShowErrorMessage("Please fill in all required fields.");
+                    return;
+                }
 
                 // Final validation with reloaded points
                 if (pointsRequired > 0 && CurrentUserPoints < pointsRequired)
@@ -386,15 +378,13 @@ namespace SpotTheScam.User
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-
-                    // CRITICAL: Create the registration table if it doesn't exist
-                    CreateExpertSessionRegistrationsTable(conn);
+                    System.Diagnostics.Debug.WriteLine("✅ Database connection opened");
 
                     // Check if user is already registered
                     string checkQuery = @"
-                        SELECT COUNT(*) 
-                        FROM ExpertSessionRegistrations 
-                        WHERE UserId = @UserId AND SessionId = @SessionId AND Status = 'Confirmed'";
+                SELECT COUNT(*) 
+                FROM VideoCallBookings 
+                WHERE UserId = @UserId AND SessionId = @SessionId AND BookingStatus = 'Confirmed'";
 
                     using (SqlCommand cmd = new SqlCommand(checkQuery, conn))
                     {
@@ -404,16 +394,17 @@ namespace SpotTheScam.User
                         int existingRegistration = Convert.ToInt32(cmd.ExecuteScalar());
                         if (existingRegistration > 0)
                         {
+                            System.Diagnostics.Debug.WriteLine("❌ User already registered");
                             ShowErrorMessage("You are already registered for this session.");
                             return;
                         }
                     }
 
-                    // Check if session is still available
+                    // Check session availability
                     string availabilityQuery = @"
-                        SELECT (MaxParticipants - ISNULL(CurrentParticipants, 0)) as AvailableSpots 
-                        FROM ExpertSessions 
-                        WHERE Id = @SessionId AND Status = 'Available'";
+                SELECT (MaxParticipants - ISNULL(CurrentParticipants, 0)) as AvailableSpots 
+                FROM ExpertSessions 
+                WHERE Id = @SessionId AND Status = 'Available'";
 
                     using (SqlCommand cmd = new SqlCommand(availabilityQuery, conn))
                     {
@@ -422,67 +413,141 @@ namespace SpotTheScam.User
 
                         if (result == null || Convert.ToInt32(result) <= 0)
                         {
+                            System.Diagnostics.Debug.WriteLine("❌ Session no longer available");
                             ShowErrorMessage("This session is no longer available or is full.");
                             return;
                         }
                     }
 
-                    // Register user for session
-                    string registerQuery = @"
-                        INSERT INTO ExpertSessionRegistrations 
-                        (UserId, SessionId, RegistrationDate, Status, PointsSpent, FirstName, LastName, Email, Phone, CreatedDate)
-                        VALUES 
-                        (@UserId, @SessionId, @RegistrationDate, @Status, @PointsSpent, @FirstName, @LastName, @Email, @Phone, @CreatedDate)";
+                    // Get table structure to build dynamic query
+                    string getColumnsQuery = @"
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'VideoCallBookings' 
+                AND COLUMN_NAME IN ('SessionId', 'UserId', 'CustomerName', 'CustomerPhone', 'CustomerEmail', 
+                                   'ScamConcerns', 'BookingDate', 'BookingStatus', 'PointsUsed', 'BookingType', 
+                                   'FirstName', 'LastName', 'SessionLink')";
 
-                    using (SqlCommand cmd = new SqlCommand(registerQuery, conn))
+                    List<string> availableColumns = new List<string>();
+                    using (SqlCommand cmd = new SqlCommand(getColumnsQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@UserId", userId);
-                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                        cmd.Parameters.AddWithValue("@RegistrationDate", DateTime.Now);
-                        cmd.Parameters.AddWithValue("@Status", "Confirmed");
-                        cmd.Parameters.AddWithValue("@PointsSpent", pointsRequired);
-
-                        // Get user info from form fields (if available)
-                        cmd.Parameters.AddWithValue("@FirstName", txtFirstName?.Text ?? "");
-                        cmd.Parameters.AddWithValue("@LastName", txtLastName?.Text ?? "");
-                        cmd.Parameters.AddWithValue("@Email", txtEmail?.Text ?? "");
-                        cmd.Parameters.AddWithValue("@Phone", txtPhone?.Text ?? "");
-                        cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            System.Diagnostics.Debug.WriteLine($"✅ User registered successfully");
-
-                            // Deduct points if required
-                            if (pointsRequired > 0)
+                            while (reader.Read())
                             {
-                                DeductPoints(conn, userId, pointsRequired, $"Webinar Registration - Session {sessionId}");
-                                System.Diagnostics.Debug.WriteLine($"✅ Points deducted: {pointsRequired}");
+                                availableColumns.Add(reader["COLUMN_NAME"].ToString());
                             }
+                        }
+                    }
 
-                            // Update session participant count
-                            UpdateSessionParticipantCount(conn, sessionId);
-                            System.Diagnostics.Debug.WriteLine($"✅ Session participant count updated");
+                    // Build dynamic insert query based on available columns
+                    List<string> columns = new List<string>();
+                    List<string> parameters = new List<string>();
 
-                            ShowSuccessMessage("Registration successful! You will receive a confirmation email shortly.");
+                    // Essential columns
+                    if (availableColumns.Contains("SessionId")) { columns.Add("SessionId"); parameters.Add("@SessionId"); }
+                    if (availableColumns.Contains("UserId")) { columns.Add("UserId"); parameters.Add("@UserId"); }
+                    if (availableColumns.Contains("CustomerName")) { columns.Add("CustomerName"); parameters.Add("@CustomerName"); }
+                    if (availableColumns.Contains("CustomerPhone")) { columns.Add("CustomerPhone"); parameters.Add("@CustomerPhone"); }
+                    if (availableColumns.Contains("CustomerEmail")) { columns.Add("CustomerEmail"); parameters.Add("@CustomerEmail"); }
+                    if (availableColumns.Contains("ScamConcerns")) { columns.Add("ScamConcerns"); parameters.Add("@ScamConcerns"); }
+                    if (availableColumns.Contains("BookingDate")) { columns.Add("BookingDate"); parameters.Add("@BookingDate"); }
+                    if (availableColumns.Contains("BookingStatus")) { columns.Add("BookingStatus"); parameters.Add("@BookingStatus"); }
+                    if (availableColumns.Contains("PointsUsed")) { columns.Add("PointsUsed"); parameters.Add("@PointsUsed"); }
+                    if (availableColumns.Contains("BookingType")) { columns.Add("BookingType"); parameters.Add("@BookingType"); }
 
-                            // Refresh points display after successful registration
-                            LoadUserCurrentPoints();
-                            UpdatePointsDisplay();
+                    // Optional columns
+                    if (availableColumns.Contains("FirstName")) { columns.Add("FirstName"); parameters.Add("@FirstName"); }
+                    if (availableColumns.Contains("LastName")) { columns.Add("LastName"); parameters.Add("@LastName"); }
 
-                            // Redirect to success page with session info
-                            string redirectUrl = $"WebinarRegistrationSuccess.aspx?sessionId={sessionId}&firstName={txtFirstName?.Text}&lastName={txtLastName?.Text}";
+                    string registerQuery = $@"
+                INSERT INTO VideoCallBookings 
+                ({string.Join(", ", columns)})
+                VALUES 
+                ({string.Join(", ", parameters)})";
 
-                            string redirectScript = $@"
-                                setTimeout(function() {{ 
-                                    window.location.href = '{redirectUrl}'; 
-                                }}, 2000);";
-                            ClientScript.RegisterStartupScript(this.GetType(), "SuccessRedirect", redirectScript, true);
+                    try
+                    {
+                        using (SqlCommand cmd = new SqlCommand(registerQuery, conn))
+                        {
+                            // Add parameters based on available columns
+                            if (availableColumns.Contains("SessionId")) cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                            if (availableColumns.Contains("UserId")) cmd.Parameters.AddWithValue("@UserId", userId);
+                            if (availableColumns.Contains("CustomerName")) cmd.Parameters.AddWithValue("@CustomerName", txtFirstName.Text.Trim() + " " + txtLastName.Text.Trim());
+                            if (availableColumns.Contains("CustomerPhone")) cmd.Parameters.AddWithValue("@CustomerPhone", txtPhone.Text.Trim());
+                            if (availableColumns.Contains("CustomerEmail")) cmd.Parameters.AddWithValue("@CustomerEmail", txtEmail.Text.Trim());
+                            if (availableColumns.Contains("ScamConcerns")) cmd.Parameters.AddWithValue("@ScamConcerns", ddlSecurityConcerns.SelectedValue ?? "General");
+                            if (availableColumns.Contains("BookingDate")) cmd.Parameters.AddWithValue("@BookingDate", DateTime.Now);
+                            if (availableColumns.Contains("BookingStatus")) cmd.Parameters.AddWithValue("@BookingStatus", "Confirmed");
+                            if (availableColumns.Contains("PointsUsed")) cmd.Parameters.AddWithValue("@PointsUsed", pointsRequired);
+                            if (availableColumns.Contains("BookingType")) cmd.Parameters.AddWithValue("@BookingType", "Expert Session");
+                            if (availableColumns.Contains("FirstName")) cmd.Parameters.AddWithValue("@FirstName", txtFirstName.Text.Trim());
+                            if (availableColumns.Contains("LastName")) cmd.Parameters.AddWithValue("@LastName", txtLastName.Text.Trim());
+
+                            System.Diagnostics.Debug.WriteLine("🔄 Executing registration insert...");
+                            int rowsAffected = cmd.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"✅ User registered successfully in VideoCallBookings");
+
+                                // Generate and update session link if column exists
+                                if (availableColumns.Contains("SessionLink"))
+                                {
+                                    string sessionLink = GenerateSessionLink(sessionId, userId);
+                                    UpdateBookingWithSessionLink(sessionId, userId, sessionLink);
+                                }
+
+                                // Deduct points if required
+                                if (pointsRequired > 0)
+                                {
+                                    DeductPoints(conn, userId, pointsRequired, $"Webinar Registration - Session {sessionId}");
+                                    System.Diagnostics.Debug.WriteLine($"✅ Points deducted: {pointsRequired}");
+                                }
+
+                                // Update session participant count
+                                UpdateSessionParticipantCount(conn, sessionId);
+                                System.Diagnostics.Debug.WriteLine($"✅ Session participant count updated");
+
+                                ShowSuccessMessage("Registration successful! You will receive a confirmation email shortly.");
+
+                                // Refresh points display after successful registration
+                                LoadUserCurrentPoints();
+                                UpdatePointsDisplay();
+
+                                // Redirect to success page
+                                string redirectUrl = $"WebinarRegistrationSuccess.aspx?sessionId={sessionId}&firstName={txtFirstName.Text}&lastName={txtLastName.Text}";
+
+                                string redirectScript = $@"
+                            setTimeout(function() {{ 
+                                window.location.href = '{redirectUrl}'; 
+                            }}, 2000);";
+                                ClientScript.RegisterStartupScript(this.GetType(), "SuccessRedirect", redirectScript, true);
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("❌ Registration failed - no rows affected");
+                                ShowErrorMessage("Registration failed. Please try again.");
+                            }
+                        }
+                    }
+                    catch (SqlException sqlEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"❌ SQL Error during registration: {sqlEx.Message}");
+                        System.Diagnostics.Debug.WriteLine($"❌ SQL Error Number: {sqlEx.Number}");
+
+                        // Handle specific SQL errors
+                        if (sqlEx.Message.Contains("Cannot insert the value NULL"))
+                        {
+                            ShowErrorMessage("Please ensure all required fields are filled out completely.");
+                        }
+                        else if (sqlEx.Message.Contains("PRIMARY KEY constraint") || sqlEx.Message.Contains("UNIQUE constraint"))
+                        {
+                            ShowErrorMessage("You are already registered for this session.");
                         }
                         else
                         {
-                            ShowErrorMessage("Registration failed. Please try again.");
+                            ShowErrorMessage("Registration error occurred. Please try again or contact support.");
                         }
                     }
                 }
@@ -490,7 +555,8 @@ namespace SpotTheScam.User
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Error during registration: {ex.Message}");
-                ShowErrorMessage("An error occurred during registration. Please try again.");
+                System.Diagnostics.Debug.WriteLine($"❌ Stack Trace: {ex.StackTrace}");
+                ShowErrorMessage("An unexpected error occurred during registration. Please try again.");
             }
         }
 
@@ -530,8 +596,8 @@ namespace SpotTheScam.User
                     UPDATE ExpertSessions 
                     SET CurrentParticipants = (
                         SELECT COUNT(*) 
-                        FROM ExpertSessionRegistrations 
-                        WHERE SessionId = @SessionId AND Status = 'Confirmed'
+                        FROM VideoCallBookings 
+                        WHERE SessionId = @SessionId AND BookingStatus = 'Confirmed'
                     )
                     WHERE Id = @SessionId";
 
@@ -544,6 +610,97 @@ namespace SpotTheScam.User
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Error updating participant count: {ex.Message}");
+            }
+        }
+
+        private string GenerateSessionLink(int sessionId, int userId)
+        {
+            string baseUrl = Request.Url.Scheme + "://" + Request.Url.Authority;
+            string token = GenerateSecureToken(sessionId, userId);
+            return $"{baseUrl}/User/JoinSession.aspx?sessionId={sessionId}&userId={userId}&token={token}";
+        }
+
+        private string GenerateSecureToken(int sessionId, int userId)
+        {
+            // Simple token generation - you might want to make this more secure
+            string data = $"{sessionId}-{userId}-{DateTime.Now.Ticks}";
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(data))
+                   .Replace("=", "").Replace("+", "-").Replace("/", "_").Substring(0, 16);
+        }
+
+        // Updated UpdateBookingWithSessionLink method in UserWebinarRegistration.aspx.cs
+
+        private void UpdateBookingWithSessionLink(int sessionId, int userId, string sessionLink)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // First check if the SessionLink column exists
+                    string checkColumnQuery = @"
+                SELECT COUNT(*) 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'VideoCallBookings' 
+                AND COLUMN_NAME = 'SessionLink'";
+
+                    using (SqlCommand checkCmd = new SqlCommand(checkColumnQuery, conn))
+                    {
+                        int columnExists = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                        if (columnExists == 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine("⚠️ SessionLink column does not exist in VideoCallBookings table");
+                            System.Diagnostics.Debug.WriteLine("💡 Please run: ALTER TABLE VideoCallBookings ADD SessionLink NVARCHAR(500) NULL");
+                            return; // Exit gracefully instead of throwing error
+                        }
+                    }
+
+                    // Check if the booking record exists
+                    string checkQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId AND UserId = @UserId";
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        checkCmd.Parameters.AddWithValue("@UserId", userId);
+                        int recordExists = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                        if (recordExists > 0)
+                        {
+                            string updateQuery = @"
+                        UPDATE VideoCallBookings 
+                        SET SessionLink = @SessionLink 
+                        WHERE SessionId = @SessionId AND UserId = @UserId";
+
+                            using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@SessionLink", sessionLink);
+                                cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                                int rowsUpdated = cmd.ExecuteNonQuery();
+                                if (rowsUpdated > 0)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"✅ Session link updated successfully for user {userId}");
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"⚠️ No rows updated for session link - user {userId}, session {sessionId}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"❌ No booking record found for user {userId}, session {sessionId}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error updating session link: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                // Don't throw the exception - the registration should still succeed even if session link update fails
             }
         }
 
@@ -561,41 +718,6 @@ namespace SpotTheScam.User
             pnlAlert.Visible = true;
             pnlAlert.CssClass = "alert alert-success";
             ltAlertMessage.Text = message;
-        }
-
-        private int GetCurrentUserId()
-        {
-            if (Session["UserID"] != null)
-            {
-                return Convert.ToInt32(Session["UserID"]);
-            }
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string getUserIdQuery = "SELECT Id FROM Users WHERE Username = @Username";
-
-                    using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@Username", Session["Username"]);
-                        object result = cmd.ExecuteScalar();
-
-                        if (result != null)
-                        {
-                            int userId = Convert.ToInt32(result);
-                            Session["UserID"] = userId;
-                            return userId;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ Error getting user ID: {ex.Message}");
-            }
-            return 0;
         }
 
         // Helper method to get correct expert image based on name
