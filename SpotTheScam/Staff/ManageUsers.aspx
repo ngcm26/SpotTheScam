@@ -229,8 +229,7 @@
         <h1 style="color: #C46A1D; font-weight: 600; margin-bottom: 0.2em; font-size: 2.1rem;">Manage Users</h1>
         <div style="color: #344054; font-size: 1.15rem; margin-bottom: 1.2em;">This page allows staff to view and manage user accounts.</div>
     </div>
-    
-    <div class="users-filter-bar" style="padding: 0 0 18px 0; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 0; background: none;">
+    <div class="users-filter-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px;">
         <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
             <div class="filter-group" style="min-width: 220px;">
                 <span class="filter-icon"><i class="fa fa-search"></i></span>
@@ -239,6 +238,7 @@
             <asp:Button ID="btnFilter" runat="server" Text="Apply" CssClass="filter-btn" OnClick="btnFilter_Click" />
             <asp:Button ID="btnClearFilters" runat="server" Text="Clear" CssClass="filter-btn" OnClick="btnClearFilters_Click" />
         </div>
+        <a href="AddUser.aspx" class="filter-btn" style="text-decoration: none;">+ Add User</a>
     </div>
     
     <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />

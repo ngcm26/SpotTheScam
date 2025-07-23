@@ -256,6 +256,12 @@
             margin-left: auto;
             margin-right: auto;
         }
+        .result-section b {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-size: 1.08rem;
+        }
         .result-success {
             background: rgba(151, 207, 151, 0.5);
             border: 1.5px solid #3C6E3C;
@@ -277,6 +283,19 @@
             line-height: 1.6;
             font-size: 1rem;
             color: #4a5568;
+        }
+        .result-danger-box {
+            background: rgba(236, 119, 119, 0.5);
+            border: 1.5px solid #A22424;
+            color: #A22424;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto 0 auto;
+            font-size: 1.08rem;
+            box-sizing: border-box;
+            text-align: left;
         }
         
         /* Responsive Design */
@@ -349,7 +368,7 @@
             <div class="checker-desc">Detect if an SMS or Email is a phishing message or is malicious.</div>
             
             <div class="input-section">
-                <asp:TextBox ID="txtUserInput" runat="server" TextMode="MultiLine" Rows="6" CssClass="checker-input" placeholder="Paste SMS content here" />
+                <asp:TextBox ID="txtUserInput" runat="server" TextMode="MultiLine" Rows="6" CssClass="checker-input" placeholder="Paste SMS / Email content here" />
                 <div class="checker-divider"></div>
                 <div class="checker-upload">
                     <asp:FileUpload ID="fileScreenshot" runat="server" CssClass="" />
@@ -363,7 +382,7 @@
             
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <div class="result-section hidden" id="resultSection">
+                    <div class="result-section hidden" id="resultSection" data-resulttype="">
                         <div class="result-title">Result</div>
                         <asp:Label ID="lblResult" runat="server" CssClass="result-content"></asp:Label>
                     </div>
@@ -505,12 +524,17 @@
             var label = document.getElementById('<%= lblResult.ClientID %>');
             if (!box || !label) return;
             box.classList.remove('result-success', 'result-danger');
-            var text = label.innerText || label.textContent || '';
-            var yesMatch = /\b(is this a scam\?\s*)?yes\b/i.test(text);
-            var noMatch = /\b(is this a scam\?\s*)?no\b/i.test(text);
+            var html = label.innerHTML || label.textContent || '';
+            // Strip HTML tags
+            var text = html.replace(/<[^>]*>/g, '').trim();
+            // More robust regex: match 'yes' or 'no' after 'is it a scam?' or at start of line, ignoring whitespace and punctuation
+            var yesMatch = /is it a scam\?[^a-zA-Z0-9]*yes/i.test(text) || /^\s*yes\b/i.test(text);
+            var noMatch = /is it a scam\?[^a-zA-Z0-9]*no/i.test(text) || /^\s*no\b/i.test(text);
             if (yesMatch) {
                 box.classList.add('result-danger');
             } else if (noMatch) {
+                box.classList.add('result-success');
+            } else if (text.toLowerCase().includes('no scam detected') || text.toLowerCase().includes('does not appear to contain a message')) {
                 box.classList.add('result-success');
             }
         }

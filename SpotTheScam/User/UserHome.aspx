@@ -312,8 +312,81 @@
         <div class="text-center">
             <h1 class="display-4">Hello, <asp:Label ID="lblName" runat="server" />!</h1>
             <p class="lead">Welcome back to SpotTheScam. Ready to protect yourself today?</p>
-            <a class="btn btn-success btn-lg" href="#">Start Scanning</a>
         </div>
+        <!-- Main Dashboard Navigation -->
+        <div class="dashboard-nav container mt-5">
+            <div class="row justify-content-center g-4">
+                <div class="col-md-3 col-6">
+                    <a href="UserProfile.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">My Profile</h5>
+                            <p class="card-text">View & edit your profile</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="UserModules.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Modules</h5>
+                            <p class="card-text">Browse learning modules</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="Quizzes.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Quizzes</h5>
+                            <p class="card-text">Test your scam awareness</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="ForumPage.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Forum</h5>
+                            <p class="card-text">Discuss & ask questions</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="UserBlog.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Blog</h5>
+                            <p class="card-text">Read & share experiences</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="UserBankAccounts.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">Bank Accounts</h5>
+                            <p class="card-text">Manage your bank accounts</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <style>
+            .dashboard-nav .card {
+                border-radius: 12px;
+                transition: box-shadow 0.2s, transform 0.2s;
+                border: none;
+                background: #fff;
+            }
+            .dashboard-nav .card:hover {
+                box-shadow: 0 4px 24px rgba(211,111,45,0.15);
+                transform: translateY(-4px) scale(1.03);
+            }
+            .dashboard-nav .card-title {
+                color: #D36F2D;
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+            .dashboard-nav .card-text {
+                color: #051D40;
+                font-size: 1rem;
+            }
+        </style>
     </asp:PlaceHolder>
 
     <!-- Hero section shown if user is NOT logged in -->

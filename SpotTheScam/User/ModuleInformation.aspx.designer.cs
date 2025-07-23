@@ -28,5 +28,7 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Label lblHeader5Text;
         protected global::System.Web.UI.WebControls.Image img1;
         protected global::System.Web.UI.WebControls.Image img2;
+        protected global::System.Web.UI.WebControls.Label lblCompleteMessage;
+        protected global::System.Web.UI.WebControls.Button btnCompleteModule;
     }
 }

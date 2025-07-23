@@ -354,16 +354,20 @@
         <button id="carousel-left" class="carousel-arrow" type="button" aria-label="Previous modules" disabled>
             <span class="arrow-triangle left"></span>
         </button>
-        <div class="modules-row" id="modules-carousel-row">
+        <div class="modules-row" id="modules-carousel-row" style="justify-content: center; flex-wrap: wrap; gap: 40px 40px; max-width: 900px;">
             <asp:Repeater ID="rptModules" runat="server">
                 <ItemTemplate>
-                    <div class="carousel-card-wrapper" style="display: none; flex-direction: column; align-items: center;">
-                        <a href='ModuleInformation.aspx?module_id=<%# Eval("module_id") %>' class="module-link" style="text-decoration:none;">
-                            <div class="module-card">
-                                <img src='<%# ResolveUrl(Eval("cover_image").ToString()) %>' alt="Module Cover" />
-                            </div>
-                        </a>
-                        <div class="module-title"><%# Eval("module_name") %></div>
+                    <div class="carousel-card-wrapper module-grid-card">
+                        <div class="module-card grid-card">
+                            <img src='<%# ResolveUrl(Eval("cover_image").ToString()) %>' alt="Module Cover" class="module-img" />
+                        </div>
+                        <div class="module-title"><span style="font-weight: 600;"><b><%# Eval("module_name") %></b></span></div>
+                        <div class="start-btn-container">
+                            <%# (Eval("completed") != null && (bool)Eval("completed")) ?
+                                $"<button class='start-btn completed-btn' style='background: #28a745;' onclick=\"return handleCompletedClick({Eval("module_id")});\">Completed</button>" :
+                                $"<a href='ModuleInformation.aspx?module_id={Eval("module_id")}' class='start-btn' style='width: 100%; text-decoration: none; display: block; text-align: center;'>Start</a>"
+                            %>
+                        </div>
                     </div>
                 </ItemTemplate>
             </asp:Repeater>
@@ -374,18 +378,12 @@
     </div>
 
     <script type="text/javascript">
-        // Set isLoggedIn from server-side session
-        var isLoggedIn = '<%=(Session["Username"] != null || Session["UserId"] != null) ? "true" : "false" %>';
         document.addEventListener('DOMContentLoaded', function() {
             const cards = Array.from(document.querySelectorAll('.carousel-card-wrapper'));
             const leftBtn = document.getElementById('carousel-left');
             const rightBtn = document.getElementById('carousel-right');
             let startIdx = 0;
-            const visibleCount = 3;
-
-            console.log('isLoggedIn:', isLoggedIn);
-
-            // No need for attachModuleClickHandlers, links now go directly to ModuleInformation.aspx
+            const visibleCount = 4; // Show 4 cards at a time
 
             function updateCarousel() {
                 cards.forEach((card, idx) => {
@@ -393,29 +391,31 @@
                 });
                 leftBtn.disabled = startIdx === 0;
                 rightBtn.disabled = (startIdx + visibleCount >= cards.length);
-                // No need to re-attach handlers here as the links now navigate directly
             }
 
             leftBtn.addEventListener('click', function() {
                 if (startIdx > 0) {
-                    startIdx -= 1;
+                    startIdx -= visibleCount;
                     if (startIdx < 0) startIdx = 0;
-                    updateCarousel();
-                } else if (cards.length > visibleCount) {
-                    // Jump to the last possible set
-                    startIdx = cards.length - visibleCount;
                     updateCarousel();
                 }
             });
             rightBtn.addEventListener('click', function() {
                 if (startIdx + visibleCount < cards.length) {
-                    startIdx += 1;
+                    startIdx += visibleCount;
                     updateCarousel();
                 }
             });
 
             updateCarousel();
         });
+
+        function handleCompletedClick(moduleId) {
+            if (confirm('You have completed this module. Do you want to revise the module content?')) {
+                window.location.href = 'ModuleInformation.aspx?module_id=' + moduleId;
+            }
+            return false;
+        }
     </script>
 
     <style>
@@ -432,75 +432,111 @@
         }
         .modules-row {
             display: flex;
-            gap: 40px;
+            flex-wrap: wrap;
             justify-content: center;
-            flex-wrap: nowrap;
-            overflow: hidden;
+            align-items: flex-start;
             width: 100%;
-            max-width: 1100px;
-            transition: all 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+            max-width: 900px;
+            min-height: 400px;
+            gap: 40px 40px;
         }
-        .carousel-card-wrapper {
-            transition: opacity 0.5s cubic-bezier(0.4, 0.2, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
-        }
-        .module-card {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 4px 16px rgba(5,29,64,0.08);
-            width: 310px;
-            height: 440px;
+        .module-grid-card {
+            width: 320px;
+            height: 320px;
+            background: #f7f7f7;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(5,29,64,0.06);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 0;
             margin-bottom: 0;
-            overflow: hidden;
+            padding: 0 0 16px 0;
+            position: relative;
+            transition: box-shadow 0.2s;
         }
-        .module-card img {
+        .module-grid-card:hover {
+            box-shadow: 0 8px 24px rgba(5,29,64,0.13);
+        }
+        .module-card.grid-card {
+            background: none;
+            box-shadow: none;
+            width: 100%;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 18px 18px 8px 18px; /* Inset the image */
+            box-sizing: border-box;
+        }
+        .module-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 0;
-            margin: 0;
-            background: none;
-            box-shadow: none;
-        }
-        .module-progress {
-            width: 90%;
-            height: 8px;
-            background-color: #f0f0f0;
-            border-radius: 6px;
-            margin: 18px auto 0 auto;
-            overflow: hidden;
-        }
-        .module-progress::after {
-            content: '';
+            border-radius: 10px;
+            background: #fff;
             display: block;
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #E85A4F, #D2691E);
-            border-radius: 6px;
-            transition: width 0.3s ease;
+            transition: none !important;
         }
-        .progress-text {
-            font-size: 1.1rem;
-            color: #051D40;
-            font-weight: 600;
-            text-align: right;
-            width: 90%;
-            margin: 4px auto 0 auto;
+        .module-grid-card:hover .module-img {
+            /* No animation or transform on hover */
+            transform: none !important;
+            box-shadow: none !important;
+            filter: none !important;
         }
         .module-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #051D40;
-            margin-top: 18px;
-            margin-bottom: 0;
-            line-height: 1.3;
-            padding: 0 10px;
+            margin: 16px 0 8px 0;
             text-align: center;
             font-family: 'DM Sans', sans-serif;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .start-btn-container {
+            width: 90%;
+            margin-top: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            flex: 1 0 auto;
+        }
+        .start-btn {
+            width: 100%;
+            background: #D36F2D;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .start-btn:hover {
+            background: #b95a22;
+        }
+        .completed-btn {
+            background: #28a745 !important;
+            color: #fff !important;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .completed-btn:hover {
+            background: #218838 !important;
         }
         .carousel-arrow {
             background: none;
@@ -536,17 +572,25 @@
         }
         @media (max-width: 1100px) {
             .modules-row {
-                max-width: 90vw;
+                max-width: 98vw;
+            }
+            .module-grid-card {
+                width: 45vw;
+                height: 200px;
             }
         }
         @media (max-width: 768px) {
             .modules-row {
-                gap: 20px;
+                max-width: 99vw;
+                min-height: 200px;
+                gap: 20px 10px;
             }
-            .module-card {
-                max-width: 310px;
-                height: 270px;
-                padding: 18px 8px 8px 8px;
+            .module-grid-card {
+                width: 98vw;
+                height: 180px;
+            }
+            .module-card.grid-card {
+                padding: 8px 8px 4px 8px;
             }
             .carousel-arrow {
                 width: 32px;
@@ -566,11 +610,7 @@
     </style>
         
         <!-- Navigation dots (optional) -->
-        <div class="navigation-dots">
-            <div class="dot active"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
+        <!-- Removed navigation dots for single module layout -->
     </div>
     
     <!-- Skills Section -->
