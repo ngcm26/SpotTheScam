@@ -62,6 +62,7 @@ Yes
             if (!IsPostBack)
             {
                 // Initialize the page if needed
+                lblResult.Text = string.Empty;
             }
         }
         #endregion

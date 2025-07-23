@@ -15,7 +15,10 @@ namespace SpotTheScam.User
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (!IsPostBack)
+            {
+                lblResult.Text = string.Empty;
+            }
         }
 
         protected async void btnCheckLink_Click(object sender, EventArgs e)
@@ -29,7 +32,18 @@ namespace SpotTheScam.User
 
             string resultMsg = await CheckUrlWithGoogleSafeBrowsing(url);
             lblResult.Text = resultMsg;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowResultSection", "document.getElementById('resultSection').classList.remove('hidden');document.querySelector('.checker-main-bg').classList.add('expanded');setResultBoxStyle();", true);
+
+            // Determine if the result is safe or unsafe
+            string script = "document.getElementById('resultSection').classList.remove('result-success','result-danger','hidden');document.querySelector('.checker-main-bg').classList.add('expanded');";
+            if (resultMsg.Contains("Unsafe link detected!"))
+            {
+                script += "document.getElementById('resultSection').classList.add('result-danger');";
+            }
+            else if (resultMsg.Contains("not flagged as malicious"))
+            {
+                script += "document.getElementById('resultSection').classList.add('result-success');";
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowResultSection", script, true);
         }
 
         private async Task<string> CheckUrlWithGoogleSafeBrowsing(string urlToCheck)
@@ -72,11 +86,12 @@ namespace SpotTheScam.User
                             else
                                 reasons.Append($"<b>{threatType}:</b> This site is flagged as unsafe.<br>");
                         }
-                        return $"<span style='color:#A22424;font-weight:bold;'>⚠️ Unsafe link detected!</span><br>{reasons}Please avoid clicking this link and do not enter any personal information.";
+                        // Set result text only (no box)
+                        return $"⚠️ Unsafe link detected!<br>{reasons}Please avoid clicking this link and do not enter any personal information.";
                     }
                     else
                     {
-                        return "<span style='color:#3C6E3C;font-weight:bold;'>✅ This link is not flagged as malicious.</span><br>Remember: Always be careful when clicking on links, especially from unknown sources. Stay safe online!";
+                        return "✅ This link is not flagged as malicious.<br>Remember: Always be careful when clicking on links, especially from unknown sources. Stay safe online!";
                     }
                 }
                 catch (Exception ex)
