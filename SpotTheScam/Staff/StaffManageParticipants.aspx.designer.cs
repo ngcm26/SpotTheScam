@@ -51,13 +51,49 @@ namespace SpotTheScam.Staff
         protected global::System.Web.UI.WebControls.Label lblSessionLink;
 
         /// <summary>
-        /// btnStartSession control.
+        /// btnStartBroadcast control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnStartSession;
+        protected global::System.Web.UI.WebControls.Button btnStartBroadcast;
+
+        /// <summary>
+        /// btnStartGroupCall control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnStartGroupCall;
+
+        /// <summary>
+        /// btnStartOneOnOne control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnStartOneOnOne;
+
+        /// <summary>
+        /// btnConnectSelected control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnConnectSelected;
+
+        /// <summary>
+        /// btnRemoveSelected control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRemoveSelected;
 
         /// <summary>
         /// lblParticipantCount control.

@@ -15,10 +15,10 @@ namespace SpotTheScam.Staff
         {
             if (!IsPostBack)
             {
-                // Check if staff is logged in
-                if (Session["StaffName"] == null)
+                // Check if staff is logged in - FIXED: Redirect to UserLogin.aspx
+                if (Session["StaffName"] == null && Session["StaffUsername"] == null && Session["Username"] == null)
                 {
-                    Response.Redirect("StaffLogin.aspx");
+                    Response.Redirect("~/User/UserLogin.aspx");
                     return;
                 }
 
@@ -40,6 +40,27 @@ namespace SpotTheScam.Staff
                 {
                     conn.Open();
 
+                    // FIXED: Check if ANY sessions exist and use a flag to track initialization
+                    string checkQuery = "SELECT COUNT(*) FROM ExpertSessions";
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                    {
+                        int existingCount = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        System.Diagnostics.Debug.WriteLine($"=== LoadSessions ===");
+                        System.Diagnostics.Debug.WriteLine($"Total sessions count: {existingCount}");
+
+                        // ONLY create sample sessions if there are NO sessions at all AND not already initialized
+                        if (existingCount == 0 && !HasSampleSessionsBeenInitialized())
+                        {
+                            System.Diagnostics.Debug.WriteLine("No sessions found - creating sample sessions ONCE");
+                            CreateInitialSampleSessions(conn);
+                            MarkSampleSessionsAsInitialized();
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Sessions already exist ({existingCount} total) - skipping sample creation");
+                        }
+                    }
+
                     string query = @"
                         SELECT 
                             es.Id,
@@ -60,6 +81,7 @@ namespace SpotTheScam.Staff
                             es.CreatedDate,
                             (SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = es.Id AND BookingStatus = 'Confirmed') as RegistrationCount
                         FROM ExpertSessions es
+                        WHERE es.Status = 'Available'
                         ORDER BY es.SessionDate DESC, es.StartTime DESC";
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
@@ -67,8 +89,7 @@ namespace SpotTheScam.Staff
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
-                        System.Diagnostics.Debug.WriteLine($"=== LoadSessions ===");
-                        System.Diagnostics.Debug.WriteLine($"Loaded {dt.Rows.Count} sessions from database");
+                        System.Diagnostics.Debug.WriteLine($"Available sessions loaded: {dt.Rows.Count}");
 
                         if (dt.Rows.Count > 0)
                         {
@@ -92,6 +113,126 @@ namespace SpotTheScam.Staff
             }
         }
 
+        // FIXED: Add session-based tracking to prevent duplicate creation
+        private bool HasSampleSessionsBeenInitialized()
+        {
+            // Check if we've already initialized sample sessions in this application session
+            return Session["SampleSessionsInitialized"] != null &&
+                   Convert.ToBoolean(Session["SampleSessionsInitialized"]);
+        }
+
+        private void MarkSampleSessionsAsInitialized()
+        {
+            Session["SampleSessionsInitialized"] = true;
+        }
+
+        // FIXED: Only create initial samples when specifically called once
+        private void CreateInitialSampleSessions(SqlConnection conn)
+        {
+            try
+            {
+                int staffId = GetCurrentStaffId();
+                System.Diagnostics.Debug.WriteLine("Creating initial sample sessions...");
+
+                // Double-check that sessions don't exist before creating
+                string doubleCheckQuery = "SELECT COUNT(*) FROM ExpertSessions";
+                using (SqlCommand doubleCheckCmd = new SqlCommand(doubleCheckQuery, conn))
+                {
+                    int count = Convert.ToInt32(doubleCheckCmd.ExecuteScalar());
+                    if (count > 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"⚠️ Sessions already exist ({count}), aborting sample creation");
+                        return;
+                    }
+                }
+
+                // Sample Session 1 - Free Banking Security
+                string insertQuery1 = @"
+                    INSERT INTO ExpertSessions (
+                        SessionDate, StartTime, EndTime, SessionType, SessionTitle, SessionDescription, 
+                        ExpertName, ExpertTitle, MaxParticipants, CurrentParticipants, PointsCost, 
+                        Status, SessionTopic, CreatedBy, CreatedDate
+                    ) VALUES (
+                        @SessionDate, @StartTime, @EndTime, @SessionType, @SessionTitle, @SessionDescription,
+                        @ExpertName, @ExpertTitle, @MaxParticipants, @CurrentParticipants, @PointsCost,
+                        @Status, @SessionTopic, @CreatedBy, @CreatedDate
+                    )";
+
+                using (SqlCommand cmd = new SqlCommand(insertQuery1, conn))
+                {
+                    cmd.Parameters.AddWithValue("@SessionDate", DateTime.Today.AddDays(7));
+                    cmd.Parameters.AddWithValue("@StartTime", TimeSpan.Parse("14:00:00"));
+                    cmd.Parameters.AddWithValue("@EndTime", TimeSpan.Parse("15:00:00"));
+                    cmd.Parameters.AddWithValue("@SessionType", "Free");
+                    cmd.Parameters.AddWithValue("@SessionTitle", "Protecting Your Online Banking");
+                    cmd.Parameters.AddWithValue("@SessionDescription", "Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.");
+                    cmd.Parameters.AddWithValue("@ExpertName", "Dr Harvey Blue");
+                    cmd.Parameters.AddWithValue("@ExpertTitle", "Cybersecurity Specialist, 15+ years experience");
+                    cmd.Parameters.AddWithValue("@MaxParticipants", 100);
+                    cmd.Parameters.AddWithValue("@CurrentParticipants", 0);
+                    cmd.Parameters.AddWithValue("@PointsCost", 0);
+                    cmd.Parameters.AddWithValue("@Status", "Available");
+                    cmd.Parameters.AddWithValue("@SessionTopic", "Banking");
+                    cmd.Parameters.AddWithValue("@CreatedBy", staffId);
+                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
+                    cmd.ExecuteNonQuery();
+                    System.Diagnostics.Debug.WriteLine("✅ Created Session 1: Banking Security");
+                }
+
+                // Sample Session 2 - Premium Phone Scams
+                using (SqlCommand cmd = new SqlCommand(insertQuery1, conn))
+                {
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@SessionDate", DateTime.Today.AddDays(9));
+                    cmd.Parameters.AddWithValue("@StartTime", TimeSpan.Parse("10:00:00"));
+                    cmd.Parameters.AddWithValue("@EndTime", TimeSpan.Parse("11:30:00"));
+                    cmd.Parameters.AddWithValue("@SessionType", "Premium");
+                    cmd.Parameters.AddWithValue("@SessionTitle", "Small Group: Latest Phone Scam Tactics");
+                    cmd.Parameters.AddWithValue("@SessionDescription", "Intimate session with max 10 participants. Deep dive into current phone scam methods with personalized Q&A time.");
+                    cmd.Parameters.AddWithValue("@ExpertName", "Officer James Wilson");
+                    cmd.Parameters.AddWithValue("@ExpertTitle", "Fraud Investigation Specialist, 10+ years");
+                    cmd.Parameters.AddWithValue("@MaxParticipants", 10);
+                    cmd.Parameters.AddWithValue("@CurrentParticipants", 0);
+                    cmd.Parameters.AddWithValue("@PointsCost", 50);
+                    cmd.Parameters.AddWithValue("@Status", "Available");
+                    cmd.Parameters.AddWithValue("@SessionTopic", "Phone");
+                    cmd.Parameters.AddWithValue("@CreatedBy", staffId);
+                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
+                    cmd.ExecuteNonQuery();
+                    System.Diagnostics.Debug.WriteLine("✅ Created Session 2: Phone Scams");
+                }
+
+                // Sample Session 3 - VIP Consultation
+                using (SqlCommand cmd = new SqlCommand(insertQuery1, conn))
+                {
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@SessionDate", DateTime.Today.AddDays(12));
+                    cmd.Parameters.AddWithValue("@StartTime", TimeSpan.Parse("15:00:00"));
+                    cmd.Parameters.AddWithValue("@EndTime", TimeSpan.Parse("16:00:00"));
+                    cmd.Parameters.AddWithValue("@SessionType", "Premium");
+                    cmd.Parameters.AddWithValue("@SessionTitle", "VIP One-on-One Safety Consultation");
+                    cmd.Parameters.AddWithValue("@SessionDescription", "Private consultation to review your personal digital security, analyze any suspicious communications, and create a personalized safety plan.");
+                    cmd.Parameters.AddWithValue("@ExpertName", "Maria Rodriguez");
+                    cmd.Parameters.AddWithValue("@ExpertTitle", "Digital Safety Educator, Senior Specialist");
+                    cmd.Parameters.AddWithValue("@MaxParticipants", 1);
+                    cmd.Parameters.AddWithValue("@CurrentParticipants", 0);
+                    cmd.Parameters.AddWithValue("@PointsCost", 100);
+                    cmd.Parameters.AddWithValue("@Status", "Available");
+                    cmd.Parameters.AddWithValue("@SessionTopic", "Social");
+                    cmd.Parameters.AddWithValue("@CreatedBy", staffId);
+                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
+                    cmd.ExecuteNonQuery();
+                    System.Diagnostics.Debug.WriteLine("✅ Created Session 3: VIP Consultation");
+                }
+
+                System.Diagnostics.Debug.WriteLine("✅ Created 3 initial sample sessions successfully");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error creating initial sample sessions: {ex.Message}");
+            }
+        }
+
         protected void rptSessions_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             try
@@ -102,7 +243,6 @@ namespace SpotTheScam.Staff
                 System.Diagnostics.Debug.WriteLine($"=== ItemCommand Event Triggered ===");
                 System.Diagnostics.Debug.WriteLine($"Command Name: {commandName}");
                 System.Diagnostics.Debug.WriteLine($"Command Argument: {commandArg}");
-                System.Diagnostics.Debug.WriteLine($"Source Type: {source.GetType().Name}");
 
                 if (string.IsNullOrEmpty(commandArg))
                 {
@@ -602,7 +742,7 @@ namespace SpotTheScam.Staff
                     string query = "SELECT Id FROM Staff WHERE Username = @Username";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@Username", Session["StaffName"]);
+                        cmd.Parameters.AddWithValue("@Username", Session["StaffName"] ?? Session["StaffUsername"] ?? Session["Username"]);
                         object result = cmd.ExecuteScalar();
                         if (result != null)
                         {

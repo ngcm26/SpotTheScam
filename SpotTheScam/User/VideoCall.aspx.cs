@@ -56,7 +56,7 @@ namespace SpotTheScam.User
                         SELECT TOP 1 CustomerPhone 
                         FROM VideoCallBookings 
                         WHERE UserId = @UserId 
-                        AND BookingStatus = 'Confirmed'
+                        AND BookingStatus IN ('Confirmed', 'Expert Ready')
                         ORDER BY BookingDate DESC";
 
                     using (SqlCommand cmd = new SqlCommand(phoneQuery, conn))
@@ -148,7 +148,7 @@ namespace SpotTheScam.User
                         FROM VideoCallBookings vcb
                         INNER JOIN ExpertSessions es ON vcb.SessionId = es.Id
                         WHERE ({phoneConditions})
-                        AND vcb.BookingStatus = 'Confirmed'
+                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
                         AND es.Status = 'Available'
                         ORDER BY 
                             CASE 
@@ -198,6 +198,9 @@ namespace SpotTheScam.User
 
                                 if (canJoin)
                                 {
+                                    // FIXED: Update participant status to 'Connected' when they join
+                                    UpdateParticipantStatus(conn, reader["SessionId"].ToString(), phoneNumber, "Connected");
+
                                     result = new
                                     {
                                         success = true,
@@ -261,6 +264,82 @@ namespace SpotTheScam.User
 
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             return serializer.Serialize(result);
+        }
+
+        // FIXED: New method to update participant status
+        private static void UpdateParticipantStatus(SqlConnection conn, string sessionId, string phoneNumber, string status)
+        {
+            try
+            {
+                var phoneVariations = GetPhoneVariations(phoneNumber);
+                string phoneConditions = "";
+
+                for (int i = 0; i < phoneVariations.Count; i++)
+                {
+                    if (i > 0) phoneConditions += " OR ";
+                    phoneConditions += $"CustomerPhone = @Phone{i}";
+                }
+
+                string updateQuery = $@"
+                    UPDATE VideoCallBookings 
+                    SET BookingStatus = @Status 
+                    WHERE SessionId = @SessionId 
+                    AND ({phoneConditions})";
+
+                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Status", status);
+                    cmd.Parameters.AddWithValue("@SessionId", sessionId);
+
+                    for (int i = 0; i < phoneVariations.Count; i++)
+                    {
+                        cmd.Parameters.AddWithValue($"@Phone{i}", phoneVariations[i]);
+                    }
+
+                    int rowsUpdated = cmd.ExecuteNonQuery();
+                    System.Diagnostics.Debug.WriteLine($"✅ Updated {rowsUpdated} participant records to status: {status}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error updating participant status: {ex.Message}");
+            }
+        }
+
+        // NEW: Method to notify staff when participant joins
+        [WebMethod]
+        public static string NotifyStaffParticipantJoined(string sessionId, string phoneNumber, string participantName)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
+                {
+                    conn.Open();
+
+                    // Update participant status to 'Connected'
+                    UpdateParticipantStatus(conn, sessionId, phoneNumber, "Connected");
+
+                    var result = new
+                    {
+                        success = true,
+                        message = "Staff notified of participant connection"
+                    };
+
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    return serializer.Serialize(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                var result = new
+                {
+                    success = false,
+                    message = ex.Message
+                };
+
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
         }
 
         // Generate all possible phone number variations
@@ -340,18 +419,9 @@ namespace SpotTheScam.User
                         conn.Open();
 
                         // Update session status when customer leaves
-                        string updateQuery = @"
-                            UPDATE VideoCallBookings 
-                            SET BookingStatus = 'Customer Disconnected'
-                            WHERE CustomerPhone = @CustomerPhone 
-                            AND BookingStatus = 'Confirmed'";
+                        UpdateParticipantStatus(conn, hdnSessionId.Value, hdnCustomerPhone.Value, "Customer Disconnected");
 
-                        using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@CustomerPhone", hdnCustomerPhone.Value);
-                            int rowsUpdated = cmd.ExecuteNonQuery();
-                            System.Diagnostics.Debug.WriteLine($"Customer session ended for phone: {hdnCustomerPhone.Value}, rows updated: {rowsUpdated}");
-                        }
+                        System.Diagnostics.Debug.WriteLine($"Customer session ended for phone: {hdnCustomerPhone.Value}");
                     }
                 }
                 catch (Exception ex)
