@@ -290,31 +290,92 @@ namespace SpotTheScam.User
         // Helper method to insert a single transaction
         private static void InsertMockTransaction(SqlConnection conn, SqlTransaction transaction, int accountId, int userId, DateTime date, TimeSpan time, string description, string type, decimal amount, decimal balanceAfter, string senderRecipient)
         {
-            // Flagging logic
             bool isFlagged = false;
             string severity = null;
+            string flagReason = "";
 
-            // Rule 1: Large amount
+            // 1. Load user restrictions (if any)
+            int? allowedStartHour = null;
+            int? allowedEndHour = null;
+            decimal? maxDailyTransfer = null;
+
+            string restrictionQuery = @"
+        SELECT AllowedStartHour, AllowedEndHour, MaxDailyTransfer
+        FROM FamilyGroupMemberRestrictions
+        WHERE UserId = @UserId";
+
+            using (SqlCommand restrictionCmd = new SqlCommand(restrictionQuery, conn, transaction))
+            {
+                restrictionCmd.Parameters.AddWithValue("@UserId", userId);
+                using (SqlDataReader reader = restrictionCmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        if (!reader.IsDBNull(0)) allowedStartHour = reader.GetInt32(0);
+                        if (!reader.IsDBNull(1)) allowedEndHour = reader.GetInt32(1);
+                        if (!reader.IsDBNull(2)) maxDailyTransfer = reader.GetDecimal(2);
+                    }
+                }
+            }
+
+            // 2. Apply restriction checks
+            if (allowedStartHour.HasValue && allowedEndHour.HasValue)
+            {
+                if (time < TimeSpan.FromHours(allowedStartHour.Value) || time > TimeSpan.FromHours(allowedEndHour.Value))
+                {
+                    isFlagged = true;
+                    severity = "yellow";
+                    flagReason += "Outside allowed transaction time window. ";
+                }
+            }
+
+            if (maxDailyTransfer.HasValue && type == "Debit")
+            {
+                string dailyTotalQuery = @"
+            SELECT ISNULL(SUM(Amount), 0)
+            FROM BankTransactions
+            WHERE UserId = @UserId AND TransactionType = 'Debit' AND CAST(TransactionDate AS DATE) = @TransactionDate";
+
+                using (SqlCommand totalCmd = new SqlCommand(dailyTotalQuery, conn, transaction))
+                {
+                    totalCmd.Parameters.AddWithValue("@UserId", userId);
+                    totalCmd.Parameters.AddWithValue("@TransactionDate", date);
+                    decimal currentTotal = (decimal)totalCmd.ExecuteScalar();
+
+                    if (currentTotal + amount > maxDailyTransfer.Value)
+                    {
+                        isFlagged = true;
+                        severity = "red";
+                        flagReason += $"Daily transfer limit exceeded (Limit: {maxDailyTransfer.Value}). ";
+                    }
+                }
+            }
+
+            // 3. Fallback flagging (if no restriction)
             if (amount > 500)
             {
                 isFlagged = true;
-                severity = "red";
+                if (severity == null)
+                    severity = "red";
+                flagReason += "Large transaction amount. ";
             }
-            // Rule 2: Unknown recipient (simple check for demo)
-            else if (senderRecipient != null && (senderRecipient.ToLower().Contains("unknown") || senderRecipient.ToLower().Contains("suspicious")))
+            if (!string.IsNullOrEmpty(senderRecipient) &&
+                (senderRecipient.ToLower().Contains("unknown") || senderRecipient.ToLower().Contains("suspicious")))
             {
                 isFlagged = true;
-                severity = "yellow";
-            }
-            // Rule 3: Time outside 7am–9pm
-            else if (time < TimeSpan.FromHours(7) || time > TimeSpan.FromHours(21))
-            {
-                isFlagged = true;
-                severity = "yellow";
+                if (severity == null)
+                    severity = "yellow";
+                flagReason += "Suspicious recipient name. ";
             }
 
-            string query = @"INSERT INTO BankTransactions (AccountId, UserId, TransactionDate, TransactionTime, Description, TransactionType, Amount, BalanceAfterTransaction, SenderRecipient, IsFlagged, Severity)
-                     VALUES (@AccountId, @UserId, @TransactionDate, @TransactionTime, @Description, @TransactionType, @Amount, @BalanceAfterTransaction, @SenderRecipient, @IsFlagged, @Severity)";
+
+            // 4. Insert transaction
+            string query = @"
+        INSERT INTO BankTransactions 
+        (AccountId, UserId, TransactionDate, TransactionTime, Description, TransactionType, Amount, BalanceAfterTransaction, SenderRecipient, IsFlagged, Severity, Notes)
+        VALUES 
+        (@AccountId, @UserId, @TransactionDate, @TransactionTime, @Description, @TransactionType, @Amount, @BalanceAfterTransaction, @SenderRecipient, @IsFlagged, @Severity, @Notes)";
+
             using (SqlCommand cmd = new SqlCommand(query, conn, transaction))
             {
                 cmd.Parameters.AddWithValue("@AccountId", accountId);
@@ -328,8 +389,10 @@ namespace SpotTheScam.User
                 cmd.Parameters.AddWithValue("@SenderRecipient", senderRecipient ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@IsFlagged", isFlagged);
                 cmd.Parameters.AddWithValue("@Severity", (object)severity ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Notes", string.IsNullOrWhiteSpace(flagReason) ? (object)DBNull.Value : flagReason.Trim());
                 cmd.ExecuteNonQuery();
             }
         }
+
     }
 }
