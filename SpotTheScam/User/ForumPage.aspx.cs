@@ -32,7 +32,15 @@ namespace SpotTheScam.User
             string title = tb_title.Text;
             string content = tb_content.Text;
             int userId = Convert.ToInt32(Session["UserId"]);
-            string imageFileName = null;
+            string imageFileName = "";
+            if (img_forum.HasFile)
+            {
+                string folderPath = Server.MapPath("~/Uploads/forum_pictures/");
+                imageFileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(img_forum.FileName);
+                string fullPath = folderPath + imageFileName;
+
+                img_forum.SaveAs(fullPath);
+            }
 
 
 
@@ -45,7 +53,7 @@ namespace SpotTheScam.User
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.Parameters.AddWithValue("@Title", title);
                     cmd.Parameters.AddWithValue("@Description", content);
-                    cmd.Parameters.AddWithValue("@ImagePath", (object)imageFileName ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ImagePath", imageFileName);
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -66,9 +74,9 @@ namespace SpotTheScam.User
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 string query = @"
-            SELECT d.DiscussionId, d.Title, d.Description, d.CreatedAt,
+            SELECT d.DiscussionId, d.Title, d.Description, d.CreatedAt, d.ImagePath,
                    u.Username
-            FROM discussions d
+            FROM Discussions d
             JOIN Users u ON d.UserId = u.Id
             ORDER BY d.CreatedAt DESC";
 
