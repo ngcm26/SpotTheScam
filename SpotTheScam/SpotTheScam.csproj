@@ -194,6 +194,7 @@
     <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\AddBankAccounts.aspx" />
+    <Content Include="User\AddManualTransaction.aspx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
@@ -329,6 +330,13 @@
     </Compile>
     <Compile Include="User\AddBankAccounts.aspx.designer.cs">
       <DependentUpon>AddBankAccounts.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\AddManualTransaction.aspx.cs">
+      <DependentUpon>AddManualTransaction.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\AddManualTransaction.aspx.designer.cs">
+      <DependentUpon>AddManualTransaction.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
