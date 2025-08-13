@@ -185,13 +185,16 @@
     <Content Include="Global.asax" />
     <Content Include="Staff\EditUsers.aspx" />
     <Content Include="Staff\IndividualBlogStafff.aspx" />
+    <Content Include="Staff\IndividualForumStaff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
+    <Content Include="Staff\ManageForum.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
     <Content Include="Staff\StaffManageParticipants.aspx" />
     <Content Include="Staff\StaffManageSessions.aspx" />
     <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
     <Content Include="User\AddBankAccounts.aspx" />
+    <Content Include="User\AddManualTransaction.aspx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\FakeOCBCLogin.aspx" />
     <Content Include="User\FakeUOBLogin.aspx" />
@@ -268,12 +271,26 @@
     <Compile Include="Staff\IndividualBlogStafff.aspx.designer.cs">
       <DependentUpon>IndividualBlogStafff.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Staff\IndividualForumStaff.aspx.cs">
+      <DependentUpon>IndividualForumStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\IndividualForumStaff.aspx.designer.cs">
+      <DependentUpon>IndividualForumStaff.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Staff\ManageBlog.aspx.cs">
       <DependentUpon>ManageBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Staff\ManageBlog.aspx.designer.cs">
       <DependentUpon>ManageBlog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\ManageForum.aspx.cs">
+      <DependentUpon>ManageForum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\ManageForum.aspx.designer.cs">
+      <DependentUpon>ManageForum.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffAddModules.aspx.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
@@ -316,6 +333,13 @@
     </Compile>
     <Compile Include="User\AddBankAccounts.aspx.designer.cs">
       <DependentUpon>AddBankAccounts.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\AddManualTransaction.aspx.cs">
+      <DependentUpon>AddManualTransaction.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\AddManualTransaction.aspx.designer.cs">
+      <DependentUpon>AddManualTransaction.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>

@@ -37,23 +37,39 @@ namespace SpotTheScam.Staff
         }
         protected void bind()
         {
+            string filter = ddlFilter.SelectedValue;
             string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 string query = "SELECT * FROM posts";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
 
-                    gv_blog.DataSource = dt;   // 👈 Bind to GridView
-                    gv_blog.DataBind();
+                if (filter == "approved")
+                {
+                    query += " WHERE isApproved = 1";
+                }
+                else if (filter == "unapproved")
+                {
+                    query += " WHERE isApproved = 0";
                 }
 
+                query += " ORDER BY created_at DESC"; // optional sorting
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    gv_blog.DataSource = reader;
+                    gv_blog.DataBind();
+                }
             }
         }
+
+        protected void ddlFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bind();
+        }
+
 
         protected void gv_blog_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
@@ -75,6 +91,32 @@ namespace SpotTheScam.Staff
 
             // Rebind the GridView to show updated data
             bind();
+        }
+        private void ApprovePost(int postId)
+        {
+            string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                string updateQuery = "UPDATE posts SET isApproved = 1 WHERE post_id = @PostId";
+                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@PostId", postId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        protected void gv_blog_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "Approve")
+            {
+                int post_id = Convert.ToInt32(e.CommandArgument);
+
+                ApprovePost(post_id);
+                bind(); // Refresh list
+            }
         }
     }
 }

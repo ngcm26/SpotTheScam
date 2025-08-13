@@ -100,5 +100,10 @@ namespace SpotTheScam.User
         {
 
         }
+
+        protected void btn_back_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("UserBlog.aspx");
+        }
     }
 }

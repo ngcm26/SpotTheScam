@@ -14,7 +14,23 @@ namespace SpotTheScam.Staff
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            int postID = int.Parse(Request.QueryString["postID"].ToString());
+            if (string.IsNullOrEmpty(Request.QueryString["postID"]))
+            {
+                // Show message and redirect if postID is missing
+                Session["ErrorMessage"] = "Invalid blog post. Redirected to home.";
+                Response.Redirect("~/Staff/StaffHome.aspx");  // Change to your actual homepage path
+                return;
+            }
+
+            int postID;
+            // Check if postID is a valid integer
+            if (!int.TryParse(Request.QueryString["postID"], out postID))
+            {
+                Session["ErrorMessage"] = "Invalid blog ID format. Redirected to home.";
+                Response.Redirect("~/Staff/StaffHome.aspx");
+                return;
+            }
+
             string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(cs))
@@ -32,21 +48,25 @@ namespace SpotTheScam.Staff
                         string content = reader["content"].ToString();
                         string coverImage = reader["cover_image"].ToString();
 
-                        // Now you can use title, content, coverImage
                         lbl_title.Text = title;
                         lbl_content.Text = content;
                         img_cover.ImageUrl = "~/Uploads/Blog_Pictures/" + coverImage;
                     }
                     else
                     {
-                        lblMessage.Text = "Post not found.";
+                        Session["ErrorMessage"] = "Blog post not found.";
+                        Response.Redirect("~/Staff/StaffHome.aspx");
                     }
-                    reader.Close();
-                    conn.Close();
-                }
 
+                    reader.Close();
+                }
             }
 
+        }
+
+        protected void btn_back_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ManageBlog.aspx");
         }
     }
 }
