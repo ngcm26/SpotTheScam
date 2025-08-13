@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Collections.Generic;
 
 namespace SpotTheScam.Staff
 {
@@ -15,10 +16,40 @@ namespace SpotTheScam.Staff
         {
             if (!IsPostBack)
             {
-                // Check if staff is logged in - FIXED: Redirect to UserLogin.aspx
+                // Check if staff is logged in
                 if (Session["StaffName"] == null && Session["StaffUsername"] == null && Session["Username"] == null)
                 {
                     Response.Redirect("~/User/UserLogin.aspx");
+                    return;
+                }
+
+                // Check for success/error messages from redirect
+                string action = Request.QueryString["action"];
+                if (!string.IsNullOrEmpty(action))
+                {
+                    switch (action.ToLower())
+                    {
+                        case "created":
+                            ShowAlert("Session created successfully!", "success");
+                            break;
+                        case "updated":
+                            ShowAlert("Session updated successfully!", "success");
+                            break;
+                        case "deleted":
+                            ShowAlert("Session deleted successfully!", "success");
+                            break;
+                        case "cancelled":
+                            ShowAlert("Registrations cancelled successfully!", "success");
+                            break;
+                    }
+                }
+
+                // Check for force delete parameter
+                string forceDeleteParam = Request.QueryString["forceDelete"];
+                if (!string.IsNullOrEmpty(forceDeleteParam) && int.TryParse(forceDeleteParam, out int sessionToDelete))
+                {
+                    ForceDeleteSession(sessionToDelete);
+                    Response.Redirect("StaffManageSessions.aspx?action=deleted");
                     return;
                 }
 
@@ -40,27 +71,7 @@ namespace SpotTheScam.Staff
                 {
                     conn.Open();
 
-                    // FIXED: Check if ANY sessions exist and use a flag to track initialization
-                    string checkQuery = "SELECT COUNT(*) FROM ExpertSessions";
-                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
-                    {
-                        int existingCount = Convert.ToInt32(checkCmd.ExecuteScalar());
-                        System.Diagnostics.Debug.WriteLine($"=== LoadSessions ===");
-                        System.Diagnostics.Debug.WriteLine($"Total sessions count: {existingCount}");
-
-                        // ONLY create sample sessions if there are NO sessions at all AND not already initialized
-                        if (existingCount == 0 && !HasSampleSessionsBeenInitialized())
-                        {
-                            System.Diagnostics.Debug.WriteLine("No sessions found - creating sample sessions ONCE");
-                            CreateInitialSampleSessions(conn);
-                            MarkSampleSessionsAsInitialized();
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Sessions already exist ({existingCount} total) - skipping sample creation");
-                        }
-                    }
-
+                    // Load all available sessions with proper registration count
                     string query = @"
                         SELECT 
                             es.Id,
@@ -79,10 +90,11 @@ namespace SpotTheScam.Staff
                             ISNULL(es.CurrentParticipants, 0) as CurrentParticipants,
                             (es.MaxParticipants - ISNULL(es.CurrentParticipants, 0)) as AvailableSpots,
                             es.CreatedDate,
-                            (SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = es.Id AND BookingStatus = 'Confirmed') as RegistrationCount
+                            (SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = es.Id) + 
+                            ISNULL((SELECT COUNT(*) FROM WebinarRegistrations WHERE SessionId = es.Id AND IsActive = 1), 0) as RegistrationCount
                         FROM ExpertSessions es
                         WHERE es.Status = 'Available'
-                        ORDER BY es.SessionDate DESC, es.StartTime DESC";
+                        ORDER BY es.SessionDate ASC, es.StartTime ASC";
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                     {
@@ -110,126 +122,6 @@ namespace SpotTheScam.Staff
             {
                 ShowAlert("Error loading sessions: " + ex.Message, "error");
                 System.Diagnostics.Debug.WriteLine($"Error loading sessions: {ex.Message}");
-            }
-        }
-
-        // FIXED: Add session-based tracking to prevent duplicate creation
-        private bool HasSampleSessionsBeenInitialized()
-        {
-            // Check if we've already initialized sample sessions in this application session
-            return Session["SampleSessionsInitialized"] != null &&
-                   Convert.ToBoolean(Session["SampleSessionsInitialized"]);
-        }
-
-        private void MarkSampleSessionsAsInitialized()
-        {
-            Session["SampleSessionsInitialized"] = true;
-        }
-
-        // FIXED: Only create initial samples when specifically called once
-        private void CreateInitialSampleSessions(SqlConnection conn)
-        {
-            try
-            {
-                int staffId = GetCurrentStaffId();
-                System.Diagnostics.Debug.WriteLine("Creating initial sample sessions...");
-
-                // Double-check that sessions don't exist before creating
-                string doubleCheckQuery = "SELECT COUNT(*) FROM ExpertSessions";
-                using (SqlCommand doubleCheckCmd = new SqlCommand(doubleCheckQuery, conn))
-                {
-                    int count = Convert.ToInt32(doubleCheckCmd.ExecuteScalar());
-                    if (count > 0)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"⚠️ Sessions already exist ({count}), aborting sample creation");
-                        return;
-                    }
-                }
-
-                // Sample Session 1 - Free Banking Security
-                string insertQuery1 = @"
-                    INSERT INTO ExpertSessions (
-                        SessionDate, StartTime, EndTime, SessionType, SessionTitle, SessionDescription, 
-                        ExpertName, ExpertTitle, MaxParticipants, CurrentParticipants, PointsCost, 
-                        Status, SessionTopic, CreatedBy, CreatedDate
-                    ) VALUES (
-                        @SessionDate, @StartTime, @EndTime, @SessionType, @SessionTitle, @SessionDescription,
-                        @ExpertName, @ExpertTitle, @MaxParticipants, @CurrentParticipants, @PointsCost,
-                        @Status, @SessionTopic, @CreatedBy, @CreatedDate
-                    )";
-
-                using (SqlCommand cmd = new SqlCommand(insertQuery1, conn))
-                {
-                    cmd.Parameters.AddWithValue("@SessionDate", DateTime.Today.AddDays(7));
-                    cmd.Parameters.AddWithValue("@StartTime", TimeSpan.Parse("14:00:00"));
-                    cmd.Parameters.AddWithValue("@EndTime", TimeSpan.Parse("15:00:00"));
-                    cmd.Parameters.AddWithValue("@SessionType", "Free");
-                    cmd.Parameters.AddWithValue("@SessionTitle", "Protecting Your Online Banking");
-                    cmd.Parameters.AddWithValue("@SessionDescription", "Learn essential security practices for online banking, how to spot fraudulent websites, and what to do if your account is compromised.");
-                    cmd.Parameters.AddWithValue("@ExpertName", "Dr Harvey Blue");
-                    cmd.Parameters.AddWithValue("@ExpertTitle", "Cybersecurity Specialist, 15+ years experience");
-                    cmd.Parameters.AddWithValue("@MaxParticipants", 100);
-                    cmd.Parameters.AddWithValue("@CurrentParticipants", 0);
-                    cmd.Parameters.AddWithValue("@PointsCost", 0);
-                    cmd.Parameters.AddWithValue("@Status", "Available");
-                    cmd.Parameters.AddWithValue("@SessionTopic", "Banking");
-                    cmd.Parameters.AddWithValue("@CreatedBy", staffId);
-                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("✅ Created Session 1: Banking Security");
-                }
-
-                // Sample Session 2 - Premium Phone Scams
-                using (SqlCommand cmd = new SqlCommand(insertQuery1, conn))
-                {
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@SessionDate", DateTime.Today.AddDays(9));
-                    cmd.Parameters.AddWithValue("@StartTime", TimeSpan.Parse("10:00:00"));
-                    cmd.Parameters.AddWithValue("@EndTime", TimeSpan.Parse("11:30:00"));
-                    cmd.Parameters.AddWithValue("@SessionType", "Premium");
-                    cmd.Parameters.AddWithValue("@SessionTitle", "Small Group: Latest Phone Scam Tactics");
-                    cmd.Parameters.AddWithValue("@SessionDescription", "Intimate session with max 10 participants. Deep dive into current phone scam methods with personalized Q&A time.");
-                    cmd.Parameters.AddWithValue("@ExpertName", "Officer James Wilson");
-                    cmd.Parameters.AddWithValue("@ExpertTitle", "Fraud Investigation Specialist, 10+ years");
-                    cmd.Parameters.AddWithValue("@MaxParticipants", 10);
-                    cmd.Parameters.AddWithValue("@CurrentParticipants", 0);
-                    cmd.Parameters.AddWithValue("@PointsCost", 50);
-                    cmd.Parameters.AddWithValue("@Status", "Available");
-                    cmd.Parameters.AddWithValue("@SessionTopic", "Phone");
-                    cmd.Parameters.AddWithValue("@CreatedBy", staffId);
-                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("✅ Created Session 2: Phone Scams");
-                }
-
-                // Sample Session 3 - VIP Consultation
-                using (SqlCommand cmd = new SqlCommand(insertQuery1, conn))
-                {
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@SessionDate", DateTime.Today.AddDays(12));
-                    cmd.Parameters.AddWithValue("@StartTime", TimeSpan.Parse("15:00:00"));
-                    cmd.Parameters.AddWithValue("@EndTime", TimeSpan.Parse("16:00:00"));
-                    cmd.Parameters.AddWithValue("@SessionType", "Premium");
-                    cmd.Parameters.AddWithValue("@SessionTitle", "VIP One-on-One Safety Consultation");
-                    cmd.Parameters.AddWithValue("@SessionDescription", "Private consultation to review your personal digital security, analyze any suspicious communications, and create a personalized safety plan.");
-                    cmd.Parameters.AddWithValue("@ExpertName", "Maria Rodriguez");
-                    cmd.Parameters.AddWithValue("@ExpertTitle", "Digital Safety Educator, Senior Specialist");
-                    cmd.Parameters.AddWithValue("@MaxParticipants", 1);
-                    cmd.Parameters.AddWithValue("@CurrentParticipants", 0);
-                    cmd.Parameters.AddWithValue("@PointsCost", 100);
-                    cmd.Parameters.AddWithValue("@Status", "Available");
-                    cmd.Parameters.AddWithValue("@SessionTopic", "Social");
-                    cmd.Parameters.AddWithValue("@CreatedBy", staffId);
-                    cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("✅ Created Session 3: VIP Consultation");
-                }
-
-                System.Diagnostics.Debug.WriteLine("✅ Created 3 initial sample sessions successfully");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ Error creating initial sample sessions: {ex.Message}");
             }
         }
 
@@ -273,10 +165,6 @@ namespace SpotTheScam.Staff
                     case "cancelregistrations":
                         System.Diagnostics.Debug.WriteLine($"Processing CANCEL REGISTRATIONS command for session {sessionId}");
                         CancelAllRegistrations(sessionId);
-                        break;
-                    case "forcedelete":
-                        System.Diagnostics.Debug.WriteLine($"Processing FORCE DELETE command for session {sessionId}");
-                        ForceDeleteSession(sessionId);
                         break;
                     case "manageparticipants":
                         System.Diagnostics.Debug.WriteLine($"Processing MANAGE PARTICIPANTS command for session {sessionId}");
@@ -404,26 +292,68 @@ namespace SpotTheScam.Staff
                 {
                     conn.Open();
 
-                    // Check for existing registrations in VideoCallBookings
-                    string checkRegistrationsQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId AND BookingStatus = 'Confirmed'";
-                    int registrationCount = 0;
-
-                    using (SqlCommand checkRegCmd = new SqlCommand(checkRegistrationsQuery, conn))
+                    // First, verify the session exists
+                    string verifyQuery = "SELECT COUNT(*) FROM ExpertSessions WHERE Id = @SessionId";
+                    using (SqlCommand verifyCmd = new SqlCommand(verifyQuery, conn))
                     {
-                        checkRegCmd.Parameters.AddWithValue("@SessionId", sessionId);
-                        registrationCount = Convert.ToInt32(checkRegCmd.ExecuteScalar());
-                        System.Diagnostics.Debug.WriteLine($"Found {registrationCount} registrations for session {sessionId}");
+                        verifyCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        int sessionExists = Convert.ToInt32(verifyCmd.ExecuteScalar());
+
+                        if (sessionExists == 0)
+                        {
+                            ShowAlert("Session not found or already deleted.", "error");
+                            LoadSessions(); // Refresh the list
+                            return;
+                        }
                     }
 
-                    if (registrationCount > 0)
+                    // Check for existing registrations in VideoCallBookings
+                    string checkVideoBookingsQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId";
+                    int videoBookingCount = 0;
+
+                    using (SqlCommand checkVidCmd = new SqlCommand(checkVideoBookingsQuery, conn))
                     {
-                        // Show detailed message with options
+                        checkVidCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        videoBookingCount = Convert.ToInt32(checkVidCmd.ExecuteScalar());
+                        System.Diagnostics.Debug.WriteLine($"Found {videoBookingCount} video call bookings for session {sessionId}");
+                    }
+
+                    // Check for existing registrations in WebinarRegistrations
+                    int webinarRegistrationCount = 0;
+                    try
+                    {
+                        string checkWebinarQuery = "SELECT COUNT(*) FROM WebinarRegistrations WHERE SessionId = @SessionId AND IsActive = 1";
+                        using (SqlCommand checkWebCmd = new SqlCommand(checkWebinarQuery, conn))
+                        {
+                            checkWebCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                            webinarRegistrationCount = Convert.ToInt32(checkWebCmd.ExecuteScalar());
+                            System.Diagnostics.Debug.WriteLine($"Found {webinarRegistrationCount} webinar registrations for session {sessionId}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // WebinarRegistrations table might not exist - that's okay
+                        System.Diagnostics.Debug.WriteLine($"WebinarRegistrations table check failed (table might not exist): {ex.Message}");
+                    }
+
+                    int totalRegistrations = videoBookingCount + webinarRegistrationCount;
+
+                    if (totalRegistrations > 0)
+                    {
+                        // Show detailed confirmation message with options
                         string alertScript = $@"
-                            if (confirm('This session has {registrationCount} active registration(s).\n\nChoose an option:\n• Click OK to cancel all registrations and delete the session\n• Click Cancel to keep the session and registrations')) {{
-                                __doPostBack('{Page.ClientID}', 'forcedelete:{sessionId}');
+                            if (confirm('⚠️ This session has {totalRegistrations} active registration(s).\n\n' +
+                                      'Video Call Bookings: {videoBookingCount}\n' +
+                                      'Webinar Registrations: {webinarRegistrationCount}\n\n' +
+                                      'If you delete this session:\n' +
+                                      '• All participant registrations will be cancelled\n' +
+                                      '• Participants will be notified\n' +
+                                      '• Points will be refunded if applicable\n\n' +
+                                      'Are you sure you want to proceed?')) {{
+                                window.location.href = 'StaffManageSessions.aspx?forceDelete={sessionId}';
                             }}
                         ";
-                        ClientScript.RegisterStartupScript(this.GetType(), "ConfirmForceDelete", alertScript, true);
+                        ClientScript.RegisterStartupScript(this.GetType(), "ConfirmCascadeDelete", alertScript, true);
                         return;
                     }
 
@@ -436,13 +366,15 @@ namespace SpotTheScam.Staff
 
                         if (rowsAffected > 0)
                         {
-                            ShowAlert("Session deleted successfully!", "success");
-                            LoadSessions();
                             System.Diagnostics.Debug.WriteLine($"Session {sessionId} deleted successfully");
+                            // Use redirect to prevent refresh duplication
+                            Response.Redirect("StaffManageSessions.aspx?action=deleted", false);
+                            Context.ApplicationInstance.CompleteRequest();
                         }
                         else
                         {
-                            ShowAlert("Failed to delete session", "error");
+                            ShowAlert("Failed to delete session. It may have already been deleted.", "error");
+                            LoadSessions(); // Refresh to show current state
                         }
                     }
                 }
@@ -463,47 +395,169 @@ namespace SpotTheScam.Staff
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-
-                    // Get count of registrations first for reporting
-                    string countQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId AND BookingStatus = 'Confirmed'";
-                    int registrationCount = 0;
-
-                    using (SqlCommand countCmd = new SqlCommand(countQuery, conn))
+                    using (SqlTransaction transaction = conn.BeginTransaction())
                     {
-                        countCmd.Parameters.AddWithValue("@SessionId", sessionId);
-                        registrationCount = Convert.ToInt32(countCmd.ExecuteScalar());
-                    }
-
-                    if (registrationCount == 0)
-                    {
-                        ShowAlert("No registrations found for this session.", "error");
-                        return;
-                    }
-
-                    // Delete all registrations for this session
-                    string deleteRegsQuery = "DELETE FROM VideoCallBookings WHERE SessionId = @SessionId";
-                    using (SqlCommand cmd = new SqlCommand(deleteRegsQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                        int deletedCount = cmd.ExecuteNonQuery();
-
-                        if (deletedCount > 0)
+                        try
                         {
+                            int totalCancelledRegistrations = 0;
+                            int totalPointsRefunded = 0;
+
+                            // Cancel VideoCallBookings
+                            string getVideoBookingsQuery = @"
+                                SELECT UserId, ISNULL(PointsUsed, 0) as PointsUsed, CustomerName
+                                FROM VideoCallBookings 
+                                WHERE SessionId = @SessionId";
+
+                            var videoBookings = new List<(int UserId, int PointsUsed, string CustomerName)>();
+
+                            using (SqlCommand getCmd = new SqlCommand(getVideoBookingsQuery, conn, transaction))
+                            {
+                                getCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                using (SqlDataReader reader = getCmd.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        videoBookings.Add((
+                                            Convert.ToInt32(reader["UserId"]),
+                                            Convert.ToInt32(reader["PointsUsed"]),
+                                            reader["CustomerName"].ToString()
+                                        ));
+                                    }
+                                }
+                            }
+
+                            // Delete VideoCallBookings and refund points
+                            if (videoBookings.Count > 0)
+                            {
+                                string deleteVideoBookingsQuery = "DELETE FROM VideoCallBookings WHERE SessionId = @SessionId";
+                                using (SqlCommand deleteVideoCmd = new SqlCommand(deleteVideoBookingsQuery, conn, transaction))
+                                {
+                                    deleteVideoCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    int deletedVideoBookings = deleteVideoCmd.ExecuteNonQuery();
+                                    totalCancelledRegistrations += deletedVideoBookings;
+                                    System.Diagnostics.Debug.WriteLine($"Deleted {deletedVideoBookings} video call bookings");
+                                }
+
+                                // Refund points for video bookings
+                                foreach (var booking in videoBookings)
+                                {
+                                    if (booking.PointsUsed > 0)
+                                    {
+                                        string refundQuery = @"
+                                            INSERT INTO PointsTransactions (UserId, TransactionType, Points, Description, TransactionDate)
+                                            VALUES (@UserId, 'Refund', @Points, @Description, @TransactionDate)";
+
+                                        using (SqlCommand refundCmd = new SqlCommand(refundQuery, conn, transaction))
+                                        {
+                                            refundCmd.Parameters.AddWithValue("@UserId", booking.UserId);
+                                            refundCmd.Parameters.AddWithValue("@Points", booking.PointsUsed);
+                                            refundCmd.Parameters.AddWithValue("@Description", $"Session {sessionId} cancelled - Refund for {booking.CustomerName}");
+                                            refundCmd.Parameters.AddWithValue("@TransactionDate", DateTime.Now);
+                                            refundCmd.ExecuteNonQuery();
+
+                                            totalPointsRefunded += booking.PointsUsed;
+                                            System.Diagnostics.Debug.WriteLine($"Refunded {booking.PointsUsed} points to user {booking.UserId}");
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Cancel WebinarRegistrations (if table exists)
+                            try
+                            {
+                                string getWebinarQuery = @"
+                                    SELECT UserId, ISNULL(PointsUsed, 0) as PointsUsed, FirstName, LastName
+                                    FROM WebinarRegistrations 
+                                    WHERE SessionId = @SessionId AND IsActive = 1";
+
+                                var webinarRegistrations = new List<(int UserId, int PointsUsed, string Name)>();
+
+                                using (SqlCommand getWebCmd = new SqlCommand(getWebinarQuery, conn, transaction))
+                                {
+                                    getWebCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    using (SqlDataReader reader = getWebCmd.ExecuteReader())
+                                    {
+                                        while (reader.Read())
+                                        {
+                                            string fullName = $"{reader["FirstName"]} {reader["LastName"]}".Trim();
+                                            webinarRegistrations.Add((
+                                                Convert.ToInt32(reader["UserId"]),
+                                                Convert.ToInt32(reader["PointsUsed"]),
+                                                fullName
+                                            ));
+                                        }
+                                    }
+                                }
+
+                                // Deactivate webinar registrations instead of deleting
+                                if (webinarRegistrations.Count > 0)
+                                {
+                                    string deactivateWebinarQuery = "UPDATE WebinarRegistrations SET IsActive = 0 WHERE SessionId = @SessionId AND IsActive = 1";
+                                    using (SqlCommand deactivateWebCmd = new SqlCommand(deactivateWebinarQuery, conn, transaction))
+                                    {
+                                        deactivateWebCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                        int deactivatedWebinarRegs = deactivateWebCmd.ExecuteNonQuery();
+                                        totalCancelledRegistrations += deactivatedWebinarRegs;
+                                        System.Diagnostics.Debug.WriteLine($"Deactivated {deactivatedWebinarRegs} webinar registrations");
+                                    }
+
+                                    // Refund points for webinar registrations
+                                    foreach (var registration in webinarRegistrations)
+                                    {
+                                        if (registration.PointsUsed > 0)
+                                        {
+                                            string refundQuery = @"
+                                                INSERT INTO PointsTransactions (UserId, TransactionType, Points, Description, TransactionDate)
+                                                VALUES (@UserId, 'Refund', @Points, @Description, @TransactionDate)";
+
+                                            using (SqlCommand refundCmd = new SqlCommand(refundQuery, conn, transaction))
+                                            {
+                                                refundCmd.Parameters.AddWithValue("@UserId", registration.UserId);
+                                                refundCmd.Parameters.AddWithValue("@Points", registration.PointsUsed);
+                                                refundCmd.Parameters.AddWithValue("@Description", $"Session {sessionId} cancelled - Refund for {registration.Name}");
+                                                refundCmd.Parameters.AddWithValue("@TransactionDate", DateTime.Now);
+                                                refundCmd.ExecuteNonQuery();
+
+                                                totalPointsRefunded += registration.PointsUsed;
+                                                System.Diagnostics.Debug.WriteLine($"Refunded {registration.PointsUsed} points to user {registration.UserId}");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception webEx)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"WebinarRegistrations handling failed (table might not exist): {webEx.Message}");
+                                // Continue - this is not critical if the table doesn't exist
+                            }
+
                             // Reset current participants count to 0
                             string updateSessionQuery = "UPDATE ExpertSessions SET CurrentParticipants = 0 WHERE Id = @SessionId";
-                            using (SqlCommand updateCmd = new SqlCommand(updateSessionQuery, conn))
+                            using (SqlCommand updateCmd = new SqlCommand(updateSessionQuery, conn, transaction))
                             {
                                 updateCmd.Parameters.AddWithValue("@SessionId", sessionId);
                                 updateCmd.ExecuteNonQuery();
                             }
 
-                            ShowAlert($"Successfully canceled {deletedCount} registration(s). The session is now available for new registrations.", "success");
-                            LoadSessions();
-                            System.Diagnostics.Debug.WriteLine($"Canceled {deletedCount} registrations for session {sessionId}");
+                            transaction.Commit();
+
+                            string successMessage = $"Successfully canceled {totalCancelledRegistrations} registration(s).";
+                            if (totalPointsRefunded > 0)
+                            {
+                                successMessage += $" Refunded {totalPointsRefunded} total points.";
+                            }
+                            successMessage += " The session is now available for new registrations.";
+
+                            System.Diagnostics.Debug.WriteLine($"Canceled {totalCancelledRegistrations} registrations for session {sessionId}");
+
+                            // Use redirect to prevent refresh duplication
+                            Response.Redirect("StaffManageSessions.aspx?action=cancelled", false);
+                            Context.ApplicationInstance.CompleteRequest();
                         }
-                        else
+                        catch (Exception)
                         {
-                            ShowAlert("Failed to cancel registrations.", "error");
+                            transaction.Rollback();
+                            throw;
                         }
                     }
                 }
@@ -528,25 +582,139 @@ namespace SpotTheScam.Staff
                     {
                         try
                         {
-                            // Get count for reporting
-                            string countQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId AND BookingStatus = 'Confirmed'";
-                            int registrationCount = 0;
+                            int totalCancelledRegistrations = 0;
+                            int totalPointsRefunded = 0;
 
-                            using (SqlCommand countCmd = new SqlCommand(countQuery, conn, transaction))
+                            // Step 1: Handle VideoCallBookings registrations
+                            string getVideoBookingsQuery = @"
+                                SELECT UserId, ISNULL(PointsUsed, 0) as PointsUsed, CustomerName
+                                FROM VideoCallBookings 
+                                WHERE SessionId = @SessionId";
+
+                            var videoBookings = new List<(int UserId, int PointsUsed, string CustomerName)>();
+
+                            using (SqlCommand getCmd = new SqlCommand(getVideoBookingsQuery, conn, transaction))
                             {
-                                countCmd.Parameters.AddWithValue("@SessionId", sessionId);
-                                registrationCount = Convert.ToInt32(countCmd.ExecuteScalar());
+                                getCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                using (SqlDataReader reader = getCmd.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        videoBookings.Add((
+                                            Convert.ToInt32(reader["UserId"]),
+                                            Convert.ToInt32(reader["PointsUsed"]),
+                                            reader["CustomerName"].ToString()
+                                        ));
+                                    }
+                                }
                             }
 
-                            // Delete registrations first (child table)
-                            string deleteRegsQuery = "DELETE FROM VideoCallBookings WHERE SessionId = @SessionId";
-                            using (SqlCommand deleteRegsCmd = new SqlCommand(deleteRegsQuery, conn, transaction))
+                            // Delete VideoCallBookings and refund points
+                            if (videoBookings.Count > 0)
                             {
-                                deleteRegsCmd.Parameters.AddWithValue("@SessionId", sessionId);
-                                deleteRegsCmd.ExecuteNonQuery();
+                                string deleteVideoBookingsQuery = "DELETE FROM VideoCallBookings WHERE SessionId = @SessionId";
+                                using (SqlCommand deleteVideoCmd = new SqlCommand(deleteVideoBookingsQuery, conn, transaction))
+                                {
+                                    deleteVideoCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    int deletedVideoBookings = deleteVideoCmd.ExecuteNonQuery();
+                                    totalCancelledRegistrations += deletedVideoBookings;
+                                    System.Diagnostics.Debug.WriteLine($"Deleted {deletedVideoBookings} video call bookings");
+                                }
+
+                                // Refund points for video bookings
+                                foreach (var booking in videoBookings)
+                                {
+                                    if (booking.PointsUsed > 0)
+                                    {
+                                        string refundQuery = @"
+                                            INSERT INTO PointsTransactions (UserId, TransactionType, Points, Description, TransactionDate)
+                                            VALUES (@UserId, 'Refund', @Points, @Description, @TransactionDate)";
+
+                                        using (SqlCommand refundCmd = new SqlCommand(refundQuery, conn, transaction))
+                                        {
+                                            refundCmd.Parameters.AddWithValue("@UserId", booking.UserId);
+                                            refundCmd.Parameters.AddWithValue("@Points", booking.PointsUsed);
+                                            refundCmd.Parameters.AddWithValue("@Description", $"Session {sessionId} cancelled - Refund for {booking.CustomerName}");
+                                            refundCmd.Parameters.AddWithValue("@TransactionDate", DateTime.Now);
+                                            refundCmd.ExecuteNonQuery();
+
+                                            totalPointsRefunded += booking.PointsUsed;
+                                            System.Diagnostics.Debug.WriteLine($"Refunded {booking.PointsUsed} points to user {booking.UserId}");
+                                        }
+                                    }
+                                }
                             }
 
-                            // Then delete the session (parent table)
+                            // Step 2: Handle WebinarRegistrations (if table exists)
+                            try
+                            {
+                                string getWebinarQuery = @"
+                                    SELECT UserId, ISNULL(PointsUsed, 0) as PointsUsed, FirstName, LastName
+                                    FROM WebinarRegistrations 
+                                    WHERE SessionId = @SessionId AND IsActive = 1";
+
+                                var webinarRegistrations = new List<(int UserId, int PointsUsed, string Name)>();
+
+                                using (SqlCommand getWebCmd = new SqlCommand(getWebinarQuery, conn, transaction))
+                                {
+                                    getWebCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    using (SqlDataReader reader = getWebCmd.ExecuteReader())
+                                    {
+                                        while (reader.Read())
+                                        {
+                                            string fullName = $"{reader["FirstName"]} {reader["LastName"]}".Trim();
+                                            webinarRegistrations.Add((
+                                                Convert.ToInt32(reader["UserId"]),
+                                                Convert.ToInt32(reader["PointsUsed"]),
+                                                fullName
+                                            ));
+                                        }
+                                    }
+                                }
+
+                                // Delete webinar registrations and refund points
+                                if (webinarRegistrations.Count > 0)
+                                {
+                                    string deleteWebinarQuery = "DELETE FROM WebinarRegistrations WHERE SessionId = @SessionId";
+                                    using (SqlCommand deleteWebCmd = new SqlCommand(deleteWebinarQuery, conn, transaction))
+                                    {
+                                        deleteWebCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                        int deletedWebinarRegs = deleteWebCmd.ExecuteNonQuery();
+                                        totalCancelledRegistrations += deletedWebinarRegs;
+                                        System.Diagnostics.Debug.WriteLine($"Deleted {deletedWebinarRegs} webinar registrations");
+                                    }
+
+                                    // Refund points for webinar registrations
+                                    foreach (var registration in webinarRegistrations)
+                                    {
+                                        if (registration.PointsUsed > 0)
+                                        {
+                                            string refundQuery = @"
+                                                INSERT INTO PointsTransactions (UserId, TransactionType, Points, Description, TransactionDate)
+                                                VALUES (@UserId, 'Refund', @Points, @Description, @TransactionDate)";
+
+                                            using (SqlCommand refundCmd = new SqlCommand(refundQuery, conn, transaction))
+                                            {
+                                                refundCmd.Parameters.AddWithValue("@UserId", registration.UserId);
+                                                refundCmd.Parameters.AddWithValue("@Points", registration.PointsUsed);
+                                                refundCmd.Parameters.AddWithValue("@Description", $"Session {sessionId} cancelled - Refund for {registration.Name}");
+                                                refundCmd.Parameters.AddWithValue("@TransactionDate", DateTime.Now);
+                                                refundCmd.ExecuteNonQuery();
+
+                                                totalPointsRefunded += registration.PointsUsed;
+                                                System.Diagnostics.Debug.WriteLine($"Refunded {registration.PointsUsed} points to user {registration.UserId}");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception webEx)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"WebinarRegistrations handling failed (table might not exist): {webEx.Message}");
+                                // Continue - this is not critical if the table doesn't exist
+                            }
+
+                            // Step 3: Finally delete the session
                             string deleteSessionQuery = "DELETE FROM ExpertSessions WHERE Id = @SessionId";
                             using (SqlCommand deleteSessionCmd = new SqlCommand(deleteSessionQuery, conn, transaction))
                             {
@@ -556,14 +724,17 @@ namespace SpotTheScam.Staff
                                 if (sessionDeleted > 0)
                                 {
                                     transaction.Commit();
-                                    ShowAlert($"Session deleted successfully! Also canceled {registrationCount} registration(s).", "success");
-                                    LoadSessions();
-                                    System.Diagnostics.Debug.WriteLine($"Force deleted session {sessionId} with {registrationCount} registrations");
+
+                                    System.Diagnostics.Debug.WriteLine($"✅ Force deleted session {sessionId} with {totalCancelledRegistrations} registrations and {totalPointsRefunded} points refunded");
+
+                                    // Don't redirect here as this is called from Page_Load redirect
+                                    // The redirect will happen in Page_Load after this method completes
                                 }
                                 else
                                 {
                                     transaction.Rollback();
-                                    ShowAlert("Failed to delete session.", "error");
+                                    ShowAlert("Failed to delete session. It may have already been deleted.", "error");
+                                    LoadSessions(); // Refresh to show current state
                                 }
                             }
                         }
@@ -662,11 +833,12 @@ namespace SpotTheScam.Staff
 
                         if (rowsAffected > 0)
                         {
-                            string successMessage = isEdit ? "Session updated successfully!" : "Session created successfully!";
-                            ShowAlert(successMessage, "success");
-                            ClearForm();
-                            LoadSessions();
+                            string successMessage = isEdit ? "updated" : "created";
                             System.Diagnostics.Debug.WriteLine($"Session save successful: {successMessage}");
+
+                            // Use POST-Redirect-GET pattern to prevent duplicate submissions
+                            Response.Redirect($"StaffManageSessions.aspx?action={successMessage}", false);
+                            Context.ApplicationInstance.CompleteRequest();
                         }
                         else
                         {
@@ -681,23 +853,6 @@ namespace SpotTheScam.Staff
                 ShowAlert("Error saving session: " + ex.Message, "error");
                 System.Diagnostics.Debug.WriteLine($"Error saving session: {ex.Message}");
             }
-        }
-
-        protected override void RaisePostBackEvent(IPostBackEventHandler sourceControl, string eventArgument)
-        {
-            // Handle the custom postback for force delete
-            if (!string.IsNullOrEmpty(eventArgument) && eventArgument.StartsWith("forcedelete:"))
-            {
-                string sessionIdStr = eventArgument.Substring("forcedelete:".Length);
-                if (int.TryParse(sessionIdStr, out int sessionId))
-                {
-                    System.Diagnostics.Debug.WriteLine($"Processing force delete via RaisePostBackEvent for session {sessionId}");
-                    ForceDeleteSession(sessionId);
-                    return;
-                }
-            }
-
-            base.RaisePostBackEvent(sourceControl, eventArgument);
         }
 
         private void ClearForm()
@@ -729,33 +884,43 @@ namespace SpotTheScam.Staff
 
         private int GetCurrentStaffId()
         {
-            if (Session["StaffID"] != null)
+            if (Session["StaffID"] == null)
             {
-                return Convert.ToInt32(Session["StaffID"]);
-            }
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                try
                 {
-                    conn.Open();
-                    string query = "SELECT Id FROM Staff WHERE Username = @Username";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlConnection conn = new SqlConnection(connectionString))
                     {
-                        cmd.Parameters.AddWithValue("@Username", Session["StaffName"] ?? Session["StaffUsername"] ?? Session["Username"]);
-                        object result = cmd.ExecuteScalar();
-                        if (result != null)
+                        conn.Open();
+
+                        string username = Session["StaffName"]?.ToString() ??
+                                        Session["StaffUsername"]?.ToString() ??
+                                        Session["Username"]?.ToString();
+
+                        if (!string.IsNullOrEmpty(username))
                         {
-                            int staffId = Convert.ToInt32(result);
-                            Session["StaffID"] = staffId;
-                            return staffId;
+                            string query = "SELECT Id FROM Staff WHERE Username = @Username OR Email = @Username";
+                            using (SqlCommand cmd = new SqlCommand(query, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@Username", username);
+                                object result = cmd.ExecuteScalar();
+                                if (result != null)
+                                {
+                                    int staffId = Convert.ToInt32(result);
+                                    Session["StaffID"] = staffId;
+                                    return staffId;
+                                }
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error getting staff ID: {ex.Message}");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                System.Diagnostics.Debug.WriteLine($"Error getting staff ID: {ex.Message}");
+                return Convert.ToInt32(Session["StaffID"]);
             }
 
             return 1; // Default fallback

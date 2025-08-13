@@ -410,6 +410,311 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* ADD THESE STYLES TO YOUR EXISTING <style> SECTION IN StaffVideoCall.aspx */
+
+        /* MULTI-PARTICIPANT VIDEO CALL STYLES */
+        .expert-video-section {
+            background: linear-gradient(135deg, #D36F2D, #e67e22);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .expert-video {
+            text-align: center;
+        }
+
+        .expert-video h4 {
+            color: white;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .expert-video video {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border-radius: 10px;
+            background: #000;
+            object-fit: cover;
+        }
+
+        .video-controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .video-controls button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .video-controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .participants-video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+            min-height: 300px;
+        }
+
+        .participant-video-wrapper {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .participant-video-wrapper:hover {
+            border-color: #D36F2D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .participant-video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .participant-video-header h4 {
+            color: #051D40;
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .participant-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-mute-participant,
+        .btn-disconnect-participant {
+            background: transparent;
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-mute-participant:hover {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: white;
+        }
+
+        .btn-disconnect-participant:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .participant-video-wrapper video {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            background: #000;
+            object-fit: cover;
+        }
+
+        .participant-status {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .status-indicator.online {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .no-participants-connected {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            color: #666;
+        }
+
+        .no-participants-connected p {
+            margin: 10px 0;
+        }
+
+        .no-participants-connected p:first-child {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .multi-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-connect-all {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-connect-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-disconnect-all {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-disconnect-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-layout {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-layout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-cleanup {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cleanup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+        }
+
+        /* RESPONSIVE LAYOUTS */
+
+        /* 1 participant */
+        .participants-video-grid:has(.participant-video-wrapper:only-child) {
+            grid-template-columns: 1fr;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
+
+        /* 2 participants */
+        .participants-video-grid:has(.participant-video-wrapper:nth-child(2):last-child) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* 3-4 participants */
+        .participants-video-grid:has(.participant-video-wrapper:nth-child(3)) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* 5-6 participants */
+        .participants-video-grid:has(.participant-video-wrapper:nth-child(5)) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* 7+ participants */
+        .participants-video-grid:has(.participant-video-wrapper:nth-child(7)) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .participants-video-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+            }
+            
+            .participant-video-wrapper video {
+                height: 250px;
+            }
+            
+            .expert-video video {
+                max-width: 100%;
+                height: 250px;
+            }
+            
+            .multi-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .multi-controls button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 1200px) and (min-width: 769px) {
+            .participants-video-grid:has(.participant-video-wrapper:nth-child(3)) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .participants-video-grid:has(.participant-video-wrapper:nth-child(5)) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </asp:Content>
 
@@ -588,707 +893,741 @@
         </div>
     </div>
 
-    <script type="text/javascript">
-        let peer;
-        let currentCall;
-        let localStream;
-        let isConnectionActive = false;
-        let sessionId = null;
-        let currentParticipant = null;
-        let onlineParticipants = [];
-        let sessionStartTime = null;
-        let sessionMode = 'none'; // 'broadcast', 'group', 'oneOnOne', 'none'
-        let selectedParticipantIds = '';
-        let groupConnections = {};
-        let currentParticipantIndex = 0;
-        let participantsList = [];
+<script type="text/javascript">
+    // ENHANCED MULTI-PARTICIPANT VIDEO CALL SYSTEM - COMPLETE CORRECTED VERSION
+    // Complete JavaScript for StaffVideoCall.aspx with duplicate prevention
 
-        // FIXED: Real-time participant status management
-        let participantStatuses = {};
-        let updateInterval = null;
+    let peer;
+    let localStream;
+    let connections = new Map(); // Store multiple participant connections
+    let activeParticipants = new Map(); // Track active participants
+    let sessionId = null;
+    let sessionMode = 'none';
+    let isConnectionActive = false;
+    let onlineParticipants = [];
+    let sessionStartTime = null;
+    let selectedParticipantIds = '';
+    let currentParticipantIndex = 0;
+    let participantsList = [];
 
-        // Initialize participant statuses from server data
-        function initializeParticipantStatuses(serverData) {
-            console.log('🔄 Initializing participant statuses:', serverData);
-            
-            serverData.forEach(participant => {
-                participantStatuses[participant.phone] = {
-                    name: participant.name,
-                    status: participant.status,
-                    bookingStatus: participant.bookingStatus
-                };
-                
-                // Update UI immediately
-                updateParticipantStatusUI(participant.phone, participant.status);
+    // Real-time participant status management
+    let participantStatuses = {};
+    let updateInterval = null;
+
+    // IMPROVED: Multi-participant video container
+    function createMultiParticipantInterface() {
+        const videoContainer = document.getElementById('videoCallInterface');
+        if (!videoContainer) return;
+
+        videoContainer.innerHTML = `
+        <h3 style="color: #051D40; margin-bottom: 20px;">
+            📹 Active Multi-Participant Session (${activeParticipants.size} connected)
+        </h3>
+        
+        <!-- Expert Video (Always Visible) -->
+        <div class="expert-video-section">
+            <div class="video-wrapper expert-video">
+                <h4>🎯 You (Expert)</h4>
+                <video id="localVideo" autoplay="true" muted="true" playsinline="true"></video>
+                <div class="video-controls">
+                    <button onclick="toggleMute()" id="muteBtn">🎤 Mute</button>
+                    <button onclick="toggleVideo()" id="videoBtn">📹 Video</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Participants Grid -->
+        <div class="participants-video-grid" id="participantsGrid">
+            <div class="no-participants-connected">
+                <p>No participants connected yet</p>
+                <p>Click "Connect to All" or individual "Connect" buttons to start</p>
+            </div>
+        </div>
+        
+        <!-- Multi-Participant Controls -->
+        <div class="multi-controls">
+            <button onclick="connectToAllParticipants()" class="btn-connect-all">
+                📢 Connect to All Participants
+            </button>
+            <button onclick="disconnectAll()" class="btn-disconnect-all">
+                🛑 Disconnect All
+            </button>
+            <button onclick="toggleLayout()" class="btn-layout">
+                🔄 Switch Layout
+            </button>
+            <button onclick="cleanupDuplicateParticipants()" class="btn-cleanup">
+                🧹 Clean Duplicates
+            </button>
+        </div>
+    `;
+    }
+
+    // IMPROVED: Initialize expert system for multi-participant
+    async function setupMultiParticipantExpert() {
+        try {
+            // Get media stream
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 },
+                audio: true
             });
-            
-            updateOnlineParticipantsList();
+
+            const localVideo = document.getElementById('localVideo');
+            if (localVideo) {
+                localVideo.srcObject = localStream;
+            }
+
+            // Create expert peer
+            const expertId = `expert_session_${sessionId}`;
+            peer = new Peer(expertId, {
+                host: '0.peerjs.com',
+                port: 443,
+                path: '/',
+                secure: true,
+                debug: 2
+            });
+
+            peer.on('open', (id) => {
+                console.log('✅ Expert peer ready for multi-participant:', id);
+                isConnectionActive = true;
+                updateStatus('Expert system ready for multi-participant video!', 'success');
+            });
+
+            // Handle incoming calls from participants
+            peer.on('call', (call) => {
+                console.log('📞 Incoming call from:', call.peer);
+                handleIncomingCall(call);
+            });
+
+            peer.on('error', (err) => {
+                console.error('❌ Peer error:', err);
+                updateStatus('Connection error: ' + err.message, 'error');
+            });
+
+            peer.on('disconnected', () => {
+                console.warn('⚠️ Peer disconnected, attempting reconnection...');
+                isConnectionActive = false;
+                updateStatus('Connection lost. Attempting to reconnect...', 'info');
+
+                setTimeout(() => {
+                    if (peer && !peer.destroyed) {
+                        peer.reconnect();
+                    }
+                }, 2000);
+            });
+
+        } catch (err) {
+            console.error('Media error:', err);
+            updateStatus('Camera/microphone access required. Please allow permissions.', 'error');
+        }
+    }
+
+    // FIXED: Handle incoming participant calls with duplicate prevention
+    function handleIncomingCall(call) {
+        // Extract participant info
+        const participantId = call.peer.replace('customer_', '');
+
+        console.log('📞 Incoming call from participant ID:', participantId);
+
+        // CHECK: Prevent duplicate connections
+        if (connections.has(participantId)) {
+            console.log('⚠️ Participant already connected, closing duplicate:', participantId);
+            call.close();
+            return;
         }
 
-        // Update participant status in UI
-        function updateParticipantStatusUI(phone, status) {
-            const statusIndicator = document.getElementById(`status_${phone}`);
-            if (statusIndicator) {
-                statusIndicator.className = `status-indicator status-${status}`;
-            }
-            
-            // Update button if participant is online
-            const btn = document.getElementById(`btn_${phone}`);
-            if (btn && status === 'online') {
-                btn.textContent = '🟢 Connect Now';
-                btn.disabled = false;
-            } else if (btn && status === 'connected') {
-                btn.textContent = '📞 In Call';
-                btn.disabled = true;
-            } else if (btn) {
-                btn.textContent = '📞 Connect';
-                btn.disabled = false;
-            }
+        // CHECK: Prevent duplicate video elements
+        const existingElement = document.getElementById(`participant_${participantId}`);
+        if (existingElement) {
+            console.log('⚠️ Removing existing video element for:', participantId);
+            existingElement.remove();
+            activeParticipants.delete(participantId);
         }
 
-        // Update online participants list dynamically
-        function updateOnlineParticipantsList() {
-            const onlineList = document.getElementById('onlineParticipantsList');
-            if (!onlineList) return;
-            
-            let onlineCount = 0;
-            let onlineHTML = '';
-            
-            for (const [phone, participant] of Object.entries(participantStatuses)) {
-                if (participant.status === 'online' || participant.status === 'waiting') {
-                    onlineCount++;
-                    onlineHTML += `
-                        <div class="participant-card online">
-                            <div class="participant-info">
-                                <div class="participant-details">
-                                    <h4>
-                                        <span class="status-indicator status-${participant.status}"></span>
-                                        ${participant.name}
-                                    </h4>
-                                    <div class="participant-meta">
-                                        <span>📱 +${phone}</span>
-                                        <span>🟢 Available Now</span>
-                                    </div>
-                                </div>
-                                <div class="participant-actions">
-                                    <button type="button" class="btn-connect" onclick="connectToParticipant('+${phone}', '${participant.name}')">
-                                        📞 Connect Now
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
+        // Answer the call with local stream
+        call.answer(localStream);
+
+        call.on('stream', (remoteStream) => {
+            console.log('✅ Received stream from participant:', participantId);
+            addParticipantToGrid(participantId, remoteStream, call);
+        });
+
+        call.on('close', () => {
+            console.log('📞 Call ended with participant:', participantId);
+            removeParticipantFromGrid(participantId);
+        });
+
+        call.on('error', (err) => {
+            console.error('📞 Call error with participant:', participantId, err);
+            removeParticipantFromGrid(participantId);
+        });
+
+        // Store the connection
+        connections.set(participantId, call);
+    }
+
+    // FIXED: Add participant video to grid with duplicate prevention
+    function addParticipantToGrid(participantId, stream, call) {
+        const grid = document.getElementById('participantsGrid');
+        if (!grid) return;
+
+        // PREVENT DUPLICATES: Check if participant already exists
+        const existingParticipant = document.getElementById(`participant_${participantId}`);
+        if (existingParticipant) {
+            console.log('⚠️ Participant already in grid, updating stream:', participantId);
+
+            // Update existing video stream instead of creating new element
+            const existingVideo = document.getElementById(`video_${participantId}`);
+            if (existingVideo) {
+                existingVideo.srcObject = stream;
             }
-            
-            if (onlineCount === 0) {
-                onlineHTML = `
-                    <div class="no-participants">
-                        <p>No participants currently online</p>
-                        <p><small>Participants will appear here when they join the session</small></p>
+
+            // Update the stored call reference
+            const existingParticipantData = activeParticipants.get(participantId);
+            if (existingParticipantData) {
+                existingParticipantData.call = call;
+                existingParticipantData.stream = stream;
+            }
+
+            return; // Don't create duplicate
+        }
+
+        // Remove "no participants" message
+        const noParticipants = grid.querySelector('.no-participants-connected');
+        if (noParticipants) {
+            noParticipants.remove();
+        }
+
+        // Create participant video element
+        const participantDiv = document.createElement('div');
+        participantDiv.className = 'participant-video-wrapper';
+        participantDiv.id = `participant_${participantId}`;
+
+        // Get participant name from the UI
+        const participantName = getParticipantName(participantId) || `Participant ${participantId}`;
+
+        // FIXED: HTML5 compliant video attributes
+        participantDiv.innerHTML = `
+        <div class="participant-video-header">
+            <h4>👤 ${participantName}</h4>
+            <div class="participant-actions">
+                <button onclick="muteParticipant('${participantId}')" class="btn-mute-participant">
+                    🔇 Mute
+                </button>
+                <button onclick="disconnectParticipant('${participantId}')" class="btn-disconnect-participant">
+                    ❌ Disconnect
+                </button>
+            </div>
+        </div>
+        <video id="video_${participantId}" autoplay="true" playsinline="true"></video>
+        <div class="participant-status">
+            <span class="status-indicator online"></span>
+            Connected
+        </div>
+    `;
+
+        grid.appendChild(participantDiv);
+
+        // Set video stream
+        const video = document.getElementById(`video_${participantId}`);
+        if (video) {
+            video.srcObject = stream;
+        }
+
+        // Update active participants
+        activeParticipants.set(participantId, {
+            name: participantName,
+            call: call,
+            stream: stream,
+            muted: false
+        });
+
+        // Update UI
+        updateParticipantCount();
+        updateGridLayout();
+
+        console.log('✅ Added participant to grid:', participantName, participantId);
+    }
+
+    // IMPROVED: Remove participant from grid
+    function removeParticipantFromGrid(participantId) {
+        const participantElement = document.getElementById(`participant_${participantId}`);
+        if (participantElement) {
+            participantElement.remove();
+        }
+
+        // Remove from active participants
+        activeParticipants.delete(participantId);
+        connections.delete(participantId);
+
+        // Update UI
+        updateParticipantCount();
+        updateGridLayout();
+
+        // Show "no participants" message if no one is connected
+        const grid = document.getElementById('participantsGrid');
+        if (grid && activeParticipants.size === 0) {
+            grid.innerHTML = `
+                    <div class="no-participants-connected">
+                        <p>No participants connected</p>
+                        <p>Click "Connect to All" to start group session</p>
                     </div>
                 `;
-            }
-            
-            onlineList.innerHTML = onlineHTML;
-            
-            // Update counters
-            document.getElementById('onlineParticipants').textContent = onlineCount;
-            document.getElementById('onlineCount').textContent = onlineCount;
-            
-            console.log('🔄 Updated online participants list:', onlineCount);
+        }
+    }
+
+    // FIXED: Connect to all participants with duplicate prevention
+    async function connectToAllParticipants() {
+        if (!peer || !localStream) {
+            updateStatus('Expert system not ready. Please wait...', 'error');
+            return;
         }
 
-        // Start real-time updates
-        function startRealTimeUpdates() {
-            if (updateInterval) {
-                clearInterval(updateInterval);
-            }
-            
-            updateInterval = setInterval(() => {
-                if (sessionId && sessionMode !== 'none') {
-                    fetchParticipantUpdates();
+        updateStatus('🔄 Connecting to all participants...', 'info');
+
+        // Get all participant phone numbers from the UI
+        const participantCards = document.querySelectorAll('.participant-card');
+        let connectedCount = 0;
+        let totalParticipants = participantCards.length;
+
+        if (totalParticipants === 0) {
+            updateStatus('❌ No registered participants found to connect to.', 'error');
+            return;
+        }
+
+        // PREVENT DUPLICATES: Track processed participants
+        const processedParticipants = new Set();
+
+        for (const card of participantCards) {
+            const phone = card.getAttribute('data-phone');
+            const name = card.getAttribute('data-name');
+
+            if (phone && name) {
+                const cleanPhone = phone.replace(/[^0-9]/g, '');
+
+                // PREVENT DUPLICATES: Skip if already processed
+                if (processedParticipants.has(cleanPhone)) {
+                    console.log('⚠️ Skipping duplicate participant:', name, cleanPhone);
+                    continue;
                 }
-            }, 10000); // Check every 10 seconds
-            
-            console.log('🔄 Started real-time participant updates');
-        }
+                processedParticipants.add(cleanPhone);
 
-        // Fetch participant updates from server
-        async function fetchParticipantUpdates() {
-            try {
-                const response = await fetch('StaffVideoCall.aspx/GetParticipantUpdates', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ sessionId: parseInt(sessionId) })
-                });
-                
-                const data = await response.json();
-                const result = JSON.parse(data.d);
-                
-                if (result.success) {
-                    console.log('📡 Received participant updates:', result.participants);
-                    
-                    // Update participant statuses
-                    let hasChanges = false;
-                    
-                    result.participants.forEach(participant => {
-                        const oldStatus = participantStatuses[participant.phone]?.status;
-                        
-                        if (oldStatus !== participant.status) {
-                            hasChanges = true;
-                            console.log(`🔄 Status change: ${participant.name} ${oldStatus} → ${participant.status}`);
-                        }
-                        
-                        participantStatuses[participant.phone] = {
-                            name: participant.name,
-                            status: participant.status,
-                            bookingStatus: participant.bookingStatus
-                        };
-                        
-                        updateParticipantStatusUI(participant.phone, participant.status);
-                    });
-                    
-                    if (hasChanges) {
-                        updateOnlineParticipantsList();
-                        updateConnectedCount();
+                const participantId = `customer_${cleanPhone}`;
+
+                // Skip if already connected
+                if (connections.has(cleanPhone)) {
+                    console.log('Already connected to:', name);
+                    connectedCount++; // Count existing connections
+                    continue;
+                }
+
+                try {
+                    console.log('📞 Calling participant:', name, participantId);
+
+                    // Call participant
+                    const call = peer.call(participantId, localStream);
+
+                    if (call) {
+                        // Set up call handlers
+                        call.on('stream', (remoteStream) => {
+                            console.log('✅ Connected to:', name);
+                            addParticipantToGrid(cleanPhone, remoteStream, call);
+                            connectedCount++;
+                            updateStatus(`Connected ${connectedCount}/${totalParticipants} participants`, 'info');
+                        });
+
+                        call.on('error', (err) => {
+                            console.warn('Failed to connect to:', name, err);
+                        });
+
+                        call.on('close', () => {
+                            removeParticipantFromGrid(cleanPhone);
+                        });
+
+                        // Store connection immediately
+                        connections.set(cleanPhone, call);
                     }
+
+                    // Small delay between calls
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                } catch (error) {
+                    console.error('Error calling participant:', name, error);
                 }
+            }
+        }
+
+        setTimeout(() => {
+            if (connectedCount > 0) {
+                updateStatus(`✅ Multi-participant session active! ${connectedCount} participants connected.`, 'success');
+            } else {
+                updateStatus('❌ No participants could be reached. Make sure they are online and have joined the session.', 'error');
+            }
+        }, 5000);
+    }
+
+    // IMPROVED: Disconnect all participants
+    function disconnectAll() {
+        console.log('🛑 Disconnecting all participants');
+
+        connections.forEach((call, participantId) => {
+            try {
+                call.close();
             } catch (error) {
-                console.error('❌ Error fetching participant updates:', error);
+                console.warn('Error closing call:', error);
             }
+        });
+
+        connections.clear();
+        activeParticipants.clear();
+
+        // Clear the grid
+        const grid = document.getElementById('participantsGrid');
+        if (grid) {
+            grid.innerHTML = `
+                    <div class="no-participants-connected">
+                        <p>All participants disconnected</p>
+                        <p>Click "Connect to All" to start new session</p>
+                    </div>
+                `;
         }
 
-        // Initialize when page loads
-        window.onload = function () {
-            sessionId = document.getElementById('<%= hdnSessionId.ClientID %>').value;
-            
-            if (sessionId) {
-                initializeExpertSystem();
-                startParticipantMonitoring();
-                startSessionTimer();
-                
-                // Check URL parameters for mode
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlMode = urlParams.get('mode');
-                const urlParticipants = urlParams.get('participants');
-                
-                if (urlMode) {
-                    sessionMode = urlMode;
-                    selectedParticipantIds = urlParticipants || '';
-                    handleModeFromURL(urlMode);
-                }
-                
-                // Test participant count after initialization
-                setTimeout(() => {
-                    testParticipantCount();
-                }, 2000);
-            }
-        };
+        updateParticipantCount();
+        updateStatus('All participants disconnected', 'info');
+    }
 
-        function handleModeFromURL(mode) {
-            updateStatus('Initializing ' + mode + ' mode...', 'info');
-            
-            switch(mode) {
-                case 'broadcast':
-                    setTimeout(() => startBroadcastMode(), 1000);
-                    break;
-                case 'group':
-                    if (selectedParticipantIds) {
-                        setTimeout(() => startGroupModeWithParticipants(selectedParticipantIds), 1000);
-                    } else {
-                        setTimeout(() => startGroupMode(), 1000);
-                    }
-                    break;
-                case 'oneOnOne':
-                    setTimeout(() => startOneOnOneMode(), 1000);
-                    break;
-            }
+    // IMPROVED: Update participant count display
+    function updateParticipantCount() {
+        const connectedCount = activeParticipants.size;
+
+        // Update session title
+        const sessionTitle = document.querySelector('#videoCallInterface h3');
+        if (sessionTitle) {
+            sessionTitle.textContent = `📹 Active Multi-Participant Session (${connectedCount} connected)`;
         }
 
-        function initializeExpertSystem() {
-            updateStatus('Initializing expert video system...', 'info');
-            
-            // Setup peer connection for expert
-            setupExpertPeer();
-            
-            // Start checking for online participants
-            checkOnlineParticipants();
-            
-            // Update participant counts
-            updateParticipantCounts();
-            
-            // Show video interface immediately so staff can see their own video
-            document.getElementById('videoCallInterface').style.display = 'block';
-            
-            // Show bulk notification if there are participants
-            const totalParticipants = parseInt(document.getElementById('<%= lblTotalParticipants.ClientID %>').textContent || '0');
-            if (totalParticipants > 0) {
-                document.getElementById('bulkNotification').classList.add('show');
-            }
+        // Update dashboard counters
+        const connectedElements = document.querySelectorAll('#connectedParticipants');
+        connectedElements.forEach(el => {
+            el.textContent = connectedCount;
+        });
+
+        console.log('📊 Updated participant count:', connectedCount);
+    }
+
+    // IMPROVED: Dynamic grid layout based on participant count
+    function updateGridLayout() {
+        const grid = document.getElementById('participantsGrid');
+        if (!grid) return;
+
+        const participantCount = activeParticipants.size;
+
+        // Adjust grid layout based on number of participants
+        if (participantCount <= 2) {
+            grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else if (participantCount <= 4) {
+            grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else if (participantCount <= 6) {
+            grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        } else {
+            grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
         }
+    }
 
-        async function setupExpertPeer() {
-            try {
-                // Get media stream first
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
-                });
+    // FIXED: Clean up function to remove all duplicates
+    function cleanupDuplicateParticipants() {
+        console.log('🧹 Cleaning up duplicate participants...');
 
-                document.getElementById('localVideo').srcObject = localStream;
+        const grid = document.getElementById('participantsGrid');
+        if (!grid) return;
 
-                // Create expert peer
-                const expertId = `expert_session_${sessionId}`;
-                peer = new Peer(expertId, {
-                    host: 'localhost',
-                    port: 3001,
-                    path: '/',
-                    debug: 2
-                });
+        const participantElements = grid.querySelectorAll('.participant-video-wrapper');
+        const seenParticipants = new Set();
 
-                peer.on('open', (id) => {
-                    console.log('Expert peer connected:', id);
-                    isConnectionActive = true;
-                    updateStatus('Expert system ready. Choose a session mode to begin.', 'success');
-                });
+        participantElements.forEach(element => {
+            const participantId = element.id.replace('participant_', '');
 
-                peer.on('call', (call) => {
-                    console.log('Incoming call from participant');
-                    call.answer(localStream);
-                    setupCall(call);
-                });
-
-                peer.on('error', (err) => {
-                    console.error('Peer error:', err);
-                    updateStatus('Connection error: ' + err.message, 'error');
-                });
-
-            } catch (err) {
-                console.error('Media error:', err);
-                updateStatus('Camera/microphone access required. Please allow permissions.', 'error');
+            if (seenParticipants.has(participantId)) {
+                console.log('🗑️ Removing duplicate element for:', participantId);
+                element.remove();
+            } else {
+                seenParticipants.add(participantId);
             }
-        }
+        });
 
-        // === MODE SELECTION FUNCTIONS ===
-        
-        function startBroadcastMode() {
-            if (!isConnectionActive) {
-                updateStatus('Expert system not ready. Please wait...', 'error');
-                return;
-            }
-            
-            sessionMode = 'broadcast';
-            updateStatus('🎥 Starting broadcast mode - connecting to all participants...', 'info');
-            
-            // Get all registered participants
-            const participantCards = document.querySelectorAll('.participant-card');
-            participantsList = [];
-            
-            participantCards.forEach(card => {
-                const phone = card.getAttribute('data-phone');
-                const name = card.getAttribute('data-name');
-                if (phone && name) {
-                    participantsList.push({phone: phone, name: name});
-                }
+        // Clean up activeParticipants map
+        const activeKeys = Array.from(activeParticipants.keys());
+        const uniqueKeys = [...new Set(activeKeys)];
+
+        if (activeKeys.length !== uniqueKeys.length) {
+            console.log('🧹 Cleaning up activeParticipants map');
+            const newActiveParticipants = new Map();
+            uniqueKeys.forEach(key => {
+                newActiveParticipants.set(key, activeParticipants.get(key));
             });
-            
-            if (participantsList.length === 0) {
-                updateStatus('No participants found to connect to.', 'error');
-                return;
-            }
-            
-            // Show video interface
-            document.getElementById('videoCallInterface').style.display = 'block';
-            document.getElementById('activeControls').style.display = 'block';
-            
-            // Start connecting to participants one by one
-            connectToBroadcastParticipants();
+            activeParticipants = newActiveParticipants;
         }
 
-        function startGroupMode() {
-            if (!isConnectionActive) {
-                updateStatus('Expert system not ready. Please wait...', 'error');
-                return;
-            }
-            
-            sessionMode = 'group';
-            updateStatus('👥 Group mode: Please select participants from the list by clicking on them.', 'info');
-            
-            // Enable participant selection
-            enableParticipantSelection();
-        }
+        updateParticipantCount();
+        updateGridLayout();
+        updateStatus('🧹 Duplicates cleaned up!', 'success');
+    }
 
-        function startGroupModeWithParticipants(participantIds) {
-            if (!isConnectionActive) {
-                updateStatus('Expert system not ready. Please wait...', 'error');
-                return;
-            }
-            
-            sessionMode = 'group';
-            updateStatus('👥 Starting group mode with selected participants...', 'info');
-            
-            // Load participant data and start group call
-            loadSelectedParticipantsAndConnect(participantIds);
-        }
+    // UTILITY FUNCTIONS
 
-        function startOneOnOneMode() {
-            if (!isConnectionActive) {
-                updateStatus('Expert system not ready. Please wait...', 'error');
-                return;
-            }
-            
-            sessionMode = 'oneOnOne';
-            updateStatus('📞 One-on-One mode: Click on any participant to start individual consultation.', 'info');
-            
-            // Enable individual participant connection
-            enableIndividualConnections();
-        }
-
-        // === CONNECTION FUNCTIONS ===
-
-        function connectToParticipant(phone, name) {
-            if (!isConnectionActive) {
-                updateStatus('Expert system not ready. Please wait...', 'error');
-                return;
-            }
-
-            // Update participant status to connecting
-            updateParticipantStatusOnServer(sessionId, phone.replace(/[^0-9]/g, ''), 'connecting');
-            
-            // Handle based on current mode
-            if (sessionMode === 'oneOnOne') {
-                connectOneOnOne(phone, name);
-            } else if (sessionMode === 'group') {
-                addToGroupCall(phone, name);
-            } else {
-                // Auto-select one-on-one mode
-                sessionMode = 'oneOnOne';
-                updateStatus('🔄 Starting one-on-one consultation mode...', 'info');
-                connectOneOnOne(phone, name);
+    function getParticipantName(participantId) {
+        const cards = document.querySelectorAll('.participant-card');
+        for (const card of cards) {
+            const phone = card.getAttribute('data-phone');
+            if (phone && phone.replace(/[^0-9]/g, '') === participantId) {
+                return card.getAttribute('data-name');
             }
         }
+        return null;
+    }
 
-        function connectOneOnOne(phone, name) {
-            // End current call if exists
-            if (currentCall) {
-                endCurrentCall();
-            }
+    function muteParticipant(participantId) {
+        const participant = activeParticipants.get(participantId);
+        if (participant && participant.stream) {
+            const audioTracks = participant.stream.getAudioTracks();
+            audioTracks.forEach(track => {
+                track.enabled = !track.enabled;
+            });
+            participant.muted = !participant.muted;
 
-            currentParticipant = { phone: phone, name: name };
-            
-            // Update UI
-            updateParticipantStatus(phone, 'connecting');
-            updateStatus(`Connecting to ${name} (${phone})...`, 'info');
-
-            // Create participant peer ID
-            const participantId = `customer_${phone.replace(/[^0-9]/g, '')}`;
-            
-            // Call participant
-            const call = peer.call(participantId, localStream);
-            
-            if (call) {
-                setupCall(call);
-                
-                // Update button
-                const btn = document.getElementById(`btn_${phone.replace(/[^0-9]/g, '')}`);
-                if (btn) {
-                    btn.textContent = '⏳ Connecting...';
-                    btn.disabled = true;
-                }
-                
-                // Show video interface
-                document.getElementById('videoCallInterface').style.display = 'block';
-                document.getElementById('activeControls').style.display = 'block';
-            } else {
-                updateStatus(`Failed to initiate call to ${name}`, 'error');
-                updateParticipantStatus(phone, 'offline');
+            const muteBtn = document.querySelector(`#participant_${participantId} .btn-mute-participant`);
+            if (muteBtn) {
+                muteBtn.textContent = participant.muted ? '🔊 Unmute' : '🔇 Mute';
             }
         }
+    }
 
-        function addToGroupCall(phone, name) {
-            const participantId = `customer_${phone.replace(/[^0-9]/g, '')}`;
-            
-            // Check if already connected
-            if (groupConnections[participantId]) {
-                updateStatus(`${name} is already in the group call.`, 'info');
-                return;
+    function disconnectParticipant(participantId) {
+        const call = connections.get(participantId);
+        if (call) {
+            call.close();
+        }
+        removeParticipantFromGrid(participantId);
+    }
+
+    function toggleMute() {
+        if (localStream) {
+            const audioTracks = localStream.getAudioTracks();
+            audioTracks.forEach(track => {
+                track.enabled = !track.enabled;
+            });
+
+            const muteBtn = document.getElementById('muteBtn');
+            if (muteBtn) {
+                muteBtn.textContent = audioTracks[0]?.enabled ? '🎤 Mute' : '🔊 Unmute';
             }
-            
-            updateStatus(`Adding ${name} to group call...`, 'info');
-            
-            // Call participant
-            const call = peer.call(participantId, localStream);
-            
-            if (call) {
-                groupConnections[participantId] = {
-                    call: call,
+        }
+    }
+
+    function toggleVideo() {
+        if (localStream) {
+            const videoTracks = localStream.getVideoTracks();
+            videoTracks.forEach(track => {
+                track.enabled = !track.enabled;
+            });
+
+            const videoBtn = document.getElementById('videoBtn');
+            if (videoBtn) {
+                videoBtn.textContent = videoTracks[0]?.enabled ? '📹 Video Off' : '📹 Video On';
+            }
+        }
+    }
+
+    function toggleLayout() {
+        const grid = document.getElementById('participantsGrid');
+        if (!grid) return;
+
+        // Cycle through different layouts
+        const currentCols = grid.style.gridTemplateColumns;
+
+        if (currentCols.includes('repeat(2,') || currentCols.includes('repeat(2 ')) {
+            grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        } else if (currentCols.includes('repeat(3,')) {
+            grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        } else {
+            grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        }
+    }
+
+    // ENHANCED MODE FUNCTIONS
+
+    function startBroadcastMode() {
+        if (!isConnectionActive) {
+            updateStatus('Expert system not ready. Please wait...', 'error');
+            return;
+        }
+
+        sessionMode = 'broadcast';
+        updateStatus('📢 Broadcast Mode: Connecting to all participants...', 'info');
+
+        // Clean up any existing duplicates first
+        cleanupDuplicateParticipants();
+
+        createMultiParticipantInterface();
+        setTimeout(() => {
+            connectToAllParticipants();
+        }, 1000);
+    }
+
+    function startGroupMode() {
+        if (!isConnectionActive) {
+            updateStatus('Expert system not ready. Please wait...', 'error');
+            return;
+        }
+
+        sessionMode = 'group';
+        updateStatus('👥 Group Mode: Multi-participant video enabled', 'info');
+
+        // Clean up any existing duplicates first
+        cleanupDuplicateParticipants();
+
+        createMultiParticipantInterface();
+    }
+
+    function startOneOnOneMode() {
+        if (!isConnectionActive) {
+            updateStatus('Expert system not ready. Please wait...', 'error');
+            return;
+        }
+
+        sessionMode = 'oneOnOne';
+        updateStatus('📞 One-on-One mode: Click on any participant to start individual consultation.', 'info');
+
+        // Clean up any existing duplicates first
+        cleanupDuplicateParticipants();
+
+        createMultiParticipantInterface();
+    }
+
+    // FIXED: Connect to individual participant with duplicate prevention
+    function connectToParticipant(phone, name) {
+        if (!isConnectionActive) {
+            updateStatus('Expert system not ready. Please wait...', 'error');
+            return;
+        }
+
+        console.log('🔄 Attempting to connect to participant:', name, phone);
+
+        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        const participantId = `customer_${cleanPhone}`;
+
+        // PREVENT DUPLICATES: Check if already connected
+        if (connections.has(cleanPhone)) {
+            updateStatus(`Already connected to ${name}`, 'info');
+            return;
+        }
+
+        // PREVENT DUPLICATES: Check if video element already exists
+        const existingElement = document.getElementById(`participant_${cleanPhone}`);
+        if (existingElement) {
+            console.log('⚠️ Removing existing duplicate element for:', name);
+            existingElement.remove();
+            activeParticipants.delete(cleanPhone);
+        }
+
+        updateStatus(`Connecting to ${name} (${phone})...`, 'info');
+
+        // Call participant
+        const call = peer.call(participantId, localStream);
+
+        if (call) {
+            // Set up call handlers
+            call.on('stream', (remoteStream) => {
+                console.log('✅ Connected to:', name);
+                addParticipantToGrid(cleanPhone, remoteStream, call);
+                updateStatus(`Connected with ${name}! Video consultation in progress.`, 'success');
+            });
+
+            call.on('error', (err) => {
+                console.warn('Failed to connect to:', name, err);
+                updateStatus(`Failed to connect to ${name}. They may not be online.`, 'error');
+            });
+
+            call.on('close', () => {
+                console.log('Call ended with:', name);
+                removeParticipantFromGrid(cleanPhone);
+            });
+
+            // Store connection
+            connections.set(cleanPhone, call);
+        } else {
+            updateStatus(`Failed to initiate call to ${name}`, 'error');
+        }
+    }
+
+    // UTILITY FUNCTIONS FOR COMPATIBILITY
+
+    function checkOnlineParticipants() {
+        console.log('🔄 Checking online participants...');
+
+        const totalRegisteredElement = document.getElementById('<%= lblTotalParticipants.ClientID %>');
+        const totalRegistered = totalRegisteredElement ? totalRegisteredElement.textContent : '0';
+
+        const totalParticipantsElement = document.getElementById('totalParticipants');
+        if (totalParticipantsElement) {
+            totalParticipantsElement.textContent = totalRegistered;
+        }
+
+        const participantCards = document.querySelectorAll('.participant-card');
+        console.log('🔄 Found', participantCards.length, 'registered participants');
+
+        participantCards.forEach((card, index) => {
+            const phone = card.getAttribute('data-phone')?.replace(/[^0-9]/g, '') || '';
+            const name = card.getAttribute('data-name') || '';
+            const statusIndicator = card.querySelector('.status-indicator');
+
+            if (phone && name && statusIndicator) {
+                const status = 'waiting';
+                participantStatuses[phone] = {
                     name: name,
-                    phone: phone
+                    status: status,
+                    bookingStatus: 'Confirmed'
                 };
-                
-                setupGroupCall(call, name, participantId);
-                
-                // Show group video interface
-                document.getElementById('videoCallInterface').style.display = 'block';
-                document.getElementById('groupVideoGrid').style.display = 'block';
-                document.getElementById('activeControls').style.display = 'block';
-                
-                updateParticipantStatus(phone, 'connected');
+                statusIndicator.className = `status-indicator status-${status}`;
             }
-        }
+        });
 
-        function connectToBroadcastParticipants() {
-            if (currentParticipantIndex >= participantsList.length) {
-                updateStatus('📢 Broadcast mode: All participants contacted!', 'success');
-                return;
-            }
+        console.log('✅ Online participants check completed');
+    }
+
+    function updateStatus(message, type) {
+        console.log(`📱 Status (${type}):`, message);
+
+        const statusLabel = document.getElementById('<%= lblStatus.ClientID %>');
+        if (statusLabel) {
+            statusLabel.textContent = message;
+            statusLabel.className = `status-message ${type}`;
+        }
+    }
+
+    function updateParticipantCounts() {
+        const totalRegisteredElement = document.getElementById('<%= lblTotalParticipants.ClientID %>');
+            const registeredCountElement = document.getElementById('<%= lblRegisteredCount.ClientID %>');
             
-            const participant = participantsList[currentParticipantIndex];
-            updateStatus(`📢 Broadcasting to ${participant.name} (${currentParticipantIndex + 1}/${participantsList.length})...`, 'info');
+            const totalRegistered = totalRegisteredElement ? totalRegisteredElement.textContent : '0';
+            const registeredCount = registeredCountElement ? registeredCountElement.textContent : '0';
             
-            const participantId = `customer_${participant.phone.replace(/[^0-9]/g, '')}`;
-            const call = peer.call(participantId, localStream);
-            
-            if (call) {
-                // Store in group connections for broadcast
-                groupConnections[participantId] = {
-                    call: call,
-                    name: participant.name,
-                    phone: participant.phone
-                };
-                
-                setupGroupCall(call, participant.name, participantId);
-                updateParticipantStatus(participant.phone, 'connected');
+            const dashboardTotal = document.getElementById('totalParticipants');
+            if (dashboardTotal) {
+                dashboardTotal.textContent = totalRegistered;
             }
             
-            currentParticipantIndex++;
-            
-            // Continue to next participant after a short delay
-            setTimeout(() => connectToBroadcastParticipants(), 2000);
-        }
-
-        function setupCall(call) {
-            currentCall = call;
-            
-            call.on('stream', (remoteStream) => {
-                console.log('Received participant stream');
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-                document.getElementById('remoteVideoTitle').textContent = 
-                    `${currentParticipant.name} - ${currentParticipant.phone}`;
-                
-                updateStatus(`Connected with ${currentParticipant.name}! Consultation in progress.`, 'success');
-                updateConnectedCount();
-            });
-
-            call.on('close', () => {
-                console.log('Call ended');
-                endCurrentCall();
-            });
-
-            call.on('error', (err) => {
-                console.error('Call error:', err);
-                updateStatus(`Call error with ${currentParticipant?.name || 'participant'}: ${err.message}`, 'error');
-                endCurrentCall();
-            });
-        }
-
-        function setupGroupCall(call, name, participantId) {
-            call.on('stream', (remoteStream) => {
-                console.log(`Received stream from ${name}`);
-                
-                // Create video element for this participant
-                const videoWrapper = document.createElement('div');
-                videoWrapper.className = 'video-wrapper';
-                videoWrapper.id = `video_${participantId}`;
-                
-                const title = document.createElement('h4');
-                title.textContent = name;
-                
-                const video = document.createElement('video');
-                video.autoplay = true;
-                video.playsInline = true;
-                video.srcObject = remoteStream;
-                
-                videoWrapper.appendChild(title);
-                videoWrapper.appendChild(video);
-                
-                document.getElementById('groupVideos').appendChild(videoWrapper);
-                
-                updateConnectedCount();
-                updateStatus(`${name} joined the group call!`, 'success');
-            });
-
-            call.on('close', () => {
-                console.log(`${name} left the call`);
-                const videoElement = document.getElementById(`video_${participantId}`);
-                if (videoElement) {
-                    videoElement.remove();
-                }
-                delete groupConnections[participantId];
-                updateConnectedCount();
-            });
-
-            call.on('error', (err) => {
-                console.error(`Call error with ${name}:`, err);
-                updateStatus(`Connection error with ${name}: ${err.message}`, 'error');
-            });
-        }
-
-        // === UI HELPER FUNCTIONS ===
-
-        function enableParticipantSelection() {
             const participantCards = document.querySelectorAll('.participant-card');
-            participantCards.forEach(card => {
-                card.style.cursor = 'pointer';
-                card.style.border = '2px dashed #D36F2D';
-                card.addEventListener('click', function() {
-                    const phone = this.getAttribute('data-phone');
-                    const name = this.getAttribute('data-name');
-                    addToGroupCall(phone, name);
-                    this.style.border = '2px solid #28a745';
-                });
-            });
-            
-            updateStatus('Click on participants to add them to the group call.', 'info');
-        }
-
-        function enableIndividualConnections() {
-            updateStatus('Click "Connect" next to any participant for one-on-one consultation.', 'info');
-        }
-
-        function switchToNextParticipant() {
-            if (sessionMode === 'oneOnOne') {
-                // Find next participant
-                const participantCards = document.querySelectorAll('.participant-card');
-                let nextParticipant = null;
-                let foundCurrent = false;
-
-                for (let card of participantCards) {
-                    const phone = card.getAttribute('data-phone');
-                    const name = card.getAttribute('data-name');
-                    
-                    if (currentParticipant && phone === currentParticipant.phone) {
-                        foundCurrent = true;
-                        continue;
-                    }
-                    
-                    if (foundCurrent || !currentParticipant) {
-                        nextParticipant = { phone, name };
-                        break;
-                    }
-                }
-
-                if (nextParticipant) {
-                    connectOneOnOne(nextParticipant.phone, nextParticipant.name);
-                } else {
-                    // Go back to first participant
-                    if (participantCards.length > 0) {
-                        const firstCard = participantCards[0];
-                        const phone = firstCard.getAttribute('data-phone');
-                        const name = firstCard.getAttribute('data-name');
-                        connectOneOnOne(phone, name);
-                    }
-                }
+            if (participantCards.length > 0 && totalRegistered === '0') {
+                const cardCount = participantCards.length.toString();
+                if (dashboardTotal) dashboardTotal.textContent = cardCount;
+                if (registeredCountElement) registeredCountElement.textContent = cardCount;
             }
         }
-
-        function endCurrentCall() {
-            if (currentCall) {
-                currentCall.close();
-                currentCall = null;
-            }
-
-            if (currentParticipant) {
-                updateParticipantStatus(currentParticipant.phone, 'offline');
-                
-                // Reset button
-                const btn = document.getElementById(`btn_${currentParticipant.phone.replace(/[^0-9]/g, '')}`);
-                if (btn) {
-                    btn.textContent = '📞 Connect';
-                    btn.disabled = false;
-                }
-            }
-
-            document.getElementById('remoteVideo').srcObject = null;
-            currentParticipant = null;
-            updateConnectedCount();
-        }
-
-        function endCurrentSession() {
-            // End all connections
-            if (currentCall) {
-                currentCall.close();
-                currentCall = null;
-            }
-            
-            // End all group connections
-            Object.keys(groupConnections).forEach(participantId => {
-                if (groupConnections[participantId].call) {
-                    groupConnections[participantId].call.close();
-                }
-            });
-            groupConnections = {};
-            
-            // Clear video interfaces
-            document.getElementById('videoCallInterface').style.display = 'none';
-            document.getElementById('groupVideoGrid').style.display = 'none';
-            document.getElementById('activeControls').style.display = 'none';
-            document.getElementById('groupVideos').innerHTML = '';
-            
-            // Reset participant statuses
-            const participantCards = document.querySelectorAll('.participant-card');
-            participantCards.forEach(card => {
-                const phone = card.getAttribute('data-phone');
-                updateParticipantStatus(phone, 'offline');
-                card.style.cursor = 'default';
-                card.style.border = '1px solid #e9ecef';
-            });
-            
-            // Reset session mode
-            sessionMode = 'none';
-            currentParticipant = null;
-            currentParticipantIndex = 0;
-            
-            updateStatus('Session ended. Choose a new mode to start again.', 'info');
-            updateConnectedCount();
-        }
-
-        // Update participant status on server
-        async function updateParticipantStatusOnServer(sessionId, phone, status) {
-            try {
-                const response = await fetch('StaffVideoCall.aspx/UpdateParticipantStatus', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        sessionId: parseInt(sessionId), 
-                        phoneNumber: phone, 
-                        newStatus: status 
-                    })
-                });
-                
-                const data = await response.json();
-                const result = JSON.parse(data.d);
-                
-                if (result.success) {
-                    console.log('✅ Updated participant status on server:', phone, status);
-                } else {
-                    console.warn('⚠️ Failed to update participant status:', result.message);
-                }
-            } catch (error) {
-                console.error('❌ Error updating participant status:', error);
-            }
-        }
-
-        // === NOTIFICATION FUNCTIONS ===
 
         async function notifyAllParticipants() {
             try {
-                const totalParticipants = parseInt(document.getElementById('<%= lblTotalParticipants.ClientID %>').textContent || '0');
+                const totalParticipantsElement = document.getElementById('<%= lblTotalParticipants.ClientID %>');
+                const totalParticipants = totalParticipantsElement ? parseInt(totalParticipantsElement.textContent || '0') : 0;
                 
                 if (totalParticipants === 0) {
                     updateStatus('No participants to notify.', 'error');
@@ -1297,20 +1636,17 @@
                 
                 updateStatus('📤 Notifying all participants...', 'info');
                 
-                // Get all participant IDs
                 const participantCards = document.querySelectorAll('.participant-card');
                 const participantIds = [];
                 
                 participantCards.forEach(card => {
                     const phone = card.getAttribute('data-phone');
                     if (phone) {
-                        // Extract participant ID from phone or use phone as ID
                         participantIds.push(phone.replace(/[^0-9]/g, ''));
                     }
                 });
                 
                 if (participantIds.length > 0) {
-                    // Call server method to notify participants
                     const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/NotifyParticipants") %>', {
                         method: 'POST',
                         headers: {
@@ -1322,188 +1658,27 @@
                             message: 'Expert session starting soon!'
                         })
                     });
-                    
+
                     const data = await response.json();
                     const result = JSON.parse(data.d);
-                    
+
                     if (result.success) {
                         updateStatus(`✅ ${result.notifiedCount} participants notified successfully!`, 'success');
-                        document.getElementById('bulkNotification').classList.remove('show');
-                        
-                        // Update participant statuses to 'waiting'
-                        participantIds.forEach(id => {
-                            if (participantStatuses[id]) {
-                                participantStatuses[id].status = 'waiting';
-                                participantStatuses[id].bookingStatus = 'Expert Ready';
-                                updateParticipantStatusUI(id, 'waiting');
-                            }
-                        });
-                        
-                        updateOnlineParticipantsList();
+
+                        const bulkNotification = document.getElementById('bulkNotification');
+                        if (bulkNotification) {
+                            bulkNotification.classList.remove('show');
+                        }
                     } else {
                         updateStatus('❌ Error notifying participants: ' + result.message, 'error');
                     }
                 } else {
                     updateStatus('No valid participant IDs found.', 'error');
                 }
-                
             } catch (error) {
                 console.error('Error notifying participants:', error);
                 updateStatus('Error sending notifications. Please try again.', 'error');
             }
-        }
-
-        async function loadSelectedParticipantsAndConnect(participantIds) {
-            try {
-                const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/GetBulkParticipantData") %>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sessionId: parseInt(sessionId),
-                        participantIds: participantIds
-                    })
-                });
-                
-                const data = await response.json();
-                const result = JSON.parse(data.d);
-                
-                if (result.success && result.participants.length > 0) {
-                    updateStatus(`Loading ${result.count} selected participants...`, 'info');
-                    
-                    // Show video interface
-                    document.getElementById('videoCallInterface').style.display = 'block';
-                    document.getElementById('groupVideoGrid').style.display = 'block';
-                    document.getElementById('activeControls').style.display = 'block';
-                    
-                    // Connect to each participant
-                    result.participants.forEach((participant, index) => {
-                        setTimeout(() => {
-                            addToGroupCall(participant.phone, participant.name);
-                        }, index * 1000); // Stagger connections
-                    });
-                } else {
-                    updateStatus('No participants found with the selected IDs.', 'error');
-                }
-                
-            } catch (error) {
-                console.error('Error loading selected participants:', error);
-                updateStatus('Error loading participants. Please try again.', 'error');
-            }
-        }
-
-        // === UTILITY FUNCTIONS ===
-
-        function checkOnlineParticipants() {
-            // Get the actual participant count from the server-side label
-            const totalRegistered = document.getElementById('<%= lblTotalParticipants.ClientID %>').textContent || '0';
-            
-            // Update the dashboard stats
-            document.getElementById('totalParticipants').textContent = totalRegistered;
-            
-            // Get all participant cards and simulate online status
-            const participantCards = document.querySelectorAll('.participant-card');
-            
-            console.log('🔄 Checking online status for', participantCards.length, 'participants');
-            
-            participantCards.forEach((card, index) => {
-                const phone = card.getAttribute('data-phone')?.replace(/[^0-9]/g, '') || '';
-                const name = card.getAttribute('data-name') || '';
-                const statusIndicator = card.querySelector('.status-indicator');
-                
-                if (phone && name && statusIndicator) {
-                    // Check if we have status for this participant
-                    const currentStatus = participantStatuses[phone];
-                    
-                    if (currentStatus) {
-                        statusIndicator.className = `status-indicator status-${currentStatus.status}`;
-                    } else {
-                        // Simulate some participants being online (for demo)
-                        const isOnline = Math.random() > 0.6; // 40% chance of being online
-                        const status = isOnline ? 'online' : 'waiting';
-                        
-                        participantStatuses[phone] = {
-                            name: name,
-                            status: status,
-                            bookingStatus: 'Confirmed'
-                        };
-                        
-                        statusIndicator.className = `status-indicator status-${status}`;
-                    }
-                }
-            });
-            
-            updateOnlineParticipantsList();
-            
-            console.log('✅ Online participants check completed');
-        }
-
-        function updateParticipantCounts() {
-            // Get counts from server-side controls
-            const totalRegisteredElement = document.getElementById('<%= lblTotalParticipants.ClientID %>');
-            const registeredCountElement = document.getElementById('<%= lblRegisteredCount.ClientID %>');
-            
-            const totalRegistered = totalRegisteredElement ? totalRegisteredElement.textContent : '0';
-            const registeredCount = registeredCountElement ? registeredCountElement.textContent : '0';
-            
-            console.log('Debug: Retrieved counts:', {
-                totalRegistered: totalRegistered,
-                registeredCount: registeredCount
-            });
-            
-            // Update dashboard elements
-            const dashboardTotal = document.getElementById('totalParticipants');
-            if (dashboardTotal) {
-                dashboardTotal.textContent = totalRegistered;
-            }
-            
-            // Also count participant cards directly and update if server count is 0
-            const participantCards = document.querySelectorAll('.participant-card');
-            console.log('Participant cards found:', participantCards.length);
-            
-            // Use the card count if it's more reliable
-            if (participantCards.length > 0) {
-                document.getElementById('totalParticipants').textContent = participantCards.length.toString();
-                // Also update the registered count section
-                document.getElementById('<%= lblRegisteredCount.ClientID %>').textContent = participantCards.length.toString();
-                console.log('Updated counts to card count:', participantCards.length);
-            }
-            
-            // Force update the stats display
-            setTimeout(() => {
-                const currentTotal = document.getElementById('totalParticipants').textContent || '0';
-                console.log('Final total participants count:', currentTotal);
-                
-                // If still 0, try to get data from server
-                if (currentTotal === '0' && sessionId) {
-                    testParticipantCount();
-                }
-            }, 500);
-        }
-
-        function updateParticipantStatus(phone, status) {
-            const cleanPhone = phone.replace(/[^0-9]/g, '');
-            const statusIndicator = document.getElementById(`status_${cleanPhone}`);
-            
-            if (statusIndicator) {
-                statusIndicator.className = `status-indicator status-${status}`;
-            }
-        }
-
-        function updateStatus(message, type) {
-            const statusLabel = document.getElementById('<%= lblStatus.ClientID %>');
-            statusLabel.textContent = message;
-            statusLabel.className = `status-message ${type}`;
-        }
-
-        function updateConnectedCount() {
-            let connectedCount = 0;
-
-            if (currentCall) connectedCount++;
-            connectedCount += Object.keys(groupConnections).length;
-
-            document.getElementById('connectedParticipants').textContent = connectedCount;
         }
 
         function filterParticipants(searchTerm) {
@@ -1511,8 +1686,8 @@
             const term = searchTerm.toLowerCase();
 
             cards.forEach(card => {
-                const name = card.getAttribute('data-name').toLowerCase();
-                const phone = card.getAttribute('data-phone').toLowerCase();
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const phone = (card.getAttribute('data-phone') || '').toLowerCase();
 
                 if (name.includes(term) || phone.includes(term)) {
                     card.style.display = 'block';
@@ -1522,69 +1697,82 @@
             });
         }
 
-        function startParticipantMonitoring() {
-            // Check for online participants every 30 seconds
-            setInterval(() => {
-                if (sessionMode === 'none') { // Only check when not in active session
-                    checkOnlineParticipants();
+        // UPDATED INITIALIZATION: Clean up duplicates and prevent issues
+        window.onload = function() {
+            const hdnSessionIdElement = document.getElementById('<%= hdnSessionId.ClientID %>');
+            sessionId = hdnSessionIdElement ? hdnSessionIdElement.value : null;
+
+            if (sessionId) {
+                console.log('🚀 Initializing multi-participant video system for session:', sessionId);
+                
+                // Clear any existing connections first
+                connections.clear();
+                activeParticipants.clear();
+                
+                // Create the multi-participant interface immediately
+                createMultiParticipantInterface();
+                
+                // Set up the expert peer system
+                setupMultiParticipantExpert();
+                
+                // Clean up any duplicates after a short delay
+                setTimeout(() => {
+                    cleanupDuplicateParticipants();
+                }, 2000);
+                
+                // Initialize other systems
+                checkOnlineParticipants();
+                updateParticipantCounts();
+
+                // Show bulk notification if there are participants
+                const totalParticipantsElement = document.getElementById('<%= lblTotalParticipants.ClientID %>');
+            const totalParticipants = totalParticipantsElement ? parseInt(totalParticipantsElement.textContent || '0') : 0;
+
+            if (totalParticipants > 0) {
+                const bulkNotification = document.getElementById('bulkNotification');
+                if (bulkNotification) {
+                    bulkNotification.classList.add('show');
                 }
-            }, 30000);
-        }
+            }
 
-        function startSessionTimer() {
+            // Start session timer
             sessionStartTime = new Date();
-
             setInterval(() => {
                 const now = new Date();
                 const diff = now - sessionStartTime;
                 const minutes = Math.floor(diff / 60000);
                 const seconds = Math.floor((diff % 60000) / 1000);
 
-                document.getElementById('sessionDuration').textContent =
-                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        // Add a test function to verify participant count
-        async function testParticipantCount() {
-            if (!sessionId) return;
-            
-            try {
-                const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/TestParticipantCount") %>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ sessionId: parseInt(sessionId) })
-                });
-
-                const data = await response.json();
-                const result = JSON.parse(data.d);
-
-                console.log('🧪 Test participant count result:', result);
-
-                if (result.success && result.count > 0) {
-                    document.getElementById('totalParticipants').textContent = result.count.toString();
-                    updateStatus(`Found ${result.count} confirmed participants`, 'success');
+                const durationElement = document.getElementById('sessionDuration');
+                if (durationElement) {
+                    durationElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 }
-            } catch (error) {
-                console.error('Error testing participant count:', error);
-            }
+            }, 1000);
+
+            // Periodic cleanup of duplicates every 30 seconds
+            setInterval(() => {
+                cleanupDuplicateParticipants();
+            }, 30000);
+
+        } else {
+            console.error('❌ No session ID found');
+            updateStatus('Session ID not found. Please return to session management.', 'error');
+        }
+    };
+
+    // Cleanup on page unload
+    window.onbeforeunload = function () {
+        console.log('🧹 Cleaning up resources...');
+
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
         }
 
-        // Cleanup on page unload - stop real-time updates
-        window.onbeforeunload = function () {
-            if (updateInterval) {
-                clearInterval(updateInterval);
-            }
+        disconnectAll();
 
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            endCurrentSession();
-            if (peer && isConnectionActive) {
-                peer.destroy();
-            }
-        };
-    </script>
+        if (peer && isConnectionActive) {
+            peer.destroy();
+        }
+    };
+</script>
 </asp:Content>

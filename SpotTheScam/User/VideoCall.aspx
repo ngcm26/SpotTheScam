@@ -19,73 +19,10 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .phone-entry-container h2 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .phone-entry-container p {
-            color: white;
-            margin-bottom: 25px;
-            opacity: 0.9;
-        }
-
-        .phone-input {
-            width: 100%;
-            max-width: 350px;
-            padding: 18px 20px;
-            font-size: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
-            margin: 15px 0;
-            text-align: center;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            backdrop-filter: blur(10px);
-        }
-
-        .phone-input::placeholder {
-            color: rgba(255,255,255,0.7);
-        }
-
-        .phone-input:focus {
-            outline: none;
-            border-color: white;
-            background: rgba(255,255,255,0.2);
-        }
-
-        .join-btn {
-            background: white;
-            color: #D36F2D;
-            padding: 18px 35px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-
-        .join-btn:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .join-btn:disabled {
-            background: rgba(255,255,255,0.5);
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .video-container {
             display: none;
             gap: 20px;
             padding: 20px;
-            justify-content: center;
             margin-bottom: 20px;
         }
 
@@ -109,8 +46,10 @@
         video {
             width: 100%;
             max-width: 480px;
+            height: 360px;
             border-radius: 10px;
             background: #000;
+            object-fit: cover;
         }
 
         .session-info {
@@ -120,13 +59,6 @@
             border-radius: 15px;
             display: none;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .session-info h2 {
-            color: #051D40;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            font-weight: 600;
         }
 
         .control-panel {
@@ -164,50 +96,35 @@
             border: 1px solid #81c784;
         }
 
-        .customer-details {
-            line-height: 1.8;
-            text-align: left;
-        }
-
-        .customer-details p {
-            margin: 12px 0;
-            color: #333;
-        }
-
-        .customer-details strong {
-            color: #D36F2D;
-            min-width: 140px;
-            display: inline-block;
-            font-weight: 600;
-        }
-
-        .end-call-btn {
-            background-color: #dc3545;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-top: 15px;
-            transition: background-color 0.3s;
-        }
-
-        .end-call-btn:hover {
-            background-color: #c82333;
-        }
-
-        .debug-info {
-            background: #f8f9fa;
-            padding: 15px;
+        .phone-input {
+            width: 100%;
+            max-width: 350px;
+            padding: 18px 20px;
+            font-size: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
             margin: 15px 0;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 200px;
-            overflow-y: auto;
-            text-align: left;
-            border-left: 4px solid #D36F2D;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .join-btn {
+            background: white;
+            color: #D36F2D;
+            padding: 18px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .join-btn:disabled {
+            background: rgba(255,255,255,0.5);
+            cursor: not-allowed;
         }
 
         .expert-consultation-badge {
@@ -219,23 +136,42 @@
             font-weight: 600;
             display: inline-block;
             margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        }
+
+        /* Multi-participant styles */
+        .other-participants-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .participant-video-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .participant-video-card video {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            background: #000;
+            object-fit: cover;
         }
 
         @media (max-width: 768px) {
-            .phone-input {
-                max-width: 100%;
-            }
-            
             .video-container {
                 flex-direction: column;
-            }
-            
-            .customer-details strong {
-                min-width: auto;
-                display: block;
-                margin-bottom: 5px;
             }
         }
     </style>
@@ -245,470 +181,510 @@
     <div class="main-container">
         <asp:HiddenField ID="hdnSessionId" runat="server" />
         <asp:HiddenField ID="hdnCustomerPhone" runat="server" />
+        <asp:HiddenField ID="hdnUserPhone" runat="server" />
         
         <!-- Phone Entry Section -->
         <div id="phoneEntrySection" class="phone-entry-container">
             <h2>Join Expert Consultation</h2>
             <p>Enter your phone number to connect with our scam prevention expert</p>
             <div class="expert-consultation-badge">🛡️ Expert Video Consultation</div>
-            <input type="tel" id="phoneInput" class="phone-input" placeholder="Enter your phone number" />
+            <input type="text" id="phoneInput" class="phone-input" placeholder="Enter your phone number" />
             <br />
-            <button id="joinBtn" class="join-btn" onclick="joinSession()">Connect with Expert</button>
+            <button id="joinBtn" class="join-btn" type="button" onclick="joinSession()">Connect with Expert</button>
             <div id="phoneStatus" class="status-message" style="display: none;"></div>
         </div>
 
-        <!-- Session Info (shown after joining) -->
+        <!-- Session Info -->
         <div id="sessionInfo" class="session-info">
             <h2>Expert Consultation Session</h2>
-            <div class="expert-consultation-badge">🎯 Live with Scam Prevention Expert</div>
+            <div class="expert-consultation-badge">🎯 Live with Expert</div>
             <asp:Label ID="lblSessionInfo" runat="server" />
         </div>
 
-        <!-- Video Call Interface -->
+        <!-- Video Interface -->
         <div id="videoCallInterface" class="video-container">
             <div class="video-wrapper">
                 <h3>Your Video</h3>
-                <video id="localVideo" autoplay muted playsinline></video>
+                <video id="localVideo" autoplay="true" muted="true" playsinline="true"></video>
             </div>
             <div class="video-wrapper">
                 <h3>Expert Video</h3>
-                <video id="remoteVideo" autoplay playsinline></video>
+                <video id="remoteVideo" autoplay="true" playsinline="true"></video>
             </div>
         </div>
 
+        <!-- Control Panel -->
         <div class="control-panel">
-            <asp:Label ID="lblStatus" runat="server" CssClass="status-message info" />
-            <div style="display: none;">
-                <button id="endCallBtn" class="end-call-btn" onclick="endCall()">End Call</button>
+            <asp:Label ID="lblStatus" runat="server" CssClass="status-message info" 
+                Text="Enter your phone number above to join the expert consultation" />
+            <div>
+                <button id="endCallBtn" class="join-btn" type="button" onclick="endCall()" style="display: none; background: #dc3545;">End Call</button>
             </div>
-            <div id="debugInfo" class="debug-info" style="display: none;"></div>
         </div>
     </div>
 
     <script type="text/javascript">
-        // Enhanced JavaScript for User VideoCall.aspx - Replace the existing script section
-
+        // Simplified User Video Call System
         let peer;
-        let currentCall;
         let localStream;
-        let isConnectionActive = false;
+        let currentCall;
+        let expertCall;
+        let isConnected = false;
         let sessionId = null;
-        let customerPhone = null;
+        let customerPhone = '';
+        let participantConnections = new Map();
 
-        function updateDebugInfo(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            if (debugDiv) {
-                debugDiv.style.display = 'block';
-                const timestamp = new Date().toLocaleTimeString();
-                debugDiv.innerHTML += `${timestamp}: ${message}<br>`;
-                debugDiv.scrollTop = debugDiv.scrollHeight;
-            }
-            console.log('🔧 DEBUG:', message);
+        // Debug function
+        function debugLog(message) {
+            console.log('🔍 DEBUG:', message);
+            updateStatus(message, 'info');
         }
 
-        function showStatus(message, type = 'info') {
-            // Update main status label
-            const statusElement = document.getElementById('<%= lblStatus.ClientID %>');
-            if (statusElement) {
-                statusElement.innerText = message;
-                statusElement.className = `status-message ${type}`;
+        // Page load initialization
+        window.onload = function () {
+            debugLog('User video call page loaded');
+
+            // Check for auto-join parameters
+            sessionId = getSessionId();
+            customerPhone = getCustomerPhone();
+
+            debugLog('Session ID: ' + sessionId + ', Phone: ' + customerPhone);
+
+            if (sessionId && customerPhone) {
+                debugLog('Auto-joining session');
+                document.getElementById('phoneInput').value = customerPhone;
+                setTimeout(() => joinSession(), 1000);
             }
+        };
 
-            // Update phone status
-            const phoneStatus = document.getElementById('phoneStatus');
-            if (phoneStatus) {
-                phoneStatus.innerText = message;
-                phoneStatus.className = `status-message ${type}`;
-                phoneStatus.style.display = 'block';
-            }
-
-            console.log(`📱 Customer status (${type}):`, message);
-        }
-
+        // Join session
         async function joinSession() {
             const phoneInput = document.getElementById('phoneInput');
+            const joinBtn = document.getElementById('joinBtn');
+
             const phone = phoneInput.value.trim();
 
             if (!phone) {
-                showStatus('Please enter your phone number', 'error');
+                updateStatus('Please enter your phone number', 'error');
                 return;
             }
 
-            // Validate and format phone number
-            const formattedPhone = formatPhoneNumber(phone);
-            if (!formattedPhone) {
-                showStatus('Please enter a valid phone number', 'error');
-                return;
-            }
+            joinBtn.disabled = true;
+            joinBtn.innerText = 'Connecting...';
+            debugLog('Starting join process with phone: ' + phone);
 
-            customerPhone = formattedPhone;
-            const hdnCustomerPhone = document.getElementById('<%= hdnCustomerPhone.ClientID %>');
-    if (hdnCustomerPhone) {
-        hdnCustomerPhone.value = customerPhone;
-    }
+            try {
+                // Check session
+                const response = await fetch('VideoCall.aspx/CheckSession', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: phone })
+                });
 
-    // Disable join button
-    const joinBtn = document.getElementById('joinBtn');
-    if (joinBtn) {
-        joinBtn.disabled = true;
-    }
+                const data = await response.json();
+                const result = JSON.parse(data.d);
 
-    showStatus('Looking for your expert consultation...', 'info');
-    updateDebugInfo(`Checking session for phone: ${customerPhone}`);
+                debugLog('Session check result: ' + JSON.stringify(result));
 
-    try {
-        // Check if session exists with this phone number
-        const sessionData = await checkSessionExists(customerPhone);
-        if (sessionData.success) {
-            sessionId = sessionData.sessionId;
-            const hdnSessionId = document.getElementById('<%= hdnSessionId.ClientID %>');
-            if (hdnSessionId) {
-                hdnSessionId.value = sessionId;
-            }
-            
-            updateDebugInfo(`Session found: ${sessionId}`);
-            
-            // FIXED: Notify staff immediately when participant joins
-            await notifyStaffParticipantJoined();
-            
-            // Hide phone entry, show session info
-            const phoneEntrySection = document.getElementById('phoneEntrySection');
-            const sessionInfoDiv = document.getElementById('sessionInfo');
-            
-            if (phoneEntrySection) phoneEntrySection.style.display = 'none';
-            if (sessionInfoDiv) sessionInfoDiv.style.display = 'block';
-            
-            // Load session details
-            loadSessionDetails(sessionData);
-            
-            // Initialize video call
-            await initializeCall();
-        } else {
-            showStatus(sessionData.message || 'No active expert session found with this phone number', 'error');
-            if (joinBtn) {
-                joinBtn.disabled = false;
-            }
-        }
-    } catch (error) {
-        updateDebugInfo(`Error joining session: ${error.message}`);
-        showStatus('Error connecting to session. Please try again.', 'error');
-        if (joinBtn) {
-            joinBtn.disabled = false;
-        }
-    }
-}
+                if (result.success) {
+                    sessionId = result.sessionId;
+                    customerPhone = phone;
 
-// FIXED: Notify staff when participant joins
-async function notifyStaffParticipantJoined() {
-    if (!sessionId || !customerPhone) return;
-    
-    try {
-        const response = await fetch('VideoCall.aspx/NotifyStaffParticipantJoined', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                sessionId: sessionId, 
-                phoneNumber: customerPhone,
-                participantName: 'Participant'
-            })
-        });
-        
-        const data = await response.json();
-        const result = JSON.parse(data.d);
-        
-        if (result.success) {
-            updateDebugInfo('✅ Staff notified of participant connection');
-        }
-    } catch (error) {
-        updateDebugInfo(`⚠️ Failed to notify staff: ${error.message}`);
-    }
-}
+                    // Store values
+                    document.getElementById('<%= hdnSessionId.ClientID %>').value = sessionId;
+                    document.getElementById('<%= hdnCustomerPhone.ClientID %>').value = phone;
+                    document.getElementById('<%= hdnUserPhone.ClientID %>').value = phone;
 
-function formatPhoneNumber(phone) {
-    // Remove all non-digit characters
-    const cleaned = phone.replace(/\D/g, '');
-    
-    // Check for valid length (assuming 8-15 digits)
-    if (cleaned.length < 8 || cleaned.length > 15) {
-        return null;
-    }
-    
-    // Format as needed (this example assumes Singapore format)
-    if (cleaned.length === 8) {
-        return `+65${cleaned}`;
-    } else if (cleaned.startsWith('65') && cleaned.length === 10) {
-        return `+${cleaned}`;
-    } else if (cleaned.startsWith('0')) {
-        return `+65${cleaned.substring(1)}`;
-    }
-    
-    return `+${cleaned}`;
-}
+                    // Hide phone entry, show session info
+                    document.getElementById('phoneEntrySection').style.display = 'none';
+                    document.getElementById('sessionInfo').style.display = 'block';
 
-async function checkSessionExists(phone) {
-    try {
-        updateDebugInfo(`Making request to check session for phone: ${phone}`);
-        
-        const response = await fetch('VideoCall.aspx/CheckSession', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ phoneNumber: phone })
-        });
-        
-        const data = await response.json();
-        const result = JSON.parse(data.d);
-        
-        updateDebugInfo(`Session check result: ${JSON.stringify(result)}`);
-        return result;
-    } catch (error) {
-        updateDebugInfo(`Check session error: ${error.message}`);
-        return { success: false, message: 'Connection error' };
-    }
-}
+                    debugLog('Session found, initializing video...');
+                    await initializeVideo();
 
-function loadSessionDetails(sessionData) {
-    const sessionInfo = `
-        <div class='customer-details'>
-            <p><strong>Session ID:</strong> ${sessionData.sessionId}</p>
-            <p><strong>Expert:</strong> ${sessionData.staffName || 'Scam Prevention Specialist'}</p>
-            <p><strong>Session Date:</strong> ${sessionData.sessionDate || 'Today'}</p>
-            <p><strong>Session Time:</strong> ${sessionData.sessionTime || 'Current'}</p>
-            <p><strong>Consultation Type:</strong> Expert Video Consultation</p>
-            <p><strong>Focus Area:</strong> Scam Prevention & Safety Education</p>
-            <p><strong>Status:</strong> <span style="color: #28a745; font-weight: 600;">✅ Connected & Ready</span></p>
-        </div>`;
-        
-    const lblSessionInfo = document.getElementById('<%= lblSessionInfo.ClientID %>');
-    if (lblSessionInfo) {
-        lblSessionInfo.innerHTML = sessionInfo;
-    }
-
-    updateDebugInfo('Session details loaded and displayed');
-}
-
-async function initializeCall() {
-    try {
-        updateDebugInfo('Starting customer initialization...');
-
-        // Get user media first
-        localStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        });
-
-        updateDebugInfo('Got media stream successfully');
-
-        const localVideo = document.getElementById('localVideo');
-        if (localVideo) {
-            localVideo.srcObject = localStream;
-        }
-
-        // Create peer ID using phone number
-        const peerId = `customer_${customerPhone.replace(/[^0-9]/g, '')}`;
-        updateDebugInfo(`Creating customer peer with ID: ${peerId}`);
-
-        peer = new Peer(peerId, {
-            host: 'localhost',
-            port: 3001,
-            path: '/',
-            debug: 3
-        });
-
-        peer.on('open', (id) => {
-            updateDebugInfo(`Peer connection opened with ID: ${id}`);
-            showStatus('🟢 Connected! Waiting for expert to join...', 'success');
-            isConnectionActive = true;
-
-            // Show video interface
-            const videoCallInterface = document.getElementById('videoCallInterface');
-            const endCallBtnParent = document.getElementById('endCallBtn')?.parentElement;
-
-            if (videoCallInterface) {
-                videoCallInterface.style.display = 'flex';
-            }
-            if (endCallBtnParent) {
-                endCallBtnParent.style.display = 'block';
-            }
-        });
-
-        peer.on('call', (call) => {
-            updateDebugInfo('📞 Receiving call from expert');
-            call.answer(localStream);
-            setupCall(call);
-            
-            // Update status to show expert connection
-            showStatus('🎯 Expert connected! Session in progress...', 'success');
-        });
-
-        peer.on('error', (err) => {
-            updateDebugInfo(`Peer error: ${err.type} - ${err.message}`);
-            isConnectionActive = false;
-            let message = 'Connection error: ';
-
-            switch (err.type) {
-                case 'invalid-id':
-                    message += 'Please refresh and try again';
-                    break;
-                case 'peer-unavailable':
-                    message += 'Expert not available yet. Please wait...';
-                    break;
-                case 'network':
-                    message += 'Network connection issue';
-                    break;
-                default:
-                    message += err.message;
-            }
-
-            showStatus(message, 'error');
-        });
-
-        peer.on('disconnected', () => {
-            updateDebugInfo('Peer disconnected, attempting reconnection...');
-            isConnectionActive = false;
-            showStatus('Connection lost. Attempting to reconnect...', 'info');
-
-            // Try to reconnect
-            setTimeout(() => {
-                if (peer && !peer.destroyed) {
-                    peer.reconnect();
+                } else {
+                    updateStatus(result.message, 'error');
+                    joinBtn.disabled = false;
+                    joinBtn.innerText = 'Connect with Expert';
                 }
-            }, 2000);
-        });
 
-    } catch (err) {
-        updateDebugInfo(`Setup error: ${err.message}`);
-        showStatus('Error accessing camera/microphone. Please ensure they are connected and permitted.', 'error');
-    }
-}
-
-function setupCall(call) {
-    currentCall = call;
-    updateDebugInfo('Setting up call with expert');
-
-    call.on('stream', (remoteStream) => {
-        updateDebugInfo('Received remote stream from expert');
-
-        const remoteVideo = document.getElementById('remoteVideo');
-        if (remoteVideo) {
-            remoteVideo.srcObject = remoteStream;
-        }
-
-        showStatus('🛡️ Connected with your scam prevention expert!', 'success');
-        updateDebugInfo('✅ Video call established successfully');
-    });
-
-    call.on('close', () => {
-        updateDebugInfo('Call ended by expert');
-
-        const remoteVideo = document.getElementById('remoteVideo');
-        if (remoteVideo) {
-            remoteVideo.srcObject = null;
-        }
-
-        showStatus('📋 Consultation completed. Thank you!', 'info');
-        
-        // Show session summary or feedback form
-        setTimeout(() => {
-            showSessionSummary();
-        }, 2000);
-    });
-
-    call.on('error', (err) => {
-        updateDebugInfo(`Call error: ${err.message}`);
-        showStatus('Call error: ' + err.message, 'error');
-    });
-}
-
-// FIXED: Show session summary when call ends
-function showSessionSummary() {
-    const summaryHTML = `
-        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px; margin: 20px 0;">
-            <h3 style="color: #28a745; margin-bottom: 15px;">✅ Session Completed</h3>
-            <p>Thank you for participating in our expert consultation session!</p>
-            <p>We hope you found the session helpful for your scam prevention knowledge.</p>
-            <div style="margin-top: 20px;">
-                <button onclick="window.location.href='UserMySessions.aspx'" style="background: #D36F2D; color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; cursor: pointer;">
-                    📅 View My Sessions
-                </button>
-                <button onclick="window.location.href='UserHome.aspx'" style="background: #28a745; color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; cursor: pointer;">
-                    🏠 Back to Home
-                </button>
-            </div>
-        </div>
-    `;
-    
-            const statusElement = document.getElementById('<%= lblStatus.ClientID %>');
-            if (statusElement) {
-                statusElement.innerHTML = summaryHTML;
-                statusElement.className = 'status-message success';
+            } catch (error) {
+                debugLog('Error in joinSession: ' + error.message);
+                updateStatus('Connection error. Please try again.', 'error');
+                joinBtn.disabled = false;
+                joinBtn.innerText = 'Connect with Expert';
             }
         }
 
-        function endCall() {
-            updateDebugInfo('User initiated call end');
+        // Initialize video
+        async function initializeVideo() {
+            try {
+                debugLog('Getting user media...');
 
-            if (currentCall) {
-                currentCall.close();
-                currentCall = null;
+                // Get camera and microphone
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+
+                // Show local video
+                const localVideo = document.getElementById('localVideo');
+                if (localVideo) {
+                    localVideo.srcObject = localStream;
+                    debugLog('Local video stream set');
+                }
+
+                // Show video interface
+                document.getElementById('videoCallInterface').style.display = 'flex';
+                document.getElementById('endCallBtn').style.display = 'inline-block';
+
+                debugLog('Creating peer connection...');
+                await createPeerConnection();
+
+            } catch (err) {
+                debugLog('Media error: ' + err.message);
+                updateStatus('Camera/microphone access required. Please allow permissions and refresh.', 'error');
+            }
+        }
+
+        // Create peer connection
+        async function createPeerConnection() {
+            try {
+                const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
+                const peerId = `customer_${cleanPhone}`;
+
+                debugLog('Creating peer with ID: ' + peerId);
+
+                peer = new Peer(peerId, {
+                    host: '0.peerjs.com',
+                    port: 443,
+                    path: '/',
+                    secure: true,
+                    debug: 1
+                });
+
+                peer.on('open', (id) => {
+                    debugLog('Peer connected with ID: ' + id);
+                    updateStatus('Connected! Waiting for expert to join...', 'success');
+
+                    // Try to connect to expert
+                    setTimeout(() => connectToExpert(), 2000);
+                });
+
+                peer.on('call', (call) => {
+                    debugLog('Incoming call from: ' + call.peer);
+                    handleIncomingCall(call);
+                });
+
+                peer.on('error', (err) => {
+                    debugLog('Peer error: ' + err.type + ' - ' + err.message);
+                    updateStatus('Connection error: ' + err.message, 'error');
+                });
+
+                peer.on('disconnected', () => {
+                    debugLog('Peer disconnected');
+                    updateStatus('Connection lost. Attempting to reconnect...', 'info');
+                });
+
+            } catch (err) {
+                debugLog('Error creating peer: ' + err.message);
+                updateStatus('Failed to create connection. Please refresh and try again.', 'error');
+            }
+        }
+
+        // Connect to expert
+        function connectToExpert() {
+            if (!peer || !localStream || !sessionId) {
+                debugLog('Cannot connect to expert - missing requirements');
+                return;
             }
 
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
+            const expertId = `expert_session_${sessionId}`;
+            debugLog('Attempting to call expert: ' + expertId);
 
-            if (peer && isConnectionActive) {
-                peer.destroy();
+            try {
+                const call = peer.call(expertId, localStream);
+
+                if (call) {
+                    expertCall = call;
+
+                    call.on('stream', (remoteStream) => {
+                        debugLog('Received expert video stream');
+                        handleExpertStream(remoteStream);
+                    });
+
+                    call.on('error', (err) => {
+                        debugLog('Expert call error: ' + err.message);
+                        updateStatus('Expert not available. Retrying...', 'info');
+                        setTimeout(() => connectToExpert(), 5000);
+                    });
+
+                    call.on('close', () => {
+                        debugLog('Expert call ended');
+                        handleExpertDisconnect();
+                    });
+                } else {
+                    debugLog('Failed to create call to expert');
+                    setTimeout(() => connectToExpert(), 5000);
+                }
+            } catch (err) {
+                debugLog('Error calling expert: ' + err.message);
+                setTimeout(() => connectToExpert(), 5000);
             }
+        }
+
+        // Handle incoming calls
+        function handleIncomingCall(call) {
+            debugLog('Handling incoming call from: ' + call.peer);
+
+            // Answer the call
+            call.answer(localStream);
+
+            call.on('stream', (remoteStream) => {
+                debugLog('Received stream from: ' + call.peer);
+
+                if (call.peer.includes('expert_session_')) {
+                    handleExpertStream(remoteStream);
+                } else if (call.peer.includes('customer_')) {
+                    handleParticipantStream(call.peer, remoteStream, call);
+                }
+            });
+
+            call.on('close', () => {
+                debugLog('Call closed from: ' + call.peer);
+                if (call.peer.includes('expert_session_')) {
+                    handleExpertDisconnect();
+                } else {
+                    removeParticipant(call.peer);
+                }
+            });
+        }
+
+        // Handle expert stream
+        function handleExpertStream(stream) {
+            debugLog('Setting expert video stream');
+
+            const remoteVideo = document.getElementById('remoteVideo');
+            if (remoteVideo) {
+                remoteVideo.srcObject = stream;
+                isConnected = true;
+                updateStatus('🎉 Connected with expert! Video consultation is active.', 'success');
+
+                // Start looking for other participants
+                setTimeout(() => discoverParticipants(), 3000);
+            }
+        }
+
+        // Handle expert disconnect
+        function handleExpertDisconnect() {
+            debugLog('Expert disconnected');
 
             const remoteVideo = document.getElementById('remoteVideo');
             if (remoteVideo) {
                 remoteVideo.srcObject = null;
             }
 
-            showStatus('Consultation ended', 'info');
+            isConnected = false;
+            expertCall = null;
+            updateStatus('Expert disconnected. Waiting for reconnection...', 'info');
 
-            // Show session summary
-            setTimeout(() => {
-                showSessionSummary();
-            }, 1000);
+            // Try to reconnect
+            setTimeout(() => connectToExpert(), 3000);
         }
 
-        // Cleanup on page unload
-        window.onbeforeunload = function () {
-            updateDebugInfo('Page unloading - cleaning up resources');
+        // Handle participant stream
+        function handleParticipantStream(participantId, stream, call) {
+            debugLog('Adding participant: ' + participantId);
+
+            participantConnections.set(participantId, { call, stream });
+            addParticipantToUI(participantId, stream);
+        }
+
+        // Add participant to UI
+        function addParticipantToUI(participantId, stream) {
+            // Create participants section if it doesn't exist
+            let participantsSection = document.querySelector('.other-participants-section');
+            if (!participantsSection) {
+                const mainContainer = document.querySelector('.main-container');
+                participantsSection = document.createElement('div');
+                participantsSection.className = 'other-participants-section';
+                participantsSection.innerHTML = `
+                    <h3>👥 Other Participants</h3>
+                    <div class="participants-grid" id="participantsGrid"></div>
+                `;
+                mainContainer.appendChild(participantsSection);
+            }
+
+            // Add participant video
+            const grid = document.getElementById('participantsGrid');
+            const participantDiv = document.createElement('div');
+            participantDiv.className = 'participant-video-card';
+            participantDiv.id = `participant_${participantId}`;
+
+            const participantName = participantId.replace('customer_', 'Participant ');
+            participantDiv.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: #051D40;">👤 ${participantName}</h4>
+                </div>
+                <video autoplay="true" playsinline="true"></video>
+            `;
+
+            grid.appendChild(participantDiv);
+
+            // Set video stream
+            const video = participantDiv.querySelector('video');
+            if (video) {
+                video.srcObject = stream;
+            }
+
+            debugLog('Participant added to UI: ' + participantName);
+        }
+
+        // Discover other participants
+        async function discoverParticipants() {
+            if (!sessionId || !isConnected) return;
+
+            try {
+                debugLog('Discovering other participants...');
+
+                const response = await fetch('/Staff/StaffVideoCall.aspx/GetSessionParticipants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: parseInt(sessionId) })
+                });
+
+                const data = await response.json();
+                const result = JSON.parse(data.d);
+
+                if (result.success && result.participants) {
+                    const myPhone = customerPhone.replace(/[^0-9]/g, '');
+
+                    result.participants.forEach(participant => {
+                        const cleanPhone = participant.phone.replace(/[^0-9]/g, '');
+
+                        if (cleanPhone !== myPhone) {
+                            const participantId = `customer_${cleanPhone}`;
+
+                            if (!participantConnections.has(participantId)) {
+                                setTimeout(() => {
+                                    connectToParticipant(participantId);
+                                }, Math.random() * 2000);
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                debugLog('Error discovering participants: ' + error.message);
+            }
+        }
+
+        // Connect to participant
+        function connectToParticipant(participantId) {
+            if (!peer || !localStream) return;
+
+            debugLog('Connecting to participant: ' + participantId);
+
+            try {
+                const call = peer.call(participantId, localStream);
+
+                if (call) {
+                    call.on('stream', (remoteStream) => {
+                        debugLog('Connected to participant: ' + participantId);
+                        handleParticipantStream(participantId, remoteStream, call);
+                    });
+
+                    call.on('error', (err) => {
+                        debugLog('Participant call error: ' + err.message);
+                    });
+                }
+            } catch (err) {
+                debugLog('Error connecting to participant: ' + err.message);
+            }
+        }
+
+        // Remove participant
+        function removeParticipant(participantId) {
+            const element = document.getElementById(`participant_${participantId}`);
+            if (element) {
+                element.remove();
+            }
+            participantConnections.delete(participantId);
+            debugLog('Removed participant: ' + participantId);
+        }
+
+        // End call
+        function endCall() {
+            debugLog('Ending call...');
 
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
-            if (currentCall) {
-                currentCall.close();
+
+            if (expertCall) {
+                expertCall.close();
             }
-            if (peer && isConnectionActive) {
+
+            participantConnections.forEach((connection) => {
+                connection.call.close();
+            });
+
+            if (peer) {
                 peer.destroy();
             }
-        };
 
-        // Auto-focus phone input when page loads
-        window.onload = function () {
-            console.log('🔧 Customer VideoCall page loading...');
+            // Reset UI
+            document.getElementById('videoCallInterface').style.display = 'none';
+            document.getElementById('sessionInfo').style.display = 'none';
+            document.getElementById('phoneEntrySection').style.display = 'block';
+            document.getElementById('joinBtn').disabled = false;
+            document.getElementById('joinBtn').innerText = 'Connect with Expert';
+            document.getElementById('phoneInput').value = '';
 
-            const phoneInput = document.getElementById('phoneInput');
-            if (phoneInput) {
-                phoneInput.focus();
+            updateStatus('Call ended. You can start a new session above.', 'info');
+        }
 
-                // Add enter key support
-                phoneInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        joinSession();
-                    }
-                });
+        // Utility functions
+        function updateStatus(message, type) {
+            console.log('📱 Status (' + type + '): ' + message);
+
+            const statusLabel = document.getElementById('<%= lblStatus.ClientID %>');
+            if (statusLabel) {
+                statusLabel.textContent = message;
+                statusLabel.className = 'status-message ' + type;
             }
+        }
 
-            updateDebugInfo('Customer video call page initialized');
+        function getSessionId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionFromUrl = urlParams.get('sessionId');
+            if (sessionFromUrl) return sessionFromUrl;
+            
+            const sessionField = document.getElementById('<%= hdnSessionId.ClientID %>');
+            if (sessionField && sessionField.value) return sessionField.value;
+            
+            return null;
+        }
+
+        function getCustomerPhone() {
+            const phoneField = document.getElementById('<%= hdnCustomerPhone.ClientID %>') || 
+                              document.getElementById('<%= hdnUserPhone.ClientID %>');
+            if (phoneField && phoneField.value) return phoneField.value;
+
+            return '';
+        }
+
+        // Periodic participant discovery
+        setInterval(() => {
+            if (isConnected && sessionId) {
+                discoverParticipants();
+            }
+        }, 10000);
+
+        // Cleanup on page unload
+        window.onbeforeunload = function () {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
         };
     </script>
 </asp:Content>

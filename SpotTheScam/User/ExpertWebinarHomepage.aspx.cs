@@ -256,24 +256,35 @@ namespace SpotTheScam.User
             ClientScript.RegisterStartupScript(this.GetType(), "UpdatePointsDisplay", script, true);
         }
 
+        // FIXED: Updated LoadUpcomingSessions method to show ALL sessions properly
         private void LoadUpcomingSessions()
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine("=== LoadUpcomingSessions START ===");
+
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Load upcoming sessions from database
+                    // FIXED: More inclusive query to get ALL available sessions
                     string query = @"
-                        SELECT TOP 6 Id as SessionId, SessionTitle as Title, SessionDescription as Description, 
-                               SessionDate, StartTime, ExpertName, PointsCost as PointsRequired, 
-                               SessionType, (MaxParticipants - CurrentParticipants) as AvailableSpots, 
-                               MaxParticipants
-                        FROM ExpertSessions 
-                        WHERE SessionDate >= CAST(GETDATE() AS DATE) 
-                        AND Status = 'Available'
-                        ORDER BY SessionDate ASC, StartTime ASC";
+                        SELECT 
+                            es.Id as SessionId, 
+                            es.SessionTitle as Title, 
+                            es.SessionDescription as Description, 
+                            es.SessionDate, 
+                            CONVERT(varchar, es.StartTime, 108) as StartTime,
+                            es.ExpertName, 
+                            ISNULL(es.PointsCost, 0) as PointsRequired, 
+                            es.SessionType, 
+                            (es.MaxParticipants - ISNULL(es.CurrentParticipants, 0)) as AvailableSpots, 
+                            es.MaxParticipants,
+                            es.Status
+                        FROM ExpertSessions es
+                        WHERE es.Status = 'Available'
+                        AND (es.SessionDate >= CAST(GETDATE() AS DATE) OR es.SessionDate >= DATEADD(day, -7, GETDATE()))
+                        ORDER BY es.SessionDate ASC, es.StartTime ASC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -281,14 +292,24 @@ namespace SpotTheScam.User
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
+                        System.Diagnostics.Debug.WriteLine($"Found {dt.Rows.Count} sessions from database");
+
+                        // Debug: Log each session found
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Session: {row["Title"]}, Date: {row["SessionDate"]}, ID: {row["SessionId"]}, Status: {row["Status"]}");
+                        }
+
                         if (dt.Rows.Count > 0)
                         {
-                            // Bind to repeater or update individual session controls
+                            // Bind to repeater
                             rptUpcomingSessions.DataSource = dt;
                             rptUpcomingSessions.DataBind();
+                            System.Diagnostics.Debug.WriteLine($"✅ Successfully bound {dt.Rows.Count} sessions to repeater");
                         }
                         else
                         {
+                            System.Diagnostics.Debug.WriteLine("⚠️ No sessions found in database - loading fallback sessions");
                             // Show fallback message or load hardcoded sessions
                             LoadFallbackSessions();
                         }
@@ -297,7 +318,8 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading upcoming sessions: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Error loading upcoming sessions: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
                 // Load fallback hardcoded sessions if database fails
                 LoadFallbackSessions();
             }
@@ -305,6 +327,8 @@ namespace SpotTheScam.User
 
         private void LoadFallbackSessions()
         {
+            System.Diagnostics.Debug.WriteLine("=== LoadFallbackSessions START ===");
+
             // Create fallback data structure
             DataTable dt = new DataTable();
             dt.Columns.Add("SessionId", typeof(int));
@@ -321,18 +345,20 @@ namespace SpotTheScam.User
             // Add hardcoded fallback sessions
             dt.Rows.Add(1, "Protecting Your Online Banking",
                 "Learn secure banking practices and how to spot fraudulent banking websites with cybersecurity expert Dr. Harvey Blue",
-                new DateTime(2025, 6, 15), "2:00 PM", "Dr Harvey Blue", 0, "Free", 100, 100);
+                DateTime.Today.AddDays(7), "14:00", "Dr Harvey Blue", 0, "Free", 100, 100);
 
             dt.Rows.Add(2, "Latest Phone Scam Tactics",
                 "Discover the newest phone scam methods and how to protect yourself with Officer James Wilson from the Police Fraud Division",
-                new DateTime(2025, 6, 17), "10:00 AM", "Officer James Wilson", 50, "Premium", 10, 10);
+                DateTime.Today.AddDays(9), "10:00", "Officer James Wilson", 50, "Premium", 10, 10);
 
             dt.Rows.Add(3, "Safe Social Media for Seniors",
                 "Navigate Facebook, Instagram, and other platforms safely while avoiding scammers with digital educator Maria Rodriguez",
-                new DateTime(2025, 6, 19), "2:00 PM", "Maria Rodriguez", 0, "Free", 50, 50);
+                DateTime.Today.AddDays(12), "15:00", "Maria Rodriguez", 0, "Free", 50, 50);
 
             rptUpcomingSessions.DataSource = dt;
             rptUpcomingSessions.DataBind();
+
+            System.Diagnostics.Debug.WriteLine($"✅ Loaded {dt.Rows.Count} fallback sessions");
         }
 
         protected string GetSessionTypeClass(object pointsRequired)
@@ -394,9 +420,36 @@ namespace SpotTheScam.User
 
         protected string FormatSessionDate(object sessionDate, object startTime)
         {
-            DateTime date = Convert.ToDateTime(sessionDate);
-            string time = startTime.ToString();
-            return $"{date:MMMM dd}, {time}";
+            try
+            {
+                DateTime date = Convert.ToDateTime(sessionDate);
+                string time = startTime.ToString();
+
+                // Handle time formatting - remove seconds if present
+                if (time.Contains(":"))
+                {
+                    string[] timeParts = time.Split(':');
+                    if (timeParts.Length >= 2)
+                    {
+                        int hour = Convert.ToInt32(timeParts[0]);
+                        int minute = Convert.ToInt32(timeParts[1]);
+
+                        // Convert to 12-hour format with AM/PM
+                        string ampm = hour >= 12 ? "PM" : "AM";
+                        if (hour > 12) hour -= 12;
+                        if (hour == 0) hour = 12;
+
+                        time = $"{hour}:{minute:D2} {ampm}";
+                    }
+                }
+
+                return $"{date:MMMM dd}, {time}";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error formatting session date: {ex.Message}");
+                return "Date/Time TBD";
+            }
         }
 
         // NEW METHOD: Get current points as string for use in markup

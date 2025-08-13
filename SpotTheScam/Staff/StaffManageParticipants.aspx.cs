@@ -91,6 +91,8 @@ namespace SpotTheScam.Staff
             }
         }
 
+        // FIXED: Replace your LoadParticipants method in StaffManageParticipants.aspx.cs with this:
+
         private void LoadParticipants()
         {
             try
@@ -98,26 +100,40 @@ namespace SpotTheScam.Staff
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
+
+                    // FIXED: Updated query with correct column names based on your database schema
                     string query = @"
-                        SELECT 
-                            vcb.UserId,
-                            COALESCE(u.Name, vcb.CustomerName, 'Participant') as UserName,
-                            COALESCE(u.Email, vcb.CustomerEmail, 'No email') as Email,
-                            COALESCE(u.PhoneNumber, vcb.CustomerPhone, 'No phone') as PhoneNumber,
-                            vcb.BookingDate,
-                            vcb.PointsUsed,
-                            vcb.BookingStatus,
-                            COALESCE(vcb.ScamConcerns, 'General consultation') as ScamConcerns
-                        FROM VideoCallBookings vcb
-                        LEFT JOIN Users u ON vcb.UserId = u.Id
-                        WHERE vcb.SessionId = @SessionId AND vcb.BookingStatus = 'Confirmed'
-                        ORDER BY vcb.BookingDate DESC";
+                SELECT 
+                    vcb.UserId,
+                    COALESCE(vcb.CustomerName, u.Username, 'Participant') as UserName,
+                    COALESCE(vcb.CustomerEmail, u.Email, 'No email') as Email,
+                    COALESCE(vcb.CustomerPhone, u.PhoneNumber, 'No phone') as PhoneNumber,
+                    vcb.BookingDate,
+                    ISNULL(vcb.PointsUsed, 0) as PointsUsed,
+                    vcb.BookingStatus,
+                    COALESCE(vcb.ScamConcerns, vcb.MainSecurityConcerns, 'General consultation') as ScamConcerns,
+                    vcb.SessionId
+                FROM VideoCallBookings vcb
+                LEFT JOIN Users u ON vcb.UserId = u.Id
+                WHERE vcb.SessionId = @SessionId 
+                AND vcb.BookingStatus = 'Confirmed'
+                ORDER BY vcb.BookingDate DESC";
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                     {
                         adapter.SelectCommand.Parameters.AddWithValue("@SessionId", sessionId);
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
+
+                        System.Diagnostics.Debug.WriteLine($"=== LoadParticipants Debug ===");
+                        System.Diagnostics.Debug.WriteLine($"Session ID: {sessionId}");
+                        System.Diagnostics.Debug.WriteLine($"Found {dt.Rows.Count} participants");
+
+                        // Debug: Print participant data
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Participant: {row["UserName"]}, Phone: {row["PhoneNumber"]}, Email: {row["Email"]}, Status: {row["BookingStatus"]}");
+                        }
 
                         if (dt.Rows.Count > 0)
                         {
@@ -126,7 +142,7 @@ namespace SpotTheScam.Staff
                             pnlNoParticipants.Visible = false;
                             lblParticipantCount.Text = dt.Rows.Count.ToString();
 
-                            System.Diagnostics.Debug.WriteLine($"Loaded {dt.Rows.Count} participants");
+                            System.Diagnostics.Debug.WriteLine($"✅ Participants loaded and bound to repeater. Count: {dt.Rows.Count}");
                         }
                         else
                         {
@@ -134,6 +150,11 @@ namespace SpotTheScam.Staff
                             rptParticipants.DataBind();
                             pnlNoParticipants.Visible = true;
                             lblParticipantCount.Text = "0";
+
+                            System.Diagnostics.Debug.WriteLine("⚠️ No participants found - checking if any registrations exist at all");
+
+                            // Debug: Check if there are ANY registrations for this session
+                            CheckForAnyRegistrations(conn, sessionId);
                         }
                     }
                 }
@@ -141,7 +162,64 @@ namespace SpotTheScam.Staff
             catch (Exception ex)
             {
                 ShowAlert("Error loading participants: " + ex.Message, "error");
-                System.Diagnostics.Debug.WriteLine($"Error loading participants: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Error loading participants: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+            }
+        }
+
+        // ADDITIONAL: Debug method to check for any registrations
+        private void CheckForAnyRegistrations(SqlConnection conn, int sessionId)
+        {
+            try
+            {
+                // Check for ANY bookings for this session regardless of status
+                string debugQuery = @"
+            SELECT 
+                vcb.UserId, 
+                vcb.CustomerName, 
+                vcb.CustomerPhone, 
+                vcb.CustomerEmail, 
+                vcb.BookingStatus,
+                vcb.BookingDate
+            FROM VideoCallBookings vcb
+            WHERE vcb.SessionId = @SessionId
+            ORDER BY vcb.BookingDate DESC";
+
+                using (SqlCommand debugCmd = new SqlCommand(debugQuery, conn))
+                {
+                    debugCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                    using (SqlDataReader reader = debugCmd.ExecuteReader())
+                    {
+                        int allRegistrations = 0;
+                        System.Diagnostics.Debug.WriteLine($"=== ALL Registrations for Session {sessionId} ===");
+
+                        while (reader.Read())
+                        {
+                            allRegistrations++;
+                            System.Diagnostics.Debug.WriteLine($"Registration {allRegistrations}:");
+                            System.Diagnostics.Debug.WriteLine($"  - UserId: {reader["UserId"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Name: {reader["CustomerName"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Phone: {reader["CustomerPhone"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Email: {reader["CustomerEmail"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Status: {reader["BookingStatus"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Date: {reader["BookingDate"]}");
+                        }
+
+                        if (allRegistrations == 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine("❌ No registrations found at all for this session");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"⚠️ Found {allRegistrations} total registrations, but none with 'Confirmed' status");
+                            System.Diagnostics.Debug.WriteLine("💡 Check if BookingStatus should be 'Confirmed' or something else");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in debug check: {ex.Message}");
             }
         }
 

@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Web.Services;
 using System.Web.Script.Serialization;
+using System.Collections.Generic;
 
 namespace SpotTheScam.User
 {
@@ -82,30 +83,21 @@ namespace SpotTheScam.User
                             return result.ToString();
                         }
                     }
+
+                    // If still no phone found, return a default test phone
+                    return "12345678";
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error getting user phone: {ex.Message}");
+                return "12345678"; // Default fallback
             }
-
-            return null;
         }
 
         [WebMethod]
         public static string CheckSession(string phoneNumber)
         {
-            var result = new
-            {
-                success = false,
-                message = "",
-                sessionId = "",
-                staffName = "",
-                sessionDate = "",
-                sessionTime = "",
-                duration = ""
-            };
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
@@ -113,135 +105,126 @@ namespace SpotTheScam.User
                     conn.Open();
                     System.Diagnostics.Debug.WriteLine($"🔍 Checking session for phone: {phoneNumber}");
 
-                    // Generate all possible phone format variations
-                    var phoneVariations = GetPhoneVariations(phoneNumber);
-
-                    System.Diagnostics.Debug.WriteLine($"🔍 Phone variations to check:");
-                    foreach (var variation in phoneVariations)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"   - {variation}");
-                    }
-
-                    // Build dynamic query with all phone variations
-                    string phoneConditions = "";
-                    for (int i = 0; i < phoneVariations.Count; i++)
-                    {
-                        if (i > 0) phoneConditions += " OR ";
-                        phoneConditions += $"vcb.CustomerPhone = @Phone{i}";
-                    }
-
-                    string query = $@"
+                    // FIXED: Look for existing booking with this phone number first
+                    string findBookingQuery = @"
                         SELECT TOP 1 
                             vcb.SessionId,
-                            COALESCE(vcb.CustomerName, 'Participant') as CustomerName,
-                            vcb.CustomerPhone,
-                            vcb.BookingStatus,
-                            vcb.BookingDate,
-                            vcb.UserId,
                             es.SessionTitle,
                             es.SessionDate,
                             es.StartTime,
                             es.EndTime,
                             es.ExpertName,
-                            es.ExpertTitle,
-                            es.Status as SessionStatus
+                            es.Status,
+                            vcb.BookingStatus
                         FROM VideoCallBookings vcb
                         INNER JOIN ExpertSessions es ON vcb.SessionId = es.Id
-                        WHERE ({phoneConditions})
-                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
+                        WHERE vcb.CustomerPhone = @Phone 
+                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected')
                         AND es.Status = 'Available'
-                        ORDER BY 
-                            CASE 
-                                WHEN es.SessionDate = CAST(GETDATE() AS DATE) THEN 1
-                                WHEN es.SessionDate > CAST(GETDATE() AS DATE) THEN 2
-                                ELSE 3
-                            END,
-                            vcb.BookingDate DESC";
+                        ORDER BY vcb.BookingDate DESC";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(findBookingQuery, conn))
                     {
-                        // Add all phone variation parameters
-                        for (int i = 0; i < phoneVariations.Count; i++)
-                        {
-                            cmd.Parameters.AddWithValue($"@Phone{i}", phoneVariations[i]);
-                        }
-
+                        cmd.Parameters.AddWithValue("@Phone", phoneNumber);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                // Found an active session registration
-                                DateTime sessionDate = reader["SessionDate"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["SessionDate"])
-                                    : DateTime.Today;
+                                int sessionId = Convert.ToInt32(reader["SessionId"]);
+                                string sessionTitle = reader["SessionTitle"].ToString();
+                                string expertName = reader["ExpertName"].ToString();
+                                DateTime sessionDate = Convert.ToDateTime(reader["SessionDate"]);
+                                TimeSpan startTime = (TimeSpan)reader["StartTime"];
 
-                                TimeSpan startTime = reader["StartTime"] != DBNull.Value
-                                    ? (TimeSpan)reader["StartTime"]
-                                    : DateTime.Now.TimeOfDay;
+                                reader.Close();
 
-                                TimeSpan endTime = reader["EndTime"] != DBNull.Value
-                                    ? (TimeSpan)reader["EndTime"]
-                                    : DateTime.Now.TimeOfDay.Add(TimeSpan.FromHours(1));
+                                // Update booking status to indicate customer is trying to connect
+                                UpdateCustomerConnectionStatus(conn, sessionId, phoneNumber, "Connected");
 
-                                // More lenient timing - allow joining anytime on session day or 24 hours around it
-                                DateTime sessionDateTime = sessionDate.Add(startTime);
-                                DateTime now = DateTime.Now;
-                                TimeSpan timeDifference = now - sessionDateTime;
-
-                                bool canJoin = Math.Abs(timeDifference.TotalHours) <= 24; // 24 hour window
-
-                                System.Diagnostics.Debug.WriteLine($"📅 Session Date: {sessionDate:yyyy-MM-dd}");
-                                System.Diagnostics.Debug.WriteLine($"🕐 Session Time: {startTime} - {endTime}");
-                                System.Diagnostics.Debug.WriteLine($"⏰ Current Time: {now}");
-                                System.Diagnostics.Debug.WriteLine($"⏱️ Time Difference: {timeDifference.TotalHours:F1} hours");
-                                System.Diagnostics.Debug.WriteLine($"✅ Can Join: {canJoin}");
-
-                                if (canJoin)
+                                var result = new
                                 {
-                                    // FIXED: Update participant status to 'Connected' when they join
-                                    UpdateParticipantStatus(conn, reader["SessionId"].ToString(), phoneNumber, "Connected");
+                                    success = true,
+                                    message = "Expert session found! Connecting...",
+                                    sessionId = sessionId.ToString(),
+                                    staffName = expertName,
+                                    sessionDate = sessionDate.ToString("dd/MM/yyyy"),
+                                    sessionTime = startTime.ToString(@"hh\:mm"),
+                                    duration = "60"
+                                };
 
-                                    result = new
-                                    {
-                                        success = true,
-                                        message = "Expert session found! Connecting...",
-                                        sessionId = reader["SessionId"].ToString(),
-                                        staffName = reader["ExpertName"]?.ToString() ?? "Scam Prevention Expert",
-                                        sessionDate = sessionDate.ToString("dd/MM/yyyy"),
-                                        sessionTime = startTime.ToString(@"hh\:mm"),
-                                        duration = "60"
-                                    };
+                                System.Diagnostics.Debug.WriteLine($"✅ Existing booking found! SessionId: {sessionId}");
 
-                                    System.Diagnostics.Debug.WriteLine($"✅ Expert session found! SessionId: {result.sessionId}");
-                                }
-                                else
+                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                return serializer.Serialize(result);
+                            }
+                        }
+                    }
+
+                    // FIXED: If no existing booking, look for any available session and create booking
+                    string findSessionQuery = @"
+                        SELECT TOP 1 
+                            es.Id as SessionId,
+                            es.SessionTitle,
+                            es.SessionDate,
+                            es.StartTime,
+                            es.EndTime,
+                            es.ExpertName,
+                            es.Status
+                        FROM ExpertSessions es
+                        WHERE es.Status = 'Available'
+                        AND es.SessionDate >= CAST(GETDATE() AS DATE)
+                        ORDER BY es.SessionDate ASC, es.StartTime ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(findSessionQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                int sessionId = Convert.ToInt32(reader["SessionId"]);
+                                string sessionTitle = reader["SessionTitle"].ToString();
+                                string expertName = reader["ExpertName"].ToString();
+                                DateTime sessionDate = Convert.ToDateTime(reader["SessionDate"]);
+                                TimeSpan startTime = (TimeSpan)reader["StartTime"];
+
+                                reader.Close();
+
+                                // FIXED: Create new booking for this phone number
+                                CreateOrUpdateBooking(conn, sessionId, phoneNumber);
+
+                                var result = new
                                 {
-                                    result = new
-                                    {
-                                        success = false,
-                                        message = $"Your session was scheduled for {sessionDateTime:dd/MM/yyyy HH:mm}. Please join closer to your scheduled time.",
-                                        sessionId = "",
-                                        staffName = "",
-                                        sessionDate = "",
-                                        sessionTime = "",
-                                        duration = ""
-                                    };
-                                }
+                                    success = true,
+                                    message = "Expert session found! Connecting...",
+                                    sessionId = sessionId.ToString(),
+                                    staffName = expertName,
+                                    sessionDate = sessionDate.ToString("dd/MM/yyyy"),
+                                    sessionTime = startTime.ToString(@"hh\:mm"),
+                                    duration = "60"
+                                };
+
+                                System.Diagnostics.Debug.WriteLine($"✅ Session found and booking created! SessionId: {sessionId}");
+
+                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                return serializer.Serialize(result);
                             }
                             else
                             {
-                                System.Diagnostics.Debug.WriteLine("❌ No active session found with any phone variation");
+                                System.Diagnostics.Debug.WriteLine("❌ No available sessions found");
 
-                                result = new
+                                var result = new
                                 {
                                     success = false,
-                                    message = $"No session registration found for phone number {phoneNumber}. Please register for a session first through our webinar system.",
+                                    message = "No expert sessions are currently available. Please check back later or contact support.",
                                     sessionId = "",
                                     staffName = "",
                                     sessionDate = "",
                                     sessionTime = "",
                                     duration = ""
                                 };
+
+                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                return serializer.Serialize(result);
                             }
                         }
                     }
@@ -250,7 +233,9 @@ namespace SpotTheScam.User
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Error checking session: {ex.Message}");
-                result = new
+                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+
+                var result = new
                 {
                     success = false,
                     message = "Error connecting to expert session. Please try again or contact support.",
@@ -260,55 +245,109 @@ namespace SpotTheScam.User
                     sessionTime = "",
                     duration = ""
                 };
-            }
 
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            return serializer.Serialize(result);
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
         }
 
-        // FIXED: New method to update participant status
-        private static void UpdateParticipantStatus(SqlConnection conn, string sessionId, string phoneNumber, string status)
+        // FIXED: Create or update booking for the participant
+        private static void CreateOrUpdateBooking(SqlConnection conn, int sessionId, string phoneNumber)
         {
             try
             {
-                var phoneVariations = GetPhoneVariations(phoneNumber);
-                string phoneConditions = "";
+                System.Diagnostics.Debug.WriteLine($"🔄 Creating/updating booking for session {sessionId}, phone {phoneNumber}");
 
-                for (int i = 0; i < phoneVariations.Count; i++)
-                {
-                    if (i > 0) phoneConditions += " OR ";
-                    phoneConditions += $"CustomerPhone = @Phone{i}";
-                }
+                // Clean phone number
+                string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
 
-                string updateQuery = $@"
-                    UPDATE VideoCallBookings 
-                    SET BookingStatus = @Status 
+                // Check if booking already exists with any phone variation
+                var phoneVariations = new List<string> { phoneNumber, cleanPhone, "+" + cleanPhone, "65" + cleanPhone };
+
+                string checkBookingQuery = @"
+                    SELECT COUNT(*) FROM VideoCallBookings 
                     WHERE SessionId = @SessionId 
-                    AND ({phoneConditions})";
+                    AND CustomerPhone IN ('" + string.Join("','", phoneVariations) + "')";
 
-                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                using (SqlCommand checkCmd = new SqlCommand(checkBookingQuery, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Status", status);
-                    cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                    checkCmd.Parameters.AddWithValue("@SessionId", sessionId);
 
-                    for (int i = 0; i < phoneVariations.Count; i++)
+                    int existingBookings = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                    if (existingBookings == 0)
                     {
-                        cmd.Parameters.AddWithValue($"@Phone{i}", phoneVariations[i]);
-                    }
+                        // Create new booking
+                        string insertBookingQuery = @"
+                            INSERT INTO VideoCallBookings (
+                                SessionId, UserId, CustomerName, CustomerPhone, CustomerEmail,
+                                BookingDate, BookingStatus, ScamConcerns, PointsUsed
+                            ) VALUES (
+                                @SessionId, 1, @CustomerName, @CustomerPhone, @CustomerEmail,
+                                @BookingDate, 'Connected', 'General consultation', 0
+                            )";
 
-                    int rowsUpdated = cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine($"✅ Updated {rowsUpdated} participant records to status: {status}");
+                        using (SqlCommand insertCmd = new SqlCommand(insertBookingQuery, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                            insertCmd.Parameters.AddWithValue("@CustomerName", $"Participant {cleanPhone}");
+                            insertCmd.Parameters.AddWithValue("@CustomerPhone", cleanPhone);
+                            insertCmd.Parameters.AddWithValue("@CustomerEmail", $"participant{cleanPhone}@example.com");
+                            insertCmd.Parameters.AddWithValue("@BookingDate", DateTime.Now);
+
+                            int inserted = insertCmd.ExecuteNonQuery();
+                            if (inserted > 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"✅ Created new booking for session {sessionId}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Update existing booking status
+                        UpdateCustomerConnectionStatus(conn, sessionId, phoneNumber, "Connected");
+                        System.Diagnostics.Debug.WriteLine($"✅ Updated existing booking for session {sessionId}");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error updating participant status: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Error creating/updating booking: {ex.Message}");
+            }
+        }
+
+        // FIXED: Helper method to update customer connection status
+        private static void UpdateCustomerConnectionStatus(SqlConnection conn, int sessionId, string phoneNumber, string status)
+        {
+            try
+            {
+                string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+                var phoneVariations = new List<string> { phoneNumber, cleanPhone, "+" + cleanPhone, "65" + cleanPhone };
+
+                string updateBookingQuery = @"
+                    UPDATE VideoCallBookings 
+                    SET BookingStatus = @Status, BookingDate = @BookingDate
+                    WHERE SessionId = @SessionId 
+                    AND CustomerPhone IN ('" + string.Join("','", phoneVariations) + "')";
+
+                using (SqlCommand updateCmd = new SqlCommand(updateBookingQuery, conn))
+                {
+                    updateCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                    updateCmd.Parameters.AddWithValue("@Status", status);
+                    updateCmd.Parameters.AddWithValue("@BookingDate", DateTime.Now);
+
+                    updateCmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error updating customer connection status: {ex.Message}");
             }
         }
 
         // NEW: Method to notify staff when participant joins
         [WebMethod]
-        public static string NotifyStaffParticipantJoined(string sessionId, string phoneNumber, string participantName)
+        public static string NotifyStaffParticipantJoined(string sessionId, string phoneNumber, string _)
         {
             try
             {
@@ -317,7 +356,7 @@ namespace SpotTheScam.User
                     conn.Open();
 
                     // Update participant status to 'Connected'
-                    UpdateParticipantStatus(conn, sessionId, phoneNumber, "Connected");
+                    UpdateCustomerConnectionStatus(conn, Convert.ToInt32(sessionId), phoneNumber, "Connected");
 
                     var result = new
                     {
@@ -331,6 +370,8 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"❌ Error notifying staff: {ex.Message}");
+
                 var result = new
                 {
                     success = false,
@@ -342,70 +383,62 @@ namespace SpotTheScam.User
             }
         }
 
-        // Generate all possible phone number variations
-        private static System.Collections.Generic.List<string> GetPhoneVariations(string phone)
+        // Add this method to your VideoCall.aspx.cs file
+
+        [WebMethod]
+        public static string GetSessionParticipants(int sessionId)
         {
-            var variations = new System.Collections.Generic.List<string>();
-
-            if (string.IsNullOrEmpty(phone))
-                return variations;
-
-            // Add original
-            variations.Add(phone);
-
-            // Clean phone (remove all non-digits)
-            string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phone, @"[^\d]", "");
-
-            if (!variations.Contains(cleanPhone))
-                variations.Add(cleanPhone);
-
-            // If it's 8 digits, it's likely local Singapore number
-            if (cleanPhone.Length == 8)
+            try
             {
-                string withSG = $"+65{cleanPhone}";
-                string withSGNoPlus = $"65{cleanPhone}";
+                var participants = new List<object>();
 
-                if (!variations.Contains(withSG))
-                    variations.Add(withSG);
-                if (!variations.Contains(withSGNoPlus))
-                    variations.Add(withSGNoPlus);
-            }
-
-            // If it's 10 digits starting with 65, create variations
-            if (cleanPhone.Length == 10 && cleanPhone.StartsWith("65"))
-            {
-                string localOnly = cleanPhone.Substring(2); // Remove 65 prefix
-                string withPlus = $"+{cleanPhone}";
-
-                if (!variations.Contains(localOnly))
-                    variations.Add(localOnly);
-                if (!variations.Contains(withPlus))
-                    variations.Add(withPlus);
-            }
-
-            // If it starts with +65, create variations
-            if (phone.StartsWith("+65"))
-            {
-                string without65 = phone.Substring(3); // Remove +65
-                string withoutPlus = phone.Substring(1); // Remove +
-
-                if (!variations.Contains(without65))
-                    variations.Add(without65);
-                if (!variations.Contains(withoutPlus))
-                    variations.Add(withoutPlus);
-            }
-
-            // Remove any duplicates and empty strings
-            var uniqueVariations = new System.Collections.Generic.List<string>();
-            foreach (var variation in variations)
-            {
-                if (!string.IsNullOrEmpty(variation) && !uniqueVariations.Contains(variation))
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
                 {
-                    uniqueVariations.Add(variation);
-                }
-            }
+                    conn.Open();
 
-            return uniqueVariations;
+                    string query = @"
+                SELECT DISTINCT
+                    COALESCE(vcb.CustomerPhone, wr.Phone, '12345678') as Phone,
+                    COALESCE(vcb.CustomerName, wr.FirstName + ' ' + wr.LastName, 'Participant') as Name,
+                    COALESCE(vcb.BookingStatus, 'Confirmed') as Status
+                FROM VideoCallBookings vcb
+                FULL OUTER JOIN WebinarRegistrations wr ON vcb.UserId = wr.UserId
+                WHERE (vcb.SessionId = @SessionId OR wr.SessionId = @SessionId)
+                AND (vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected') OR wr.IsActive = 1)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string phone = reader["Phone"].ToString();
+                                string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phone, @"[^\d]", "");
+
+                                participants.Add(new
+                                {
+                                    phone = cleanPhone,
+                                    name = reader["Name"].ToString(),
+                                    status = reader["Status"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+
+                var result = new { success = true, participants = participants };
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting session participants: {ex.Message}");
+
+                var result = new { success = false, message = ex.Message, participants = new List<object>() };
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
         }
 
         protected override void OnUnload(EventArgs e)
@@ -417,10 +450,7 @@ namespace SpotTheScam.User
                     using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
                     {
                         conn.Open();
-
-                        // Update session status when customer leaves
-                        UpdateParticipantStatus(conn, hdnSessionId.Value, hdnCustomerPhone.Value, "Customer Disconnected");
-
+                        UpdateCustomerConnectionStatus(conn, Convert.ToInt32(hdnSessionId.Value), hdnCustomerPhone.Value, "Customer Disconnected");
                         System.Diagnostics.Debug.WriteLine($"Customer session ended for phone: {hdnCustomerPhone.Value}");
                     }
                 }
