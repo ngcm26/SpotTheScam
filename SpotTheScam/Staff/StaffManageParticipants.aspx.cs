@@ -363,7 +363,7 @@ namespace SpotTheScam.Staff
                                 }
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             transaction.Rollback();
                             throw;
@@ -505,7 +505,7 @@ namespace SpotTheScam.Staff
                             ShowAlert(message, "success");
                             LoadParticipants();
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             transaction.Rollback();
                             throw;

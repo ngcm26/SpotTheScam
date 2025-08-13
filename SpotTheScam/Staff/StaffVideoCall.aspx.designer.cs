@@ -9,8 +9,11 @@
 
 namespace SpotTheScam.Staff
 {
+
+
     public partial class StaffVideoCall
     {
+
         /// <summary>
         /// hdnSessionId control.
         /// </summary>
@@ -48,6 +51,15 @@ namespace SpotTheScam.Staff
         protected global::System.Web.UI.WebControls.Label lblTotalParticipants;
 
         /// <summary>
+        /// lblStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblStatus;
+
+        /// <summary>
         /// lblRegisteredCount control.
         /// </summary>
         /// <remarks>
@@ -73,14 +85,5 @@ namespace SpotTheScam.Staff
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlNoRegistered;
-
-        /// <summary>
-        /// lblStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblStatus;
     }
 }

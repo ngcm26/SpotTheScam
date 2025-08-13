@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Services;
 using System.Web.Script.Serialization;
-using System.Collections.Generic;
-using System.Data;
-using System.Web.UI;
-using System.Linq;
 
 namespace SpotTheScam.Staff
 {
@@ -130,439 +131,165 @@ namespace SpotTheScam.Staff
 
         private void LoadRegisteredParticipants(int sessionId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-
-                // FIXED: Get the actual registration count first to avoid confusion
-                int actualRegistrationCount = GetActualRegistrationCount(conn, sessionId);
-
-                System.Diagnostics.Debug.WriteLine($"=== LoadRegisteredParticipants for session {sessionId} ===");
-                System.Diagnostics.Debug.WriteLine($"Actual registration count: {actualRegistrationCount}");
-
-                // FIXED: Only create samples if there are truly no registrations AND it's a valid session
-                if (actualRegistrationCount == 0)
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    // Check if the session exists and is valid
-                    if (IsValidSession(conn, sessionId))
+                    conn.Open();
+
+                    // Updated query with correct column names and proper name handling
+                    string query = @"
+                SELECT 
+                    vcb.UserId,
+                    CASE 
+                        WHEN vcb.CustomerName IS NOT NULL AND LEN(TRIM(vcb.CustomerName)) > 0 
+                        THEN vcb.CustomerName
+                        WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
+                        THEN vcb.FirstName + ' ' + vcb.LastName
+                        WHEN u.Username IS NOT NULL 
+                        THEN u.Username
+                        ELSE 'Participant ' + RIGHT('000' + CAST(vcb.UserId as VARCHAR), 3)
+                    END as CustomerName,
+                    
+                    CASE 
+                        WHEN vcb.CustomerEmail IS NOT NULL AND LEN(TRIM(vcb.CustomerEmail)) > 0 
+                        THEN vcb.CustomerEmail
+                        WHEN u.Email IS NOT NULL 
+                        THEN u.Email
+                        ELSE 'participant' + CAST(vcb.UserId as VARCHAR) + '@example.com'
+                    END as CustomerEmail,
+                    
+                    CASE 
+                        WHEN vcb.CustomerPhone IS NOT NULL AND LEN(TRIM(vcb.CustomerPhone)) > 0 
+                        THEN vcb.CustomerPhone
+                        WHEN u.PhoneNumber IS NOT NULL 
+                        THEN u.PhoneNumber
+                        ELSE '12345678'
+                    END as CustomerPhone,
+                    
+                    vcb.BookingDate,
+                    ISNULL(vcb.PointsUsed, 0) as PointsUsed,
+                    vcb.BookingStatus,
+                    CASE 
+                        WHEN vcb.ScamConcerns IS NOT NULL AND LEN(TRIM(vcb.ScamConcerns)) > 0 
+                        THEN vcb.ScamConcerns
+                        WHEN vcb.MainSecurityConcerns IS NOT NULL 
+                        THEN vcb.MainSecurityConcerns
+                        ELSE 'General consultation'
+                    END as ScamConcerns,
+                    vcb.SessionId
+                FROM VideoCallBookings vcb
+                LEFT JOIN Users u ON vcb.UserId = u.Id
+                WHERE vcb.SessionId = @SessionId 
+                AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
+                ORDER BY vcb.BookingDate DESC";
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                     {
-                        System.Diagnostics.Debug.WriteLine("No registrations found for valid session. Creating sample data for testing...");
-                        CreateSampleParticipants(conn, sessionId);
-                        actualRegistrationCount = GetActualRegistrationCount(conn, sessionId);
-                        System.Diagnostics.Debug.WriteLine($"After creating samples: {actualRegistrationCount} participants");
-                    }
-                }
+                        adapter.SelectCommand.Parameters.AddWithValue("@SessionId", sessionId);
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
 
-                // FIXED: Query with better logic to avoid duplicates
-                string query = @"
-                    WITH ParticipantData AS (
-                        -- Get from VideoCallBookings first
-                        SELECT 
-                            vcb.UserId,
-                            vcb.CustomerName,
-                            vcb.CustomerPhone,
-                            vcb.CustomerEmail,
-                            vcb.BookingDate,
-                            vcb.ScamConcerns,
-                            vcb.PointsUsed,
-                            vcb.BookingStatus,
-                            'VideoCall' as SourceTable,
-                            ROW_NUMBER() OVER (PARTITION BY vcb.UserId ORDER BY vcb.BookingDate DESC) as rn
-                        FROM VideoCallBookings vcb
-                        WHERE vcb.SessionId = @SessionId 
-                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
-                        
-                        UNION ALL
-                        
-                        -- Get from WebinarRegistrations only if no VideoCallBookings exist for that user
-                        SELECT 
-                            wr.UserId,
-                            wr.FirstName + ' ' + wr.LastName as CustomerName,
-                            wr.Phone as CustomerPhone,
-                            wr.Email as CustomerEmail,
-                            wr.RegistrationDate as BookingDate,
-                            wr.SecurityConcerns as ScamConcerns,
-                            wr.PointsUsed,
-                            'Confirmed' as BookingStatus,
-                            'Webinar' as SourceTable,
-                            ROW_NUMBER() OVER (PARTITION BY wr.UserId ORDER BY wr.RegistrationDate DESC) as rn
-                        FROM WebinarRegistrations wr
-                        WHERE wr.SessionId = @SessionId 
-                        AND wr.IsActive = 1
-                        AND NOT EXISTS (
-                            SELECT 1 FROM VideoCallBookings vcb2 
-                            WHERE vcb2.SessionId = @SessionId 
-                            AND vcb2.UserId = wr.UserId
-                            AND vcb2.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
-                        )
-                    )
-                    SELECT 
-                        UserId,
-                        COALESCE(NULLIF(CustomerName, ''), 'Participant ' + CAST(UserId AS VARCHAR)) as CustomerName,
-                        COALESCE(NULLIF(CustomerPhone, ''), '12345678') as CustomerPhone,
-                        COALESCE(NULLIF(CustomerEmail, ''), 'participant' + CAST(UserId AS VARCHAR) + '@example.com') as CustomerEmail,
-                        BookingDate,
-                        COALESCE(NULLIF(ScamConcerns, ''), 'General consultation') as ScamConcerns,
-                        PointsUsed,
-                        BookingStatus,
-                        SourceTable
-                    FROM ParticipantData 
-                    WHERE rn = 1  -- Only get the latest record for each user
-                    ORDER BY BookingDate ASC";
+                        System.Diagnostics.Debug.WriteLine($"=== LoadParticipants Debug ===");
+                        System.Diagnostics.Debug.WriteLine($"Session ID: {sessionId}");
+                        System.Diagnostics.Debug.WriteLine($"Found {dt.Rows.Count} participants");
 
-                using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
-                {
-                    adapter.SelectCommand.Parameters.AddWithValue("@SessionId", sessionId);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    System.Diagnostics.Debug.WriteLine($"Query returned {dt.Rows.Count} participant records");
-
-                    // FIXED: Set the count immediately and reliably
-                    int finalParticipantCount = dt.Rows.Count;
-
-                    lblTotalParticipants.Text = finalParticipantCount.ToString();
-                    lblRegisteredCount.Text = finalParticipantCount.ToString();
-
-                    System.Diagnostics.Debug.WriteLine($"Set label counts to: {finalParticipantCount}");
-
-                    if (finalParticipantCount > 0)
-                    {
                         // Debug: Print participant data
                         foreach (DataRow row in dt.Rows)
                         {
-                            System.Diagnostics.Debug.WriteLine($"Participant: {row["CustomerName"]}, Phone: {row["CustomerPhone"]}, Email: {row["CustomerEmail"]}, Source: {row["SourceTable"]}");
+                            System.Diagnostics.Debug.WriteLine($"Participant: {row["CustomerName"]}, Phone: {row["CustomerPhone"]}, Email: {row["CustomerEmail"]}, Status: {row["BookingStatus"]}");
                         }
 
-                        rptRegisteredParticipants.DataSource = dt;
-                        rptRegisteredParticipants.DataBind();
-                        pnlNoRegistered.Visible = false;
+                        if (dt.Rows.Count > 0)
+                        {
+                            rptRegisteredParticipants.DataSource = dt;
+                            rptRegisteredParticipants.DataBind();
+                            pnlNoRegistered.Visible = false;
+                            lblTotalParticipants.Text = dt.Rows.Count.ToString();
+                            lblRegisteredCount.Text = dt.Rows.Count.ToString();
 
-                        System.Diagnostics.Debug.WriteLine($"✅ Participants loaded and bound to repeater. Count: {finalParticipantCount}");
+                            System.Diagnostics.Debug.WriteLine($"✅ Participants loaded and bound to repeater. Count: {dt.Rows.Count}");
+                        }
+                        else
+                        {
+                            rptRegisteredParticipants.DataSource = null;
+                            rptRegisteredParticipants.DataBind();
+                            pnlNoRegistered.Visible = true;
+                            lblTotalParticipants.Text = "0";
+                            lblRegisteredCount.Text = "0";
 
-                        // FIXED: Improved JavaScript initialization
-                        string initScript = GenerateInitializationScript(dt, sessionId, finalParticipantCount);
-                        ClientScript.RegisterStartupScript(this.GetType(), "InitializeParticipants", initScript, true);
-                    }
-                    else
-                    {
-                        rptRegisteredParticipants.DataSource = null;
-                        rptRegisteredParticipants.DataBind();
-                        pnlNoRegistered.Visible = true;
+                            System.Diagnostics.Debug.WriteLine("⚠️ No participants found - checking if any registrations exist at all");
 
-                        System.Diagnostics.Debug.WriteLine($"⚠️ No registered participants found for session {sessionId}");
-                    }
-                }
-            }
-        }
-
-        // FIXED: Helper method to get actual registration count
-        private int GetActualRegistrationCount(SqlConnection conn, int sessionId)
-        {
-            string countQuery = @"
-                SELECT COUNT(DISTINCT UserId) as TotalCount
-                FROM (
-                    SELECT UserId FROM VideoCallBookings 
-                    WHERE SessionId = @SessionId 
-                    AND BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
-                    
-                    UNION
-                    
-                    SELECT UserId FROM WebinarRegistrations 
-                    WHERE SessionId = @SessionId 
-                    AND IsActive = 1
-                    AND NOT EXISTS (
-                        SELECT 1 FROM VideoCallBookings vcb 
-                        WHERE vcb.SessionId = @SessionId 
-                        AND vcb.UserId = WebinarRegistrations.UserId
-                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
-                    )
-                ) AS CombinedRegistrations";
-
-            using (SqlCommand cmd = new SqlCommand(countQuery, conn))
-            {
-                cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                object result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-        }
-
-        // FIXED: Helper method to check if session exists
-        private bool IsValidSession(SqlConnection conn, int sessionId)
-        {
-            string sessionQuery = "SELECT COUNT(*) FROM ExpertSessions WHERE Id = @SessionId AND Status = 'Available'";
-            using (SqlCommand cmd = new SqlCommand(sessionQuery, conn))
-            {
-                cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
-            }
-        }
-
-        // FIXED: Improved sample participant creation
-        private void CreateSampleParticipants(SqlConnection conn, int sessionId)
-        {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("Creating sample participants for testing...");
-
-                // Check if samples already exist to avoid duplicates
-                string checkQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId";
-                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
-                {
-                    checkCmd.Parameters.AddWithValue("@SessionId", sessionId);
-                    if (Convert.ToInt32(checkCmd.ExecuteScalar()) > 0)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Sample participants already exist, skipping creation");
-                        return;
+                            // Debug: Check if there are ANY registrations for this session
+                            CheckForAnyRegistrations(conn, sessionId);
+                        }
                     }
                 }
-
-                string insertQuery = @"
-                    INSERT INTO VideoCallBookings (
-                        SessionId, UserId, CustomerName, CustomerPhone, CustomerEmail, 
-                        BookingDate, BookingStatus, ScamConcerns, PointsUsed
-                    ) VALUES (
-                        @SessionId, @UserId, @CustomerName, @CustomerPhone, @CustomerEmail,
-                        @BookingDate, @BookingStatus, @ScamConcerns, @PointsUsed
-                    )";
-
-                // Sample participant 1
-                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                    cmd.Parameters.AddWithValue("@UserId", 1);
-                    cmd.Parameters.AddWithValue("@CustomerName", "John Smith");
-                    cmd.Parameters.AddWithValue("@CustomerPhone", "+6512345678");
-                    cmd.Parameters.AddWithValue("@CustomerEmail", "john.smith@example.com");
-                    cmd.Parameters.AddWithValue("@BookingDate", DateTime.Now.AddMinutes(-30));
-                    cmd.Parameters.AddWithValue("@BookingStatus", "Confirmed");
-                    cmd.Parameters.AddWithValue("@ScamConcerns", "Banking security");
-                    cmd.Parameters.AddWithValue("@PointsUsed", 0);
-                    cmd.ExecuteNonQuery();
-                }
-
-                System.Diagnostics.Debug.WriteLine("✅ Created 1 sample participant");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error creating sample participants: {ex.Message}");
+                ShowError("Error loading participants: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"❌ Error loading participants: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
             }
         }
 
-        // FIXED: Generate proper initialization script
-        private string GenerateInitializationScript(DataTable dt, int sessionId, int participantCount)
+        // Debug method to check for any registrations
+        private void CheckForAnyRegistrations(SqlConnection conn, int sessionId)
         {
-            var script = $@"
-                document.addEventListener('DOMContentLoaded', function() {{
-                    console.log('🚀 Initializing StaffVideoCall with {participantCount} participants');
-                    
-                    // FIXED: Force update all counters immediately and consistently
-                    var actualCount = {participantCount};
-                    updateAllCountersImmediately(actualCount);
-                    
-                    // Initialize participant data for JavaScript
-                    if (typeof initializeParticipantStatuses === 'function') {{
-                        var participantData = [];";
-
-            foreach (DataRow row in dt.Rows)
+            try
             {
-                string phone = row["CustomerPhone"].ToString();
-                string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phone, @"[^\d]", "");
-                string name = row["CustomerName"].ToString().Replace("'", "\\'");
+                // Check for ANY bookings for this session regardless of status
+                string debugQuery = @"
+            SELECT 
+                vcb.UserId, 
+                vcb.CustomerName, 
+                vcb.CustomerPhone, 
+                vcb.CustomerEmail, 
+                vcb.BookingStatus,
+                vcb.BookingDate
+            FROM VideoCallBookings vcb
+            WHERE vcb.SessionId = @SessionId
+            ORDER BY vcb.BookingDate DESC";
 
-                script += $@"
-                        participantData.push({{
-                            phone: '{cleanPhone}',
-                            name: '{name}',
-                            status: 'waiting',
-                            bookingStatus: 'Confirmed'
-                        }});";
+                using (SqlCommand debugCmd = new SqlCommand(debugQuery, conn))
+                {
+                    debugCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                    using (SqlDataReader reader = debugCmd.ExecuteReader())
+                    {
+                        int allRegistrations = 0;
+                        System.Diagnostics.Debug.WriteLine($"=== ALL Registrations for Session {sessionId} ===");
+
+                        while (reader.Read())
+                        {
+                            allRegistrations++;
+                            System.Diagnostics.Debug.WriteLine($"Registration {allRegistrations}:");
+                            System.Diagnostics.Debug.WriteLine($"  - UserId: {reader["UserId"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Name: {reader["CustomerName"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Phone: {reader["CustomerPhone"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Email: {reader["CustomerEmail"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Status: {reader["BookingStatus"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Date: {reader["BookingDate"]}");
+                        }
+
+                        if (allRegistrations == 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine("❌ No registrations found at all for this session");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"⚠️ Found {allRegistrations} total registrations");
+                        }
+                    }
+                }
             }
-
-            script += $@"
-                        console.log('Initializing participant statuses with data:', participantData);
-                        initializeParticipantStatuses(participantData);
-                    }}
-                    
-                    // Start real-time updates
-                    startRealTimeUpdates({sessionId});
-                    
-                    // FIXED: Multiple updates to ensure consistency
-                    setTimeout(function() {{
-                        updateAllCountersImmediately(actualCount);
-                        if (typeof updateParticipantCounts === 'function') {{
-                            updateParticipantCounts();
-                        }}
-                        if (typeof checkOnlineParticipants === 'function') {{
-                            checkOnlineParticipants();
-                        }}
-                    }}, 500);
-                    
-                    // Final update after 2 seconds
-                    setTimeout(function() {{
-                        updateAllCountersImmediately(actualCount);
-                    }}, 2000);
-                }});
-                
-                // FIXED: Comprehensive function to update all counters consistently
-                function updateAllCountersImmediately(count) {{
-                    console.log('📊 FORCING UPDATE of all counters to:', count);
-                    
-                    // Update all possible counter elements
-                    var counterSelectors = [
-                        'totalParticipants',
-                        '{lblTotalParticipants.ClientID}',
-                        '{lblRegisteredCount.ClientID}'
-                    ];
-                    
-                    counterSelectors.forEach(function(id) {{
-                        var element = document.getElementById(id);
-                        if (element) {{
-                            element.textContent = count;
-                            element.innerText = count;
-                            console.log('✅ Updated', id, 'to:', count);
-                        }}
-                    }});
-                    
-                    // Update stat cards by traversing DOM
-                    var statNumbers = document.querySelectorAll('.stat-number');
-                    statNumbers.forEach(function(el) {{
-                        var label = el.parentElement.querySelector('.stat-label');
-                        if (label && label.textContent.includes('Total')) {{
-                            el.textContent = count;
-                            el.innerText = count;
-                            console.log('✅ Updated Total Registered stat to:', count);
-                        }}
-                    }});
-                    
-                    // Update participant count badges
-                    var countBadges = document.querySelectorAll('.participant-count');
-                    countBadges.forEach(function(badge) {{
-                        var section = badge.closest('.participants-section');
-                        if (section) {{
-                            var titleElement = section.querySelector('.section-title');
-                            if (titleElement && titleElement.textContent.includes('Registered')) {{
-                                badge.textContent = count;
-                                badge.innerText = count;
-                                console.log('✅ Updated Registered participant badge to:', count);
-                            }}
-                        }}
-                    }});
-                    
-                    console.log('✅ All counters force-updated to:', count);
-                }}
-                
-                // Enhanced real-time updates function
-                function startRealTimeUpdates(sessionId) {{
-                    console.log('🔄 Starting real-time updates for session:', sessionId);
-                    
-                    function updateStatus() {{
-                        fetch('StaffVideoCall.aspx/GetParticipantUpdates', {{
-                            method: 'POST',
-                            headers: {{ 'Content-Type': 'application/json' }},
-                            body: JSON.stringify({{ sessionId: sessionId }})
-                        }})
-                        .then(response => response.json())
-                        .then(data => {{
-                            try {{
-                                var result = JSON.parse(data.d);
-                                if (result.success && result.participants) {{
-                                    updateParticipantStatusUI(result.participants);
-                                    updateOnlineCount(result.participants);
-                                    
-                                    // FIXED: Maintain the total registered count
-                                    var actualCount = {participantCount};
-                                    updateAllCountersImmediately(actualCount);
-                                }}
-                            }} catch (e) {{
-                                console.log('Status update error:', e);
-                            }}
-                        }})
-                        .catch(error => {{
-                            console.log('Failed to update participant statuses:', error);
-                        }});
-                    }}
-                    
-                    // Update every 15 seconds (longer interval to reduce server load)
-                    setInterval(updateStatus, 15000);
-                    
-                    // Initial update after 3 seconds
-                    setTimeout(updateStatus, 3000);
-                }}
-                
-                // Enhanced participant status UI update
-                function updateParticipantStatusUI(participants) {{
-                    participants.forEach(function(participant) {{
-                        var cleanPhone = participant.phone.replace(/[^0-9]/g, '');
-                        var statusElement = document.getElementById('status_' + cleanPhone);
-                        var buttonElement = document.getElementById('btn_' + cleanPhone);
-                        
-                        if (statusElement) {{
-                            statusElement.className = 'status-indicator status-' + participant.status;
-                        }}
-                        
-                        if (buttonElement) {{
-                            switch(participant.status) {{
-                                case 'online':
-                                    buttonElement.textContent = '🟢 Connect Now';
-                                    buttonElement.disabled = false;
-                                    break;
-                                case 'connected':
-                                    buttonElement.textContent = '📞 In Call';
-                                    buttonElement.disabled = true;
-                                    break;
-                                default:
-                                    buttonElement.textContent = '📞 Connect';
-                                    buttonElement.disabled = false;
-                            }}
-                        }}
-                    }});
-                }}
-                
-                // Enhanced online count update
-                function updateOnlineCount(participants) {{
-                    var onlineCount = participants.filter(p => p.status === 'online' || p.status === 'waiting').length;
-                    var connectedCount = participants.filter(p => p.status === 'connected').length;
-                    
-                    // Update online participants counter
-                    var onlineElements = document.querySelectorAll('#onlineParticipants, #onlineCount');
-                    onlineElements.forEach(function(el) {{
-                        el.textContent = onlineCount;
-                    }});
-                    
-                    // Update connected participants counter
-                    var connectedElements = document.querySelectorAll('#connectedParticipants');
-                    connectedElements.forEach(function(el) {{
-                        el.textContent = connectedCount;
-                    }});
-                    
-                    // Update stat cards for online and connected (but NOT total registered)
-                    var statNumbers = document.querySelectorAll('.stat-number');
-                    statNumbers.forEach(function(el) {{
-                        var label = el.parentElement.querySelector('.stat-label');
-                        if (label) {{
-                            if (label.textContent.includes('Online')) {{
-                                el.textContent = onlineCount;
-                            }} else if (label.textContent.includes('Video Call')) {{
-                                el.textContent = connectedCount;
-                            }}
-                        }}
-                    }});
-                    
-                    console.log('📊 Updated status counts - Online:', onlineCount, 'Connected:', connectedCount);
-                }}";
-
-            return script;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in debug check: {ex.Message}");
+            }
         }
 
-        private void ShowError(string message)
-        {
-            lblStatus.Text = message;
-            lblStatus.CssClass = "status-message error";
-        }
-
-        // ===== ENHANCED WEB METHODS =====
-
+        // Web method for getting participant updates
         [WebMethod]
         public static string GetParticipantUpdates(int sessionId)
         {
@@ -575,45 +302,39 @@ namespace SpotTheScam.Staff
                     conn.Open();
 
                     string query = @"
-                        WITH ParticipantStatus AS (
-                            SELECT 
-                                UserId,
-                                COALESCE(CustomerName, FirstName + ' ' + LastName, 'Participant') as Name,
-                                COALESCE(CustomerPhone, Phone, '12345678') as Phone,
-                                COALESCE(BookingStatus, 'Confirmed') as BookingStatus,
-                                COALESCE(BookingDate, RegistrationDate, GETDATE()) as LastActivity,
-                                CASE 
-                                    WHEN BookingStatus = 'Connected' OR BookingStatus = 'In Call' THEN 'connected'
-                                    WHEN BookingStatus = 'Expert Ready' THEN 'waiting'
-                                    WHEN BookingStatus = 'Confirmed' THEN 'online'
-                                    ELSE 'offline'
-                                END as Status,
-                                ROW_NUMBER() OVER (PARTITION BY UserId ORDER BY 
-                                    CASE WHEN BookingStatus IS NOT NULL THEN 1 ELSE 2 END,
-                                    COALESCE(BookingDate, RegistrationDate) DESC
-                                ) as rn
-                            FROM (
-                                SELECT 
-                                    UserId, CustomerName, CustomerPhone, BookingStatus, BookingDate,
-                                    NULL as FirstName, NULL as LastName, NULL as Phone, NULL as RegistrationDate
-                                FROM VideoCallBookings 
-                                WHERE SessionId = @SessionId 
-                                AND BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
-                                
-                                UNION ALL
-                                
-                                SELECT 
-                                    UserId, NULL as CustomerName, NULL as CustomerPhone, NULL as BookingStatus, NULL as BookingDate,
-                                    FirstName, LastName, Phone, RegistrationDate
-                                FROM WebinarRegistrations 
-                                WHERE SessionId = @SessionId 
-                                AND IsActive = 1
-                            ) AS CombinedData
-                        )
-                        SELECT Name, Phone, Status, BookingStatus, LastActivity
-                        FROM ParticipantStatus 
-                        WHERE rn = 1
-                        ORDER BY LastActivity DESC";
+                        SELECT 
+                            vcb.UserId,
+                            CASE 
+                                WHEN vcb.CustomerName IS NOT NULL AND LEN(TRIM(vcb.CustomerName)) > 0 
+                                THEN vcb.CustomerName
+                                WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
+                                THEN vcb.FirstName + ' ' + vcb.LastName
+                                WHEN u.Username IS NOT NULL 
+                                THEN u.Username
+                                ELSE 'Participant ' + RIGHT('000' + CAST(vcb.UserId as VARCHAR), 3)
+                            END as Name,
+                            
+                            CASE 
+                                WHEN vcb.CustomerPhone IS NOT NULL AND LEN(TRIM(vcb.CustomerPhone)) > 0 
+                                THEN vcb.CustomerPhone
+                                WHEN u.PhoneNumber IS NOT NULL 
+                                THEN u.PhoneNumber
+                                ELSE '12345678'
+                            END as Phone,
+                            
+                            COALESCE(vcb.BookingStatus, 'Confirmed') as BookingStatus,
+                            COALESCE(vcb.BookingDate, GETDATE()) as LastActivity,
+                            CASE 
+                                WHEN vcb.BookingStatus = 'Connected' OR vcb.BookingStatus = 'In Call' THEN 'connected'
+                                WHEN vcb.BookingStatus = 'Expert Ready' THEN 'waiting'
+                                WHEN vcb.BookingStatus = 'Confirmed' THEN 'online'
+                                ELSE 'offline'
+                            END as Status
+                        FROM VideoCallBookings vcb
+                        LEFT JOIN Users u ON vcb.UserId = u.Id
+                        WHERE vcb.SessionId = @SessionId 
+                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
+                        ORDER BY vcb.BookingDate DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -665,8 +386,9 @@ namespace SpotTheScam.Staff
             }
         }
 
+        // Web method for getting participant real names
         [WebMethod]
-        public static string UpdateParticipantStatus(int sessionId, string phoneNumber, string newStatus)
+        public static string GetParticipantRealName(int sessionId, string phoneNumber)
         {
             try
             {
@@ -674,119 +396,109 @@ namespace SpotTheScam.Staff
                 {
                     conn.Open();
 
-                    var phoneVariations = GetPhoneVariations(phoneNumber);
+                    string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
 
-                    string phoneConditions = "";
-                    for (int i = 0; i < phoneVariations.Count; i++)
+                    // Enhanced query to get the most accurate participant name
+                    string nameQuery = @"
+                        SELECT TOP 1
+                            CASE 
+                                WHEN vcb.CustomerName IS NOT NULL AND LEN(TRIM(vcb.CustomerName)) > 0 
+                                     AND vcb.CustomerName NOT LIKE 'Participant %'
+                                THEN vcb.CustomerName
+                                WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
+                                THEN vcb.FirstName + ' ' + vcb.LastName
+                                WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                                THEN u.Username
+                                WHEN u.Name IS NOT NULL AND LEN(TRIM(u.Name)) > 0
+                                THEN u.Name
+                                ELSE NULL
+                            END as ParticipantName,
+                            vcb.CustomerEmail,
+                            u.Email
+                        FROM VideoCallBookings vcb
+                        LEFT JOIN Users u ON vcb.UserId = u.Id
+                        WHERE vcb.SessionId = @SessionId 
+                        AND (vcb.CustomerPhone = @Phone OR vcb.CustomerPhone = @CleanPhone)
+                        ORDER BY vcb.BookingDate DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(nameQuery, conn))
                     {
-                        if (i > 0) phoneConditions += " OR ";
-                        phoneConditions += $"CustomerPhone = @Phone{i}";
-                    }
-
-                    string updateQuery = $@"
-                        UPDATE VideoCallBookings 
-                        SET BookingStatus = @Status 
-                        WHERE SessionId = @SessionId 
-                        AND ({phoneConditions})";
-
-                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@Status", newStatus);
                         cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        cmd.Parameters.AddWithValue("@Phone", phoneNumber);
+                        cmd.Parameters.AddWithValue("@CleanPhone", cleanPhone);
 
-                        for (int i = 0; i < phoneVariations.Count; i++)
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            cmd.Parameters.AddWithValue($"@Phone{i}", phoneVariations[i]);
-                        }
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-
-                        var result = new
-                        {
-                            success = rowsAffected > 0,
-                            message = rowsAffected > 0 ? "Status updated successfully" : "No records updated",
-                            rowsAffected = rowsAffected
-                        };
-
-                        JavaScriptSerializer serializer = new JavaScriptSerializer();
-                        return serializer.Serialize(result);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var result = new
-                {
-                    success = false,
-                    message = "Error updating status: " + ex.Message,
-                    rowsAffected = 0
-                };
-
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                return serializer.Serialize(result);
-            }
-        }
-
-        [WebMethod]
-        public static string NotifyParticipants(int sessionId, string participantIds, string message)
-        {
-            try
-            {
-                var idArray = participantIds.Split(',').Where(id => !string.IsNullOrEmpty(id)).ToArray();
-                int notifiedCount = 0;
-
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
-                {
-                    conn.Open();
-
-                    foreach (string phoneId in idArray)
-                    {
-                        // Update booking status to indicate notification sent
-                        string updateQuery = @"
-                            UPDATE VideoCallBookings 
-                            SET BookingStatus = 'Expert Ready' 
-                            WHERE SessionId = @SessionId 
-                            AND (CustomerPhone LIKE '%' + @PhoneId + '%' OR UserId = @UserId)";
-
-                        using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@SessionId", sessionId);
-                            cmd.Parameters.AddWithValue("@PhoneId", phoneId.Replace("+", "").Replace(" ", ""));
-
-                            if (int.TryParse(phoneId, out int userId))
+                            if (reader.Read())
                             {
-                                cmd.Parameters.AddWithValue("@UserId", userId);
-                            }
-                            else
-                            {
-                                cmd.Parameters.AddWithValue("@UserId", DBNull.Value);
-                            }
+                                string participantName = reader["ParticipantName"]?.ToString();
+                                string customerEmail = reader["CustomerEmail"]?.ToString();
+                                string userEmail = reader["Email"]?.ToString();
 
-                            if (cmd.ExecuteNonQuery() > 0)
-                            {
-                                notifiedCount++;
+                                // If we have a good name, use it
+                                if (!string.IsNullOrEmpty(participantName))
+                                {
+                                    var result = new
+                                    {
+                                        success = true,
+                                        name = participantName
+                                    };
+
+                                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                    return serializer.Serialize(result);
+                                }
+
+                                // Try to extract name from email if no direct name available
+                                string emailToUse = !string.IsNullOrEmpty(customerEmail) ? customerEmail : userEmail;
+                                if (!string.IsNullOrEmpty(emailToUse) && emailToUse.Contains("@") && !emailToUse.StartsWith("participant"))
+                                {
+                                    string nameFromEmail = emailToUse.Split('@')[0];
+                                    // Capitalize first letter and handle common email patterns
+                                    if (nameFromEmail.Length > 1 && !nameFromEmail.All(char.IsDigit))
+                                    {
+                                        nameFromEmail = char.ToUpper(nameFromEmail[0]) + nameFromEmail.Substring(1).ToLower();
+                                        if (nameFromEmail.Contains("."))
+                                        {
+                                            string[] parts = nameFromEmail.Split('.');
+                                            nameFromEmail = string.Join(" ", parts.Select(p => char.ToUpper(p[0]) + p.Substring(1)));
+                                        }
+
+                                        var result = new
+                                        {
+                                            success = true,
+                                            name = nameFromEmail
+                                        };
+
+                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        return serializer.Serialize(result);
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
-                var result = new
+                // Fallback to formatted phone number
+                string cleanPhoneFallback = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+                string fallbackName = $"Participant ({cleanPhoneFallback.Substring(0, Math.Min(4, cleanPhoneFallback.Length))}...{cleanPhoneFallback.Substring(Math.Max(0, cleanPhoneFallback.Length - 4))})";
+
+                var fallbackResult = new
                 {
                     success = true,
-                    notifiedCount = notifiedCount,
-                    message = $"Notified {notifiedCount} participants that expert is ready"
+                    name = fallbackName
                 };
 
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                return serializer.Serialize(result);
+                JavaScriptSerializer fallbackSerializer = new JavaScriptSerializer();
+                return fallbackSerializer.Serialize(fallbackResult);
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"❌ Error getting participant real name: {ex.Message}");
+
                 var result = new
                 {
                     success = false,
-                    notifiedCount = 0,
-                    message = "Error notifying participants: " + ex.Message
+                    name = "Participant"
                 };
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -794,70 +506,10 @@ namespace SpotTheScam.Staff
             }
         }
 
-        // Generate all possible phone number variations
-        private static List<string> GetPhoneVariations(string phone)
+        private void ShowError(string message)
         {
-            var variations = new List<string>();
-
-            if (string.IsNullOrEmpty(phone))
-                return variations;
-
-            // Add original
-            variations.Add(phone);
-
-            // Clean phone (remove all non-digits)
-            string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phone, @"[^\d]", "");
-
-            if (!variations.Contains(cleanPhone))
-                variations.Add(cleanPhone);
-
-            // If it's 8 digits, it's likely local Singapore number
-            if (cleanPhone.Length == 8)
-            {
-                string withSG = "+65" + cleanPhone;
-                string withSGNoPlus = "65" + cleanPhone;
-
-                if (!variations.Contains(withSG))
-                    variations.Add(withSG);
-                if (!variations.Contains(withSGNoPlus))
-                    variations.Add(withSGNoPlus);
-            }
-
-            // If it's 10 digits starting with 65, create variations
-            if (cleanPhone.Length == 10 && cleanPhone.StartsWith("65"))
-            {
-                string localOnly = cleanPhone.Substring(2); // Remove 65 prefix
-                string withPlus = "+" + cleanPhone;
-
-                if (!variations.Contains(localOnly))
-                    variations.Add(localOnly);
-                if (!variations.Contains(withPlus))
-                    variations.Add(withPlus);
-            }
-
-            // If it starts with +65, create variations
-            if (phone.StartsWith("+65"))
-            {
-                string without65 = phone.Substring(3); // Remove +65
-                string withoutPlus = phone.Substring(1); // Remove +
-
-                if (!variations.Contains(without65))
-                    variations.Add(without65);
-                if (!variations.Contains(withoutPlus))
-                    variations.Add(withoutPlus);
-            }
-
-            // Remove any duplicates and empty strings
-            var uniqueVariations = new List<string>();
-            foreach (var variation in variations)
-            {
-                if (!string.IsNullOrEmpty(variation) && !uniqueVariations.Contains(variation))
-                {
-                    uniqueVariations.Add(variation);
-                }
-            }
-
-            return uniqueVariations;
+            lblStatus.Text = message;
+            lblStatus.CssClass = "status-message error";
         }
 
         protected override void OnUnload(EventArgs e)

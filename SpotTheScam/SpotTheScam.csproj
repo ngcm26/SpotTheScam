@@ -212,9 +212,12 @@
     <Content Include="User\ScamRecoveryGuidance.aspx" />
     <Content Include="User\SuspiciousActivities.aspx" />
     <Content Include="User\TransactionDetails.aspx" />
+    <Content Include="User\UserAchievements.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
     <Content Include="User\UserMySessions.aspx" />
+    <Content Include="User\UserMyStats.aspx" />
+    <Content Include="User\UserPointsStore.aspx" />
     <Content Include="User\UserProfile.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
@@ -454,6 +457,13 @@
     <Compile Include="User\TransactionDetails.aspx.designer.cs">
       <DependentUpon>TransactionDetails.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\UserAchievements.aspx.cs">
+      <DependentUpon>UserAchievements.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserAchievements.aspx.designer.cs">
+      <DependentUpon>UserAchievements.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\UserBlog.aspx.cs">
       <DependentUpon>UserBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -474,6 +484,20 @@
     </Compile>
     <Compile Include="User\UserMySessions.aspx.designer.cs">
       <DependentUpon>UserMySessions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserMyStats.aspx.cs">
+      <DependentUpon>UserMyStats.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserMyStats.aspx.designer.cs">
+      <DependentUpon>UserMyStats.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserPointsStore.aspx.cs">
+      <DependentUpon>UserPointsStore.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserPointsStore.aspx.designer.cs">
+      <DependentUpon>UserPointsStore.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserProfile.aspx.cs">
       <DependentUpon>UserProfile.aspx</DependentUpon>

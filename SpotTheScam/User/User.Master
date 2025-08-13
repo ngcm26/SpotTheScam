@@ -151,12 +151,13 @@
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="protectionDropdown" role="button">Blogs & Forum</a>
-                            <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="blogsForumDropdown" role="button">Blogs & Forum</a>
+                            <ul class="dropdown-menu" aria-labelledby="blogsForumDropdown">
                                 <li><a class="dropdown-item" href="UserBlog.aspx">Blogs</a></li>
                                 <li><a class="dropdown-item" href="ForumPage.aspx">Forum</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management</a>
                             <ul class="dropdown-menu" aria-labelledby="accountDropdown">
@@ -166,6 +167,7 @@
                                 <!-- Add more related features here as needed -->
                             </ul>
                         </li>
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="expertWebinarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Expert Webinar Session
@@ -175,7 +177,19 @@
                                 <li><a class="dropdown-item" href="UserMySessions.aspx">My Sessions</a></li>
                             </ul>
                         </li>
-                                            </ul>
+
+                        <!-- NEW POINTS SYSTEM DROPDOWN -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="pointsSystemDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Points & Rewards
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="pointsSystemDropdown">
+                                <li><a class="dropdown-item" href="UserPointsStore.aspx">Points Store</a></li>
+                                <li><a class="dropdown-item" href="UserAchievements.aspx">Achievements</a></li>
+                                <li><a class="dropdown-item" href="UserMyStats.aspx">My Stats</a></li>
+                            </ul>
+                        </li>
+                    </ul>
 
                     <!-- Right Buttons -->
                     <ul class="navbar-nav ms-auto d-flex align-items-center">
