@@ -124,9 +124,16 @@
         }
         
         .purchase-btn:disabled {
-            background: #d1d5db;
-            color: #6b7280;
-            cursor: not-allowed;
+            background: #d1d5db !important;
+            color: #6b7280 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .purchase-btn:disabled:hover {
+            background: #d1d5db !important;
+            color: #6b7280 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
         }
         
         .store-description {
@@ -148,6 +155,42 @@
             top: -80px;
         }
     </style>
+    
+    <script type="text/javascript">
+        function updateStoreItemStyles() {
+            var currentPoints = parseInt('<%= Session["CurrentPoints"] != null ? Session["CurrentPoints"].ToString() : "0" %>');
+
+            // Define item costs
+            var itemCosts = {
+                'report': 50,
+                'guide': 40,
+                'quiz': 50,
+                'webinar': 150
+            };
+
+            // Update each store card based on available points
+            updateCardStyle('report-card', currentPoints >= itemCosts.report);
+            updateCardStyle('guide-card', currentPoints >= itemCosts.guide);
+            updateCardStyle('quiz-card', currentPoints >= itemCosts.quiz);
+            updateCardStyle('webinar-card', false); // Always unavailable as per design
+        }
+
+        function updateCardStyle(cardId, canAfford) {
+            var card = document.getElementById(cardId);
+            if (card) {
+                if (canAfford) {
+                    card.className = 'store-card featured';
+                } else {
+                    card.className = 'store-card unavailable';
+                }
+            }
+        }
+
+        // Run when page loads
+        window.onload = function () {
+            updateStoreItemStyles();
+        };
+    </script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -168,12 +211,12 @@
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <!-- Current Points Display -->
+                <!-- Current Points Display - Now Dynamic -->
                 <div class="container">
                     <div class="text-end mb-4">
                         <span class="me-3 current-points-label">Current Points:</span>
                         <span class="points-badge">
-                            ⭐ 75
+                            ⭐ <asp:Label ID="lblCurrentPoints" runat="server" Text="0" />
                         </span>
                     </div>
                 </div>
@@ -195,7 +238,7 @@
             <div class="row g-2 gy-4">
                 <!-- Detailed Scam Report -->
                 <div class="col-6">
-                    <div class="store-card featured">
+                    <div id="report-card" class="store-card featured">
                         <div class="card-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
                             📊
                         </div>
@@ -206,15 +249,17 @@
                         <p class="store-description mb-3">
                             Get a personalized report on the latest scam trends in your area with prevention tips
                         </p>
-                        <button class="purchase-btn" type="button">
-                            Purchase Now
-                        </button>
+                        <asp:Button ID="btnPurchaseReport" runat="server" 
+                            CssClass="purchase-btn" 
+                            Text="Purchase Now"
+                            OnClick="PurchaseItem_Click"
+                            CommandArgument="DetailedScamReport|50" />
                     </div>
                 </div>
                 
                 <!-- Safety Guide PDF -->
                 <div class="col-6">
-                    <div class="store-card featured">
+                    <div id="guide-card" class="store-card featured">
                         <div class="card-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
                             📄
                         </div>
@@ -225,15 +270,17 @@
                         <p class="store-description mb-3">
                             Download a comprehensive 20-page safety guide you can share with family
                         </p>
-                        <button class="purchase-btn" type="button">
-                            Purchase Now
-                        </button>
+                        <asp:Button ID="btnPurchaseGuide" runat="server" 
+                            CssClass="purchase-btn" 
+                            Text="Purchase Now"
+                            OnClick="PurchaseItem_Click"
+                            CommandArgument="SafetyGuidePDF|40" />
                     </div>
                 </div>
                 
                 <!-- Advanced Quiz -->
                 <div class="col-6">
-                    <div class="store-card featured">
+                    <div id="quiz-card" class="store-card featured">
                         <div class="card-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
                             🔒
                         </div>
@@ -244,15 +291,17 @@
                         <p class="store-description mb-3">
                             Unlock expert-level quizzes with real-world scam scenarios and case-studies
                         </p>
-                        <button class="purchase-btn" type="button">
-                            Purchase Now
-                        </button>
+                        <asp:Button ID="btnPurchaseQuiz" runat="server" 
+                            CssClass="purchase-btn" 
+                            Text="Purchase Now"
+                            OnClick="PurchaseItem_Click"
+                            CommandArgument="AdvancedQuiz|50" />
                     </div>
                 </div>
                 
                 <!-- Reserve Live Expert Webinar -->
                 <div class="col-6">
-                    <div class="store-card unavailable">
+                    <div id="webinar-card" class="store-card unavailable">
                         <div class="card-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
                             💻
                         </div>
@@ -263,9 +312,12 @@
                         <p class="store-description mb-3">
                             Book your spot in upcoming live expert sessions on scam prevention and digital safety
                         </p>
-                        <button class="purchase-btn" type="button" disabled>
-                            Purchase Now
-                        </button>
+                        <asp:Button ID="btnPurchaseWebinar" runat="server" 
+                            CssClass="purchase-btn" 
+                            Text="Purchase Now"
+                            OnClick="PurchaseItem_Click"
+                            CommandArgument="ExpertWebinar|150"
+                            Enabled="false" />
                     </div>
                 </div>
             </div>

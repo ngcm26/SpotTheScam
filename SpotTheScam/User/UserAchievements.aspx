@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Achievements" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" %>
+﻿<%@ Page Title="Achievements" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserAchievements.aspx.cs" Inherits="SpotTheScam.User.UserAchievements" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
@@ -187,12 +187,12 @@
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <!-- Current Points Display -->
+                <!-- Current Points Display - Now Dynamic -->
                 <div class="container">
                     <div class="text-end mb-4">
                         <span class="me-3 current-points-label">Current Points:</span>
                         <span class="points-badge">
-                            ⭐ 75
+                            ⭐ <asp:Label ID="lblCurrentPoints" runat="server" Text="0" />
                         </span>
                     </div>
                 </div>

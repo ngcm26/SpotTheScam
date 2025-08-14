@@ -648,6 +648,7 @@
     <Content Include="Staff\Staff.Master" />
     <Content Include="User\User.Master" />
     <None Include="packages.config" />
+    <Content Include="Uploads\pdf_scamguide\ScamSafetyGuide.pdf" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

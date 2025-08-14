@@ -1,4 +1,4 @@
-﻿<%@ Page Title="My Stats" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" %>
+﻿<%@ Page Title="My Stats" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="UserMyStats.aspx.cs" Inherits="SpotTheScam.User.UserMyStats" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
@@ -125,6 +125,21 @@
             font-weight: 500;
         }
         
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.8);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
         @media (max-width: 768px) {
             .stats-grid {
                 gap: 15px;
@@ -139,6 +154,33 @@
             }
         }
     </style>
+    
+    <script type="text/javascript">
+        function updateCurrentPoints() {
+            // Get current points from session (same pattern as UserPointsStore)
+            var currentPoints = '<%= Session["CurrentPoints"] != null ? Session["CurrentPoints"].ToString() : "0" %>';
+            var lblCurrentPoints = document.getElementById('<%= lblCurrentPoints.ClientID %>');
+            var lblTotalPoints = document.getElementById('<%= lblTotalPoints.ClientID %>');
+            
+            // Update both current points and total points displays
+            if (lblCurrentPoints) {
+                lblCurrentPoints.innerText = currentPoints;
+            }
+            if (lblTotalPoints) {
+                lblTotalPoints.innerText = currentPoints;
+            }
+        }
+
+        // Run when page loads
+        window.onload = function () {
+            updateCurrentPoints();
+            var progressValue = document.getElementById('<%= hiddenQuizProgress.ClientID %>').value;
+            var progressBars = document.querySelectorAll('.progress-bar');
+            if (progressBars.length > 0) {
+                progressBars[0].style.width = progressValue + '%';
+            }
+        };
+    </script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -146,22 +188,26 @@
         <!-- Navigation Tabs -->
         <div class="navbar-tabs">
             <a href="UserPointsStore.aspx" class="nav-tab">
-                🏪 Points Store
+                Points Store
             </a>
             <a href="UserAchievements.aspx" class="nav-tab">
-                🏆 Achievements
+                Achievements
             </a>
             <a href="#" class="nav-tab active">
-                📊 My Stats
+                My Stats
             </a>
         </div>
         
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <!-- Current Points Display -->
+                <!-- Current Points Display - Now Dynamic (same as UserPointsStore) -->
                 <div class="container">
                     <div class="text-end mb-4">
+                        <span class="me-3 current-points-label">Current Points:</span>
+                        <span class="points-badge">
+                            ⭐ <asp:Label ID="lblCurrentPoints" runat="server" Text="0" />
+                        </span>
                     </div>
                 </div>
             </div>
@@ -183,24 +229,39 @@
                 <div class="col-12 col-lg-10">
                     <div class="stats-card">
                         <h2 class="stats-title">Your Learning Journey</h2>
-                        <p class="stats-subtitle">Keep up the great work protecting yourself from scams!</p>
+                        <p class="stats-subtitle">
+                            <asp:Label ID="lblMotivationalMessage" runat="server" Text="Keep up the great work protecting yourself from scams!"></asp:Label>
+                        </p>
                         
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <div class="stat-number">75</div>
+                                <div class="stat-number">
+                                    <asp:Label ID="lblTotalPoints" runat="server" Text="0"></asp:Label>
+                                </div>
                                 <div class="stat-label">Total Points</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-number">3/6</div>
+                                <div class="stat-number">
+                                    <asp:Label ID="lblQuizzesCompleted" runat="server" Text="1"></asp:Label>/<asp:Label ID="lblTotalQuizzes" runat="server" Text="6"></asp:Label>
+                                </div>
                                 <div class="stat-label">Quizzes Done</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar">
+                                        <asp:HiddenField ID="hiddenQuizProgress" runat="server" Value="17" />
+                                    </div>
+                                </div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-number">82%</div>
-                                <div class="stat-label">Avg Score</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number">5</div>
+                                <div class="stat-number">
+                                    <asp:Label ID="lblCurrentStreak" runat="server" Text="1"></asp:Label>
+                                </div>
                                 <div class="stat-label">Day Streak</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">
+                                    <asp:Label ID="lblAchievementsUnlocked" runat="server" Text="1"></asp:Label>
+                                </div>
+                                <div class="stat-label">Achievements Unlocked</div>
                             </div>
                         </div>
                     </div>
