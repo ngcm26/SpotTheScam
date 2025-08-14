@@ -541,7 +541,6 @@
     <Compile Include="User\User.Master.designer.cs">
       <DependentUpon>User.Master</DependentUpon>
     </Compile>
-    <Compile Include="User\Utilities\AlertsUtility.cs" />
     <Compile Include="User\VideoCall.aspx.cs">
       <DependentUpon>VideoCall.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
