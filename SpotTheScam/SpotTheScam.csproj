@@ -193,13 +193,7 @@
     <Content Include="Staff\StaffManageSessions.aspx" />
     <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
-    <Content Include="User\AddBankAccounts.aspx" />
-    <Content Include="User\AddManualTransaction.aspx" />
     <Content Include="User\CreateBlog.aspx" />
-    <Content Include="User\Dashboard.aspx" />
-    <Content Include="User\FamilyGroupInvites.aspx" />
-    <Content Include="User\FamilyGroupManagement.aspx" />
-    <Content Include="User\FamilySidebar.ascx" />
     <Content Include="User\ForumPage.aspx" />
     <Content Include="User\IndividualForum.aspx" />
     <Content Include="User\JoinSession.aspx" />
@@ -212,8 +206,6 @@
     <Content Include="User\RecoverySupport.aspx" />
     <Content Include="User\ScamChecker.aspx" />
     <Content Include="User\ScamRecoveryGuidance.aspx" />
-    <Content Include="User\SuspiciousActivities.aspx" />
-    <Content Include="User\TransactionDetails.aspx" />
     <Content Include="User\UserAchievements.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
@@ -227,13 +219,11 @@
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
-    <Content Include="User\UserBankAccounts.aspx" />
     <Content Include="User\UserHome.aspx" />
     <Content Include="Images\logo.svg" />
     <Content Include="User\UserLogin.aspx" />
     <Content Include="User\UserLogout.aspx" />
     <Content Include="User\UserRegister.aspx" />
-    <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="User\VideoCall.aspx" />
     <Content Include="Web.config" />
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
@@ -326,54 +316,12 @@
     <Compile Include="Staff\ViewModules.aspx.designer.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
     </Compile>
-    <Compile Include="User\AddBankAccounts.aspx.cs">
-      <DependentUpon>AddBankAccounts.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\AddBankAccounts.aspx.designer.cs">
-      <DependentUpon>AddBankAccounts.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\AddManualTransaction.aspx.cs">
-      <DependentUpon>AddManualTransaction.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\AddManualTransaction.aspx.designer.cs">
-      <DependentUpon>AddManualTransaction.aspx</DependentUpon>
-    </Compile>
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\CreateBlog.aspx.designer.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\Dashboard.aspx.cs">
-      <DependentUpon>Dashboard.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\Dashboard.aspx.designer.cs">
-      <DependentUpon>Dashboard.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\FamilyGroupInvites.aspx.cs">
-      <DependentUpon>FamilyGroupInvites.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\FamilyGroupInvites.aspx.designer.cs">
-      <DependentUpon>FamilyGroupInvites.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\FamilyGroupManagement.aspx.cs">
-      <DependentUpon>FamilyGroupManagement.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\FamilyGroupManagement.aspx.designer.cs">
-      <DependentUpon>FamilyGroupManagement.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\FamilySidebar.ascx.cs">
-      <DependentUpon>FamilySidebar.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\FamilySidebar.ascx.designer.cs">
-      <DependentUpon>FamilySidebar.ascx</DependentUpon>
     </Compile>
     <Compile Include="User\ForumPage.aspx.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
@@ -458,20 +406,6 @@
     </Compile>
     <Compile Include="User\ScamRecoveryGuidance.aspx.designer.cs">
       <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\SuspiciousActivities.aspx.cs">
-      <DependentUpon>SuspiciousActivities.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\SuspiciousActivities.aspx.designer.cs">
-      <DependentUpon>SuspiciousActivities.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\TransactionDetails.aspx.cs">
-      <DependentUpon>TransactionDetails.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\TransactionDetails.aspx.designer.cs">
-      <DependentUpon>TransactionDetails.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserAchievements.aspx.cs">
       <DependentUpon>UserAchievements.aspx</DependentUpon>
@@ -564,13 +498,6 @@
     <Compile Include="Staff\StaffLogout.aspx.designer.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
     </Compile>
-    <Compile Include="User\UserBankAccounts.aspx.cs">
-      <DependentUpon>UserBankAccounts.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\UserBankAccounts.aspx.designer.cs">
-      <DependentUpon>UserBankAccounts.aspx</DependentUpon>
-    </Compile>
     <Compile Include="User\UserHome.aspx.cs">
       <DependentUpon>UserHome.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -614,13 +541,7 @@
     <Compile Include="User\User.Master.designer.cs">
       <DependentUpon>User.Master</DependentUpon>
     </Compile>
-    <Compile Include="User\UserTransactionLogs.aspx.cs">
-      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
-      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
-    </Compile>
+    <Compile Include="User\Utilities\AlertsUtility.cs" />
     <Compile Include="User\VideoCall.aspx.cs">
       <DependentUpon>VideoCall.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -639,6 +560,9 @@
   <ItemGroup>
     <Content Include="Staff\Staff.Master" />
     <Content Include="User\User.Master" />
+    <Content Include="Documentation\AlertsInbox-Enhancement-Summary.md" />
+    <Content Include="Documentation\Feature-Integration-Summary.md" />
+    <Content Include="Documentation\Transaction-Fix-Guide.md" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
