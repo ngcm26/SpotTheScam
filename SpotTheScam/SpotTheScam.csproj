@@ -196,8 +196,7 @@
     <Content Include="User\AddBankAccounts.aspx" />
     <Content Include="User\AddManualTransaction.aspx" />
     <Content Include="User\CreateBlog.aspx" />
-    <Content Include="User\FakeOCBCLogin.aspx" />
-    <Content Include="User\FakeUOBLogin.aspx" />
+    <Content Include="User\Dashboard.aspx" />
     <Content Include="User\FamilyGroupInvites.aspx" />
     <Content Include="User\FamilyGroupManagement.aspx" />
     <Content Include="User\FamilySidebar.ascx" />
@@ -348,19 +347,12 @@
     <Compile Include="User\CreateBlog.aspx.designer.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
     </Compile>
-    <Compile Include="User\FakeOCBCLogin.aspx.cs">
-      <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
+    <Compile Include="User\Dashboard.aspx.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="User\FakeOCBCLogin.aspx.designer.cs">
-      <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\FakeUOBLogin.aspx.cs">
-      <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\FakeUOBLogin.aspx.designer.cs">
-      <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
+    <Compile Include="User\Dashboard.aspx.designer.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\FamilyGroupInvites.aspx.cs">
       <DependentUpon>FamilyGroupInvites.aspx</DependentUpon>
