@@ -193,12 +193,19 @@
     <Content Include="Staff\StaffManageSessions.aspx" />
     <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
+    <Content Include="User\AcceptInvite.aspx" />
+    <Content Include="User\AddTransactions.aspx" />
+    <Content Include="User\ConnectBank.aspx" />
     <Content Include="User\CreateBlog.aspx" />
+    <Content Include="User\CreateGroup.aspx" />
     <Content Include="User\ForumPage.aspx" />
     <Content Include="User\IndividualForum.aspx" />
+    <Content Include="User\Invites.aspx" />
     <Content Include="User\JoinSession.aspx" />
     <Content Include="User\LinkChecker.aspx" />
+    <Content Include="User\ManageGroup.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
+    <Content Include="User\MyGroups.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
     <Content Include="User\PointsDebug.aspx" />
     <Content Include="User\QuizCompletion.aspx" />
@@ -213,6 +220,7 @@
     <Content Include="User\UserMyStats.aspx" />
     <Content Include="User\UserPointsStore.aspx" />
     <Content Include="User\UserProfile.aspx" />
+    <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
@@ -316,12 +324,40 @@
     <Compile Include="Staff\ViewModules.aspx.designer.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\AcceptInvite.aspx.cs">
+      <DependentUpon>AcceptInvite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\AcceptInvite.aspx.designer.cs">
+      <DependentUpon>AcceptInvite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\AddTransactions.aspx.cs">
+      <DependentUpon>AddTransactions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\AddTransactions.aspx.designer.cs">
+      <DependentUpon>AddTransactions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ConnectBank.aspx.cs">
+      <DependentUpon>ConnectBank.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ConnectBank.aspx.designer.cs">
+      <DependentUpon>ConnectBank.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\CreateBlog.aspx.designer.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\CreateGroup.aspx.cs">
+      <DependentUpon>CreateGroup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\CreateGroup.aspx.designer.cs">
+      <DependentUpon>CreateGroup.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ForumPage.aspx.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
@@ -337,6 +373,13 @@
     <Compile Include="User\IndividualForum.aspx.designer.cs">
       <DependentUpon>IndividualForum.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\Invites.aspx.cs">
+      <DependentUpon>Invites.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\Invites.aspx.designer.cs">
+      <DependentUpon>Invites.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\JoinSession.aspx.cs">
       <DependentUpon>JoinSession.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -351,12 +394,26 @@
     <Compile Include="User\LinkChecker.aspx.designer.cs">
       <DependentUpon>LinkChecker.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\ManageGroup.aspx.cs">
+      <DependentUpon>ManageGroup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ManageGroup.aspx.designer.cs">
+      <DependentUpon>ManageGroup.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\ModuleInformation.aspx.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\ModuleInformation.aspx.designer.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\MyGroups.aspx.cs">
+      <DependentUpon>MyGroups.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\MyGroups.aspx.designer.cs">
+      <DependentUpon>MyGroups.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\PhoneScamsQuiz.aspx.cs">
       <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
@@ -455,6 +512,13 @@
     </Compile>
     <Compile Include="User\UserProfile.aspx.designer.cs">
       <DependentUpon>UserProfile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserTransactionLogs.aspx.cs">
+      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
+      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserWebinarRegistration.aspx.cs">
       <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>
@@ -559,9 +623,6 @@
   <ItemGroup>
     <Content Include="Staff\Staff.Master" />
     <Content Include="User\User.Master" />
-    <Content Include="Documentation\AlertsInbox-Enhancement-Summary.md" />
-    <Content Include="Documentation\Feature-Integration-Summary.md" />
-    <Content Include="Documentation\Transaction-Fix-Guide.md" />
     <None Include="packages.config" />
     <Content Include="Uploads\pdf_scamguide\ScamSafetyGuide.pdf" />
     <None Include="Web.Debug.config">
@@ -572,6 +633,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Documentation\" />
     <Folder Include="tessdata\" />
     <Folder Include="Uploads\Blog_Pictures\" />
     <Folder Include="Uploads\forum_pictures\" />
