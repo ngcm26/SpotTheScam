@@ -9,72 +9,51 @@
 
 namespace SpotTheScam.User
 {
-
-
-    public partial class FakeOCBCLogin
+    public partial class UserPointsStore
     {
-
         /// <summary>
-        /// AlertPanel control.
+        /// lblCurrentPoints control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel AlertPanel;
+        protected global::System.Web.UI.WebControls.Label lblCurrentPoints;
 
         /// <summary>
-        /// AlertMessage control.
+        /// btnPurchaseReport control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label AlertMessage;
+        protected global::System.Web.UI.WebControls.Button btnPurchaseReport;
 
         /// <summary>
-        /// txtUsername control.
+        /// btnPurchaseGuide control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUsername;
+        protected global::System.Web.UI.WebControls.Button btnPurchaseGuide;
 
         /// <summary>
-        /// rfvUsername control.
+        /// btnPurchaseQuiz control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvUsername;
+        protected global::System.Web.UI.WebControls.Button btnPurchaseQuiz;
 
         /// <summary>
-        /// txtPassword control.
+        /// btnPurchaseWebinar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPassword;
-
-        /// <summary>
-        /// rfvPassword control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPassword;
-
-        /// <summary>
-        /// btnLogin control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnLogin;
+        protected global::System.Web.UI.WebControls.Button btnPurchaseWebinar;
     }
 }

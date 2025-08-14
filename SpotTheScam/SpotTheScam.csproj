@@ -48,6 +48,9 @@
     <Reference Include="AngleSharp.Css, Version=0.17.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.Css.0.17.0\lib\net472\AngleSharp.Css.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.4.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlSanitizer, Version=9.0.0.0, Culture=neutral, PublicKeyToken=61c49a1a9e79cc28, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlSanitizer.9.0.886\lib\net47\HtmlSanitizer.dll</HintPath>
     </Reference>
@@ -60,67 +63,55 @@
     <Reference Include="HtmlSanitizer, Version=9.0.0.0, Culture=neutral, PublicKeyToken=61c49a1a9e79cc28, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlSanitizer.9.0.886\lib\net47\HtmlSanitizer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="itextsharp, Version=5.5.13.4, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.4\lib\net461\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.8\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\lib\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=9.0.0.8, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.9.0.8\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="System.Collections.Immutable, Version=9.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.9.0.1\lib\net462\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=9.0.0.8, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.9.0.8\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    <Reference Include="OpenAI, Version=2.3.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenAI.2.3.0\lib\netstandard2.0\OpenAI.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=9.0.0.8, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.9.0.8\lib\net462\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.9.0.8\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Pipelines, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.9.0.8\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory.Data, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.Data.9.0.8\lib\net462\System.Memory.Data.dll</HintPath>
     </Reference>
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Encoding.CodePages, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.6.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=8.0.0.2, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.8.0.2\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=8.0.0.3, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.8.0.3\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenAI, Version=2.2.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenAI.2.2.0\lib\netstandard2.0\OpenAI.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ClientModel, Version=1.5.1.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ClientModel.1.5.1\lib\netstandard2.0\System.ClientModel.dll</HintPath>
     </Reference>
-    <Reference Include="System.Collections.Immutable, Version=9.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.9.0.1\lib\net462\System.Collections.Immutable.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
     <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Memory.Data, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.Data.8.0.1\lib\net462\System.Memory.Data.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
@@ -128,22 +119,24 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
+    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Encoding.CodePages, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.6.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.1\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.2\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
@@ -157,22 +150,17 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
+    <Reference Include="System.Text.Encoding.CodePages, Version=9.0.0.8, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.9.0.8\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.9.0.8\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.9.0.8\lib\net462\System.Text.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -197,22 +185,27 @@
     <Content Include="Global.asax" />
     <Content Include="Staff\EditUsers.aspx" />
     <Content Include="Staff\IndividualBlogStafff.aspx" />
+    <Content Include="Staff\IndividualForumStaff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
+    <Content Include="Staff\ManageForum.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
     <Content Include="Staff\StaffManageParticipants.aspx" />
     <Content Include="Staff\StaffManageSessions.aspx" />
     <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
-    <Content Include="User\AddBankAccounts.aspx" />
+    <Content Include="User\AcceptInvite.aspx" />
+    <Content Include="User\AddTransactions.aspx" />
+    <Content Include="User\ConnectBank.aspx" />
     <Content Include="User\CreateBlog.aspx" />
-    <Content Include="User\FakeOCBCLogin.aspx" />
-    <Content Include="User\FakeUOBLogin.aspx" />
-    <Content Include="User\FamilyGroupManagement.aspx" />
+    <Content Include="User\CreateGroup.aspx" />
     <Content Include="User\ForumPage.aspx" />
     <Content Include="User\IndividualForum.aspx" />
+    <Content Include="User\Invites.aspx" />
     <Content Include="User\JoinSession.aspx" />
     <Content Include="User\LinkChecker.aspx" />
+    <Content Include="User\ManageGroup.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
+    <Content Include="User\MyGroups.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
     <Content Include="User\PointsDebug.aspx" />
     <Content Include="User\QuizCompletion.aspx" />
@@ -220,24 +213,25 @@
     <Content Include="User\RecoverySupport.aspx" />
     <Content Include="User\ScamChecker.aspx" />
     <Content Include="User\ScamRecoveryGuidance.aspx" />
-    <Content Include="User\TransactionDetails.aspx" />
+    <Content Include="User\UserAchievements.aspx" />
     <Content Include="User\UserBlog.aspx" />
     <Content Include="User\UserModules.aspx" />
     <Content Include="User\UserMySessions.aspx" />
+    <Content Include="User\UserMyStats.aspx" />
+    <Content Include="User\UserPointsStore.aspx" />
     <Content Include="User\UserProfile.aspx" />
+    <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
-    <Content Include="User\UserBankAccounts.aspx" />
     <Content Include="User\UserHome.aspx" />
     <Content Include="Images\logo.svg" />
     <Content Include="User\UserLogin.aspx" />
     <Content Include="User\UserLogout.aspx" />
     <Content Include="User\UserRegister.aspx" />
-    <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="User\VideoCall.aspx" />
     <Content Include="Web.config" />
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
@@ -274,12 +268,26 @@
     <Compile Include="Staff\IndividualBlogStafff.aspx.designer.cs">
       <DependentUpon>IndividualBlogStafff.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Staff\IndividualForumStaff.aspx.cs">
+      <DependentUpon>IndividualForumStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\IndividualForumStaff.aspx.designer.cs">
+      <DependentUpon>IndividualForumStaff.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Staff\ManageBlog.aspx.cs">
       <DependentUpon>ManageBlog.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Staff\ManageBlog.aspx.designer.cs">
       <DependentUpon>ManageBlog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\ManageForum.aspx.cs">
+      <DependentUpon>ManageForum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\ManageForum.aspx.designer.cs">
+      <DependentUpon>ManageForum.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffAddModules.aspx.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>
@@ -316,12 +324,26 @@
     <Compile Include="Staff\ViewModules.aspx.designer.cs">
       <DependentUpon>ViewModules.aspx</DependentUpon>
     </Compile>
-    <Compile Include="User\AddBankAccounts.aspx.cs">
-      <DependentUpon>AddBankAccounts.aspx</DependentUpon>
+    <Compile Include="User\AcceptInvite.aspx.cs">
+      <DependentUpon>AcceptInvite.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="User\AddBankAccounts.aspx.designer.cs">
-      <DependentUpon>AddBankAccounts.aspx</DependentUpon>
+    <Compile Include="User\AcceptInvite.aspx.designer.cs">
+      <DependentUpon>AcceptInvite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\AddTransactions.aspx.cs">
+      <DependentUpon>AddTransactions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\AddTransactions.aspx.designer.cs">
+      <DependentUpon>AddTransactions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ConnectBank.aspx.cs">
+      <DependentUpon>ConnectBank.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ConnectBank.aspx.designer.cs">
+      <DependentUpon>ConnectBank.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\CreateBlog.aspx.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
@@ -330,26 +352,12 @@
     <Compile Include="User\CreateBlog.aspx.designer.cs">
       <DependentUpon>CreateBlog.aspx</DependentUpon>
     </Compile>
-    <Compile Include="User\FakeOCBCLogin.aspx.cs">
-      <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
+    <Compile Include="User\CreateGroup.aspx.cs">
+      <DependentUpon>CreateGroup.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="User\FakeOCBCLogin.aspx.designer.cs">
-      <DependentUpon>FakeOCBCLogin.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\FakeUOBLogin.aspx.cs">
-      <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\FakeUOBLogin.aspx.designer.cs">
-      <DependentUpon>FakeUOBLogin.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\FamilyGroupManagement.aspx.cs">
-      <DependentUpon>FamilyGroupManagement.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\FamilyGroupManagement.aspx.designer.cs">
-      <DependentUpon>FamilyGroupManagement.aspx</DependentUpon>
+    <Compile Include="User\CreateGroup.aspx.designer.cs">
+      <DependentUpon>CreateGroup.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ForumPage.aspx.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
@@ -365,6 +373,13 @@
     <Compile Include="User\IndividualForum.aspx.designer.cs">
       <DependentUpon>IndividualForum.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\Invites.aspx.cs">
+      <DependentUpon>Invites.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\Invites.aspx.designer.cs">
+      <DependentUpon>Invites.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\JoinSession.aspx.cs">
       <DependentUpon>JoinSession.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -379,12 +394,26 @@
     <Compile Include="User\LinkChecker.aspx.designer.cs">
       <DependentUpon>LinkChecker.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\ManageGroup.aspx.cs">
+      <DependentUpon>ManageGroup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ManageGroup.aspx.designer.cs">
+      <DependentUpon>ManageGroup.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\ModuleInformation.aspx.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\ModuleInformation.aspx.designer.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\MyGroups.aspx.cs">
+      <DependentUpon>MyGroups.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\MyGroups.aspx.designer.cs">
+      <DependentUpon>MyGroups.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\PhoneScamsQuiz.aspx.cs">
       <DependentUpon>PhoneScamsQuiz.aspx</DependentUpon>
@@ -435,12 +464,12 @@
     <Compile Include="User\ScamRecoveryGuidance.aspx.designer.cs">
       <DependentUpon>ScamRecoveryGuidance.aspx</DependentUpon>
     </Compile>
-    <Compile Include="User\TransactionDetails.aspx.cs">
-      <DependentUpon>TransactionDetails.aspx</DependentUpon>
+    <Compile Include="User\UserAchievements.aspx.cs">
+      <DependentUpon>UserAchievements.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="User\TransactionDetails.aspx.designer.cs">
-      <DependentUpon>TransactionDetails.aspx</DependentUpon>
+    <Compile Include="User\UserAchievements.aspx.designer.cs">
+      <DependentUpon>UserAchievements.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserBlog.aspx.cs">
       <DependentUpon>UserBlog.aspx</DependentUpon>
@@ -463,12 +492,33 @@
     <Compile Include="User\UserMySessions.aspx.designer.cs">
       <DependentUpon>UserMySessions.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\UserMyStats.aspx.cs">
+      <DependentUpon>UserMyStats.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserMyStats.aspx.designer.cs">
+      <DependentUpon>UserMyStats.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserPointsStore.aspx.cs">
+      <DependentUpon>UserPointsStore.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserPointsStore.aspx.designer.cs">
+      <DependentUpon>UserPointsStore.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\UserProfile.aspx.cs">
       <DependentUpon>UserProfile.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\UserProfile.aspx.designer.cs">
       <DependentUpon>UserProfile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserTransactionLogs.aspx.cs">
+      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
+      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserWebinarRegistration.aspx.cs">
       <DependentUpon>UserWebinarRegistration.aspx</DependentUpon>
@@ -511,13 +561,6 @@
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.designer.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\UserBankAccounts.aspx.cs">
-      <DependentUpon>UserBankAccounts.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\UserBankAccounts.aspx.designer.cs">
-      <DependentUpon>UserBankAccounts.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserHome.aspx.cs">
       <DependentUpon>UserHome.aspx</DependentUpon>
@@ -562,13 +605,6 @@
     <Compile Include="User\User.Master.designer.cs">
       <DependentUpon>User.Master</DependentUpon>
     </Compile>
-    <Compile Include="User\UserTransactionLogs.aspx.cs">
-      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\UserTransactionLogs.aspx.designer.cs">
-      <DependentUpon>UserTransactionLogs.aspx</DependentUpon>
-    </Compile>
     <Compile Include="User\VideoCall.aspx.cs">
       <DependentUpon>VideoCall.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -588,6 +624,7 @@
     <Content Include="Staff\Staff.Master" />
     <Content Include="User\User.Master" />
     <None Include="packages.config" />
+    <Content Include="Uploads\pdf_scamguide\ScamSafetyGuide.pdf" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -596,6 +633,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Documentation\" />
     <Folder Include="tessdata\" />
     <Folder Include="Uploads\Blog_Pictures\" />
     <Folder Include="Uploads\forum_pictures\" />
@@ -632,7 +670,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets'))" />
   </Target>
+  <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

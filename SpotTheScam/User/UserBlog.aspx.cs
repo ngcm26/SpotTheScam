@@ -31,7 +31,7 @@ namespace SpotTheScam.User
 
             using (SqlConnection conn = new SqlConnection(cs))
             {
-                string query = "SELECT p.*, u.username FROM posts p INNER JOIN users u ON p.user_id = u.id WHERE p.isApproved = 0 ORDER BY p.created_at DESC";
+                string query = "SELECT p.*, u.username FROM posts p INNER JOIN users u ON p.user_id = u.id WHERE p.isApproved = 1 ORDER BY p.created_at DESC";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     SqlDataAdapter da = new SqlDataAdapter(cmd);

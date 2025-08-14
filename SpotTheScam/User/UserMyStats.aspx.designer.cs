@@ -11,70 +11,79 @@ namespace SpotTheScam.User
 {
 
 
-    public partial class FakeUOBLogin
+    public partial class UserMyStats
     {
 
         /// <summary>
-        /// AlertPanel control.
+        /// lblCurrentPoints control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel AlertPanel;
+        protected global::System.Web.UI.WebControls.Label lblCurrentPoints;
 
         /// <summary>
-        /// AlertMessage control.
+        /// lblMotivationalMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label AlertMessage;
+        protected global::System.Web.UI.WebControls.Label lblMotivationalMessage;
 
         /// <summary>
-        /// txtUsername control.
+        /// lblTotalPoints control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUsername;
+        protected global::System.Web.UI.WebControls.Label lblTotalPoints;
 
         /// <summary>
-        /// rfvUsername control.
+        /// lblQuizzesCompleted control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvUsername;
+        protected global::System.Web.UI.WebControls.Label lblQuizzesCompleted;
 
         /// <summary>
-        /// txtPassword control.
+        /// lblTotalQuizzes control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPassword;
+        protected global::System.Web.UI.WebControls.Label lblTotalQuizzes;
 
         /// <summary>
-        /// rfvPassword control.
+        /// hiddenQuizProgress control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvPassword;
+        protected global::System.Web.UI.WebControls.HiddenField hiddenQuizProgress;
 
         /// <summary>
-        /// btnLogin control.
+        /// lblCurrentStreak control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnLogin;
+        protected global::System.Web.UI.WebControls.Label lblCurrentStreak;
+
+        /// <summary>
+        /// lblAchievementsUnlocked control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblAchievementsUnlocked;
     }
 }

@@ -24,22 +24,31 @@ namespace SpotTheScam.Staff
         protected global::System.Web.UI.WebControls.HiddenField hdnSessionId;
 
         /// <summary>
-        /// hdnCustomerPhone control.
+        /// hdnCurrentConnection control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hdnCustomerPhone;
+        protected global::System.Web.UI.WebControls.HiddenField hdnCurrentConnection;
 
         /// <summary>
-        /// lblCustomerInfo control.
+        /// lblSessionInfo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblCustomerInfo;
+        protected global::System.Web.UI.WebControls.Label lblSessionInfo;
+
+        /// <summary>
+        /// lblTotalParticipants control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTotalParticipants;
 
         /// <summary>
         /// lblStatus control.
@@ -49,5 +58,32 @@ namespace SpotTheScam.Staff
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblStatus;
+
+        /// <summary>
+        /// lblRegisteredCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRegisteredCount;
+
+        /// <summary>
+        /// rptRegisteredParticipants control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptRegisteredParticipants;
+
+        /// <summary>
+        /// pnlNoRegistered control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlNoRegistered;
     }
 }

@@ -4,6 +4,8 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SpotTheScam.Staff
 {
@@ -14,10 +16,10 @@ namespace SpotTheScam.Staff
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check if staff is logged in
-            if (Session["StaffName"] == null)
+            // Check if staff is logged in - FIXED: Redirect to UserLogin.aspx
+            if (Session["StaffName"] == null && Session["StaffUsername"] == null && Session["Username"] == null)
             {
-                Response.Redirect("StaffLogin.aspx");
+                Response.Redirect("~/User/UserLogin.aspx");
                 return;
             }
 
@@ -89,6 +91,8 @@ namespace SpotTheScam.Staff
             }
         }
 
+        // FIXED: Replace your LoadParticipants method in StaffManageParticipants.aspx.cs with this:
+
         private void LoadParticipants()
         {
             try
@@ -96,19 +100,24 @@ namespace SpotTheScam.Staff
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
+
+                    // FIXED: Updated query with correct column names based on your database schema
                     string query = @"
-                        SELECT 
-                            vcb.UserId,
-                            u.Name as UserName,
-                            u.Email,
-                            u.PhoneNumber,
-                            vcb.BookingDate,
-                            vcb.PointsUsed,
-                            vcb.BookingStatus
-                        FROM VideoCallBookings vcb
-                        INNER JOIN Users u ON vcb.UserId = u.Id
-                        WHERE vcb.SessionId = @SessionId AND vcb.BookingStatus = 'Confirmed'
-                        ORDER BY vcb.BookingDate DESC";
+                SELECT 
+                    vcb.UserId,
+                    COALESCE(vcb.CustomerName, u.Username, 'Participant') as UserName,
+                    COALESCE(vcb.CustomerEmail, u.Email, 'No email') as Email,
+                    COALESCE(vcb.CustomerPhone, u.PhoneNumber, 'No phone') as PhoneNumber,
+                    vcb.BookingDate,
+                    ISNULL(vcb.PointsUsed, 0) as PointsUsed,
+                    vcb.BookingStatus,
+                    COALESCE(vcb.ScamConcerns, vcb.MainSecurityConcerns, 'General consultation') as ScamConcerns,
+                    vcb.SessionId
+                FROM VideoCallBookings vcb
+                LEFT JOIN Users u ON vcb.UserId = u.Id
+                WHERE vcb.SessionId = @SessionId 
+                AND vcb.BookingStatus = 'Confirmed'
+                ORDER BY vcb.BookingDate DESC";
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                     {
@@ -116,12 +125,24 @@ namespace SpotTheScam.Staff
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
+                        System.Diagnostics.Debug.WriteLine($"=== LoadParticipants Debug ===");
+                        System.Diagnostics.Debug.WriteLine($"Session ID: {sessionId}");
+                        System.Diagnostics.Debug.WriteLine($"Found {dt.Rows.Count} participants");
+
+                        // Debug: Print participant data
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Participant: {row["UserName"]}, Phone: {row["PhoneNumber"]}, Email: {row["Email"]}, Status: {row["BookingStatus"]}");
+                        }
+
                         if (dt.Rows.Count > 0)
                         {
                             rptParticipants.DataSource = dt;
                             rptParticipants.DataBind();
                             pnlNoParticipants.Visible = false;
                             lblParticipantCount.Text = dt.Rows.Count.ToString();
+
+                            System.Diagnostics.Debug.WriteLine($"✅ Participants loaded and bound to repeater. Count: {dt.Rows.Count}");
                         }
                         else
                         {
@@ -129,6 +150,11 @@ namespace SpotTheScam.Staff
                             rptParticipants.DataBind();
                             pnlNoParticipants.Visible = true;
                             lblParticipantCount.Text = "0";
+
+                            System.Diagnostics.Debug.WriteLine("⚠️ No participants found - checking if any registrations exist at all");
+
+                            // Debug: Check if there are ANY registrations for this session
+                            CheckForAnyRegistrations(conn, sessionId);
                         }
                     }
                 }
@@ -136,7 +162,64 @@ namespace SpotTheScam.Staff
             catch (Exception ex)
             {
                 ShowAlert("Error loading participants: " + ex.Message, "error");
-                System.Diagnostics.Debug.WriteLine($"Error loading participants: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Error loading participants: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+            }
+        }
+
+        // ADDITIONAL: Debug method to check for any registrations
+        private void CheckForAnyRegistrations(SqlConnection conn, int sessionId)
+        {
+            try
+            {
+                // Check for ANY bookings for this session regardless of status
+                string debugQuery = @"
+            SELECT 
+                vcb.UserId, 
+                vcb.CustomerName, 
+                vcb.CustomerPhone, 
+                vcb.CustomerEmail, 
+                vcb.BookingStatus,
+                vcb.BookingDate
+            FROM VideoCallBookings vcb
+            WHERE vcb.SessionId = @SessionId
+            ORDER BY vcb.BookingDate DESC";
+
+                using (SqlCommand debugCmd = new SqlCommand(debugQuery, conn))
+                {
+                    debugCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                    using (SqlDataReader reader = debugCmd.ExecuteReader())
+                    {
+                        int allRegistrations = 0;
+                        System.Diagnostics.Debug.WriteLine($"=== ALL Registrations for Session {sessionId} ===");
+
+                        while (reader.Read())
+                        {
+                            allRegistrations++;
+                            System.Diagnostics.Debug.WriteLine($"Registration {allRegistrations}:");
+                            System.Diagnostics.Debug.WriteLine($"  - UserId: {reader["UserId"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Name: {reader["CustomerName"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Phone: {reader["CustomerPhone"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Email: {reader["CustomerEmail"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Status: {reader["BookingStatus"]}");
+                            System.Diagnostics.Debug.WriteLine($"  - Date: {reader["BookingDate"]}");
+                        }
+
+                        if (allRegistrations == 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine("❌ No registrations found at all for this session");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"⚠️ Found {allRegistrations} total registrations, but none with 'Confirmed' status");
+                            System.Diagnostics.Debug.WriteLine("💡 Check if BookingStatus should be 'Confirmed' or something else");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in debug check: {ex.Message}");
             }
         }
 
@@ -144,12 +227,21 @@ namespace SpotTheScam.Staff
         {
             try
             {
-                int userId = Convert.ToInt32(e.CommandArgument);
-
                 switch (e.CommandName.ToLower())
                 {
                     case "removeparticipant":
+                        int userId = Convert.ToInt32(e.CommandArgument);
                         RemoveParticipant(userId);
+                        break;
+                    case "connectparticipant":
+                        string[] args = e.CommandArgument.ToString().Split(',');
+                        if (args.Length >= 3)
+                        {
+                            int participantUserId = Convert.ToInt32(args[0]);
+                            string phone = args[1];
+                            string name = args[2];
+                            ConnectToParticipant(participantUserId, phone, name);
+                        }
                         break;
                 }
             }
@@ -157,6 +249,27 @@ namespace SpotTheScam.Staff
             {
                 ShowAlert("Error processing command: " + ex.Message, "error");
                 System.Diagnostics.Debug.WriteLine($"Error in ItemCommand: {ex.Message}");
+            }
+        }
+
+        private void ConnectToParticipant(int userId, string phone, string name)
+        {
+            try
+            {
+                // Store connection info and redirect to video call page
+                Session["ConnectToUserId"] = userId;
+                Session["ConnectToPhone"] = phone;
+                Session["ConnectToName"] = name;
+                Session["CurrentSessionId"] = sessionId;
+
+                // Redirect to video call page with connection parameters
+                string videoCallUrl = $"StaffVideoCall.aspx?sessionId={sessionId}&connectTo={userId}&phone={phone}&name={Server.UrlEncode(name)}";
+                Response.Redirect(videoCallUrl);
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error initiating connection: " + ex.Message, "error");
+                System.Diagnostics.Debug.WriteLine($"Error connecting to participant: {ex.Message}");
             }
         }
 
@@ -176,9 +289,11 @@ namespace SpotTheScam.Staff
                             int pointsToRefund = 0;
 
                             string getUserQuery = @"
-                                SELECT u.Name, vcb.PointsUsed 
+                                SELECT 
+                                    COALESCE(u.Name, vcb.CustomerName, 'Participant') as Name, 
+                                    vcb.PointsUsed 
                                 FROM VideoCallBookings vcb
-                                INNER JOIN Users u ON vcb.UserId = u.Id
+                                LEFT JOIN Users u ON vcb.UserId = u.Id
                                 WHERE vcb.SessionId = @SessionId AND vcb.UserId = @UserId";
 
                             using (SqlCommand getUserCmd = new SqlCommand(getUserQuery, conn, transaction))
@@ -248,7 +363,7 @@ namespace SpotTheScam.Staff
                                 }
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             transaction.Rollback();
                             throw;
@@ -263,17 +378,246 @@ namespace SpotTheScam.Staff
             }
         }
 
-        protected void btnStartSession_Click(object sender, EventArgs e)
+        // NEW: Bulk action methods
+        protected void btnConnectSelected_Click(object sender, EventArgs e)
         {
             try
             {
-                // Redirect to the video call page
-                Response.Redirect($"StaffVideoCall.aspx?sessionId={sessionId}");
+                string selectedIds = Request.Form["hdnSelectedParticipants"];
+                if (string.IsNullOrEmpty(selectedIds))
+                {
+                    ShowAlert("Please select participants to connect to.", "error");
+                    return;
+                }
+
+                var participantIds = selectedIds.Split(',').Where(id => !string.IsNullOrEmpty(id)).ToList();
+                if (participantIds.Count == 0)
+                {
+                    ShowAlert("No participants selected.", "error");
+                    return;
+                }
+
+                if (participantIds.Count == 1)
+                {
+                    // Single participant - redirect to one-on-one call
+                    int userId = Convert.ToInt32(participantIds[0]);
+                    var participantInfo = GetParticipantInfo(userId);
+                    if (participantInfo != null)
+                    {
+                        ConnectToParticipant(userId, participantInfo.Phone, participantInfo.Name);
+                    }
+                }
+                else
+                {
+                    // Multiple participants - redirect to group call mode
+                    Session["SelectedParticipants"] = selectedIds;
+                    Session["CurrentSessionId"] = sessionId;
+                    Response.Redirect($"StaffVideoCall.aspx?sessionId={sessionId}&mode=group&participants={selectedIds}");
+                }
             }
             catch (Exception ex)
             {
-                ShowAlert("Error starting session: " + ex.Message, "error");
+                ShowAlert("Error connecting to selected participants: " + ex.Message, "error");
+                System.Diagnostics.Debug.WriteLine($"Error in bulk connect: {ex.Message}");
             }
+        }
+
+        protected void btnRemoveSelected_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string selectedIds = Request.Form["hdnSelectedParticipants"];
+                if (string.IsNullOrEmpty(selectedIds))
+                {
+                    ShowAlert("Please select participants to remove.", "error");
+                    return;
+                }
+
+                var participantIds = selectedIds.Split(',').Where(id => !string.IsNullOrEmpty(id)).Select(int.Parse).ToList();
+                int removedCount = 0;
+                int totalPointsRefunded = 0;
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlTransaction transaction = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            foreach (int userId in participantIds)
+                            {
+                                // Get points to refund
+                                string getPointsQuery = "SELECT ISNULL(PointsUsed, 0) FROM VideoCallBookings WHERE SessionId = @SessionId AND UserId = @UserId";
+                                using (SqlCommand getPointsCmd = new SqlCommand(getPointsQuery, conn, transaction))
+                                {
+                                    getPointsCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    getPointsCmd.Parameters.AddWithValue("@UserId", userId);
+                                    int pointsToRefund = Convert.ToInt32(getPointsCmd.ExecuteScalar() ?? 0);
+                                    totalPointsRefunded += pointsToRefund;
+                                }
+
+                                // Remove participant
+                                string deleteQuery = "DELETE FROM VideoCallBookings WHERE SessionId = @SessionId AND UserId = @UserId";
+                                using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn, transaction))
+                                {
+                                    deleteCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    deleteCmd.Parameters.AddWithValue("@UserId", userId);
+                                    if (deleteCmd.ExecuteNonQuery() > 0)
+                                    {
+                                        removedCount++;
+                                    }
+                                }
+
+                                // Refund points if any
+                                if (totalPointsRefunded > 0)
+                                {
+                                    string refundQuery = "UPDATE Users SET Points = Points + @PointsToRefund WHERE Id = @UserId";
+                                    using (SqlCommand refundCmd = new SqlCommand(refundQuery, conn, transaction))
+                                    {
+                                        refundCmd.Parameters.AddWithValue("@PointsToRefund", totalPointsRefunded);
+                                        refundCmd.Parameters.AddWithValue("@UserId", userId);
+                                        refundCmd.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+
+                            // Update session participant count
+                            string updateCountQuery = @"
+                                UPDATE ExpertSessions 
+                                SET CurrentParticipants = (
+                                    SELECT COUNT(*) FROM VideoCallBookings 
+                                    WHERE SessionId = @SessionId AND BookingStatus = 'Confirmed'
+                                ) 
+                                WHERE Id = @SessionId";
+
+                            using (SqlCommand updateCmd = new SqlCommand(updateCountQuery, conn, transaction))
+                            {
+                                updateCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                updateCmd.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+
+                            string message = totalPointsRefunded > 0
+                                ? $"Removed {removedCount} participants and refunded {totalPointsRefunded} total points."
+                                : $"Removed {removedCount} participants from the session.";
+
+                            ShowAlert(message, "success");
+                            LoadParticipants();
+                        }
+                        catch (Exception)
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error removing selected participants: " + ex.Message, "error");
+                System.Diagnostics.Debug.WriteLine($"Error in bulk remove: {ex.Message}");
+            }
+        }
+
+        protected void btnStartBroadcast_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Session["CurrentSessionId"] = sessionId;
+                Response.Redirect($"StaffVideoCall.aspx?sessionId={sessionId}&mode=broadcast");
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error starting broadcast session: " + ex.Message, "error");
+            }
+        }
+
+        protected void btnStartGroupCall_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string selectedIds = Request.Form["hdnSelectedParticipants"];
+                if (string.IsNullOrEmpty(selectedIds))
+                {
+                    ShowAlert("Please select participants for the group call.", "error");
+                    return;
+                }
+
+                Session["SelectedParticipants"] = selectedIds;
+                Session["CurrentSessionId"] = sessionId;
+                Response.Redirect($"StaffVideoCall.aspx?sessionId={sessionId}&mode=group&participants={selectedIds}");
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error starting group call: " + ex.Message, "error");
+            }
+        }
+
+        protected void btnStartOneOnOne_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Session["CurrentSessionId"] = sessionId;
+                Response.Redirect($"StaffVideoCall.aspx?sessionId={sessionId}&mode=oneOnOne");
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error starting one-on-one mode: " + ex.Message, "error");
+            }
+        }
+
+        // Helper class for participant information
+        public class ParticipantInfo
+        {
+            public int UserId { get; set; }
+            public string Name { get; set; }
+            public string Phone { get; set; }
+            public string Email { get; set; }
+        }
+
+        private ParticipantInfo GetParticipantInfo(int userId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT 
+                            vcb.UserId,
+                            COALESCE(u.Name, vcb.CustomerName, 'Participant') as Name,
+                            COALESCE(u.PhoneNumber, vcb.CustomerPhone, '') as Phone,
+                            COALESCE(u.Email, vcb.CustomerEmail, '') as Email
+                        FROM VideoCallBookings vcb
+                        LEFT JOIN Users u ON vcb.UserId = u.Id
+                        WHERE vcb.SessionId = @SessionId AND vcb.UserId = @UserId AND vcb.BookingStatus = 'Confirmed'";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return new ParticipantInfo
+                                {
+                                    UserId = Convert.ToInt32(reader["UserId"]),
+                                    Name = reader["Name"].ToString(),
+                                    Phone = reader["Phone"].ToString(),
+                                    Email = reader["Email"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting participant info: {ex.Message}");
+            }
+            return null;
         }
 
         private void ShowAlert(string message, string type)

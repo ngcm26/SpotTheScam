@@ -24,15 +24,6 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Button btn_back;
 
         /// <summary>
-        /// btn_Publish control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_Publish;
-
-        /// <summary>
         /// tb_BlogTitle control.
         /// </summary>
         /// <remarks>
@@ -58,5 +49,14 @@ namespace SpotTheScam.User
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox tb_BlogContent;
+
+        /// <summary>
+        /// btn_Publish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btn_Publish;
     }
 }

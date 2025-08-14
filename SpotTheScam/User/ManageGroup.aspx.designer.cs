@@ -11,151 +11,151 @@ namespace SpotTheScam.User
 {
 
 
-    public partial class TransactionDetails
+    public partial class ManageGroup
     {
 
         /// <summary>
-        /// AlertPanel control.
+        /// hGroup control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel AlertPanel;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl hGroup;
 
         /// <summary>
-        /// AlertMessage control.
+        /// pDesc control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label AlertMessage;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl pDesc;
 
         /// <summary>
-        /// ltFlaggedStatus control.
+        /// pnlMsg control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltFlaggedStatus;
+        protected global::System.Web.UI.WebControls.Panel pnlMsg;
 
         /// <summary>
-        /// ltSeverity control.
+        /// lblMsg control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltSeverity;
+        protected global::System.Web.UI.WebControls.Label lblMsg;
 
         /// <summary>
-        /// ltDate control.
+        /// txtInviteEmail control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltDate;
+        protected global::System.Web.UI.WebControls.TextBox txtInviteEmail;
 
         /// <summary>
-        /// ltTime control.
+        /// ddlInviteRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltTime;
+        protected global::System.Web.UI.WebControls.DropDownList ddlInviteRole;
 
         /// <summary>
-        /// ltDescription control.
+        /// btnInvite control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltDescription;
+        protected global::System.Web.UI.WebControls.Button btnInvite;
 
         /// <summary>
-        /// ltType control.
+        /// gvMembers control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltType;
+        protected global::System.Web.UI.WebControls.GridView gvMembers;
 
         /// <summary>
-        /// ltAmount control.
+        /// pnlRestrict control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltAmount;
+        protected global::System.Web.UI.WebControls.Panel pnlRestrict;
 
         /// <summary>
-        /// ltSenderRecipient control.
+        /// lblEditingUser control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltSenderRecipient;
+        protected global::System.Web.UI.WebControls.Label lblEditingUser;
 
         /// <summary>
-        /// ltBalanceAfter control.
+        /// txtSingleLimit control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltBalanceAfter;
+        protected global::System.Web.UI.WebControls.TextBox txtSingleLimit;
 
         /// <summary>
-        /// ltBankName control.
+        /// txtDailyLimit control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltBankName;
+        protected global::System.Web.UI.WebControls.TextBox txtDailyLimit;
 
         /// <summary>
-        /// ltAccountNickname control.
+        /// ddlStartHour control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltAccountNickname;
+        protected global::System.Web.UI.WebControls.DropDownList ddlStartHour;
 
         /// <summary>
-        /// btnAlertFamily control.
+        /// ddlEndHour control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAlertFamily;
+        protected global::System.Web.UI.WebControls.DropDownList ddlEndHour;
 
         /// <summary>
-        /// btnContactBank control.
+        /// btnSaveRestrictions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnContactBank;
+        protected global::System.Web.UI.WebControls.Button btnSaveRestrictions;
 
         /// <summary>
-        /// btnBack control.
+        /// btnCancelEdit control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnBack;
+        protected global::System.Web.UI.WebControls.Button btnCancelEdit;
     }
 }

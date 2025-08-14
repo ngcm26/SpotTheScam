@@ -4,170 +4,244 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
     <style>
         .main-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .phone-lookup-container {
-            background: #f8f9fa;
+        .session-overview {
+            background: linear-gradient(135deg, #D36F2D 0%, #e67e22 100%);
+            color: white;
             padding: 30px;
             border-radius: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .phone-input {
-            width: 100%;
-            max-width: 300px;
-            padding: 15px;
-            font-size: 18px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .phone-input:focus {
-            outline: none;
-            border-color: #D36F2D;
-        }
-
-        .connect-btn {
-            background-color: #D36F2D;
+        .session-overview h2 {
             color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            margin: 0 0 15px 0;
+            font-size: 1.8rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin: 0 10px;
         }
 
-        .connect-btn:hover {
-            background-color: #b45a22;
+        .session-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .connect-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .waiting-customers {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .customer-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .stat-card {
+            background: rgba(255,255,255,0.1);
             padding: 15px;
-            margin: 10px 0;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #D36F2D;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(10px);
         }
 
-        .customer-info {
-            flex-grow: 1;
-        }
-
-        .customer-phone {
+        .stat-number {
+            font-size: 2rem;
             font-weight: bold;
-            font-size: 16px;
-            color: #333;
+            display: block;
         }
 
-        .customer-waiting-time {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .quick-connect-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .quick-connect-btn:hover {
-            background-color: #218838;
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
         .video-container {
-            display: none;
-            gap: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .expert-video-section {
+            background: linear-gradient(135deg, #D36F2D, #e67e22);
             padding: 20px;
-            justify-content: center;
+            border-radius: 12px;
             margin-bottom: 20px;
         }
 
-        .video-wrapper {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 8px;
+        .expert-video {
             text-align: center;
-            flex: 1;
-            max-width: 500px;
         }
 
-        video {
+        .expert-video h4 {
+            color: white;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .expert-video video {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
+            height: 350px;
+            border-radius: 10px;
+            background: #000;
+            object-fit: cover;
+        }
+
+        .video-controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .video-controls button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .video-controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .participants-video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        /* FIXED: Consistent sizing for all participant videos */
+        .participants-video-grid.single-participant {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 400px));
+            justify-content: center;
+        }
+
+        .participant-video-wrapper {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            max-width: 450px; /* FIXED: Prevent videos from being too wide */
+        }
+
+        .participant-video-wrapper:hover {
+            border-color: #D36F2D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .participant-video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .participant-video-header h4 {
+            color: #051D40;
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+
+        .participant-status {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* FIXED: Consistent video height for all participants */
+        .participant-video-wrapper video {
+            width: 100%;
+            height: 200px; /* FIXED: Consistent height matching your screenshot */
             border-radius: 8px;
             background: #000;
+            object-fit: cover;
         }
 
-        .session-info {
-            margin-bottom: 20px;
-            padding: 15px;
+        .no-participants-connected {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
             background: #f8f9fa;
-            border-radius: 8px;
-            display: none;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            color: #666;
         }
 
         .control-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
             text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
             margin: 20px 0;
-            padding: 15px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn-control {
-            padding: 10px 20px;
-            margin: 0 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: #D36F2D;
+            background: var(--brand-orange);
             color: white;
-            font-weight: 500;
-            transition: background-color 0.3s;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(211, 111, 45, 0.3);
         }
 
         .btn-control:hover {
-            background-color: #b45a22;
+            background: #b45a22;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(211, 111, 45, 0.4);
+        }
+
+        .btn-control.secondary {
+            background: #6c757d;
+        }
+
+        .btn-control.secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-control.danger {
+            background: #dc3545;
+        }
+
+        .btn-control.danger:hover {
+            background: #c82333;
         }
 
         .status-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 10px;
             text-align: center;
             font-weight: 500;
-            display: block;
         }
 
         .error {
@@ -188,484 +262,873 @@
             border: 1px solid #81c784;
         }
 
-        .customer-details {
-            line-height: 1.6;
+        .participants-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .customer-details p {
-            margin: 10px 0;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .customer-details strong {
-            color: #666;
-            min-width: 120px;
-            display: inline-block;
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #051D40;
+            margin: 0;
         }
 
-        h3 {
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .debug-info {
-            background: #f8f9fa;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 200px;
-            overflow-y: auto;
-            text-align: left;
-        }
-
-        .refresh-btn {
-            background-color: #6c757d;
+        .participant-count {
+            background: #D36F2D;
             color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 10px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
+        .participant-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .participant-info h4 {
+            color: #051D40;
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .participant-details {
+            color: #666;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .participant-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-connect {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-connect:hover {
+            background: #218838;
+        }
+
+        .btn-connect:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .participants-video-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .participant-video-wrapper video {
+                height: 200px;
+            }
+            
+            .expert-video video {
+                max-width: 100%;
+                height: 250px;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-control {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
     </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="main-container">
         <asp:HiddenField ID="hdnSessionId" runat="server" />
-        <asp:HiddenField ID="hdnCustomerPhone" runat="server" />
+        <asp:HiddenField ID="hdnCurrentConnection" runat="server" />
         
-        <!-- Phone Lookup Section -->
-        <div id="phoneLookupSection" class="phone-lookup-container">
-            <h2>Connect with Webinar Participants</h2>
-            <p>Enter a participant's phone number to start a video consultation</p>
-            <input type="tel" id="phoneInput" class="phone-input" placeholder="Enter participant's phone number" />
-            <br />
-            <button id="connectBtn" class="connect-btn" onclick="connectToCustomer()">Connect to Participant</button>
-            <button id="refreshBtn" class="refresh-btn" onclick="refreshWaitingList()">Refresh List</button>
-            <div id="phoneStatus" class="status-message" style="display: none;"></div>
-        </div>
-
-        <!-- Waiting Customers Section -->
-        <div id="waitingCustomersSection" class="waiting-customers">
-            <h3>Participants Currently Online</h3>
-            <div id="waitingList">
-                <!-- This will be populated dynamically -->
-                <div class="customer-item" style="display: none;">
-                    <div class="customer-info">
-                        <div class="customer-phone">No participants currently waiting</div>
-                        <div class="customer-waiting-time">Check back in a few minutes</div>
-                    </div>
+        <!-- Session Overview -->
+        <div class="session-overview">
+            <h2>Expert Video Session Management</h2>
+            <asp:Label ID="lblSessionInfo" runat="server" />
+            
+            <div class="session-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalParticipants"><asp:Label ID="lblTotalParticipants" runat="server" Text="0" /></span>
+                    <span class="stat-label">Total Registered</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="onlineParticipants">0</span>
+                    <span class="stat-label">Currently Online</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="connectedParticipants">0</span>
+                    <span class="stat-label">In Video Call</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="sessionDuration">0:00</span>
+                    <span class="stat-label">Session Duration</span>
                 </div>
             </div>
         </div>
 
-        <!-- Session Info (shown after connecting) -->
-        <div id="sessionInfo" class="session-info">
-            <h2>Expert Consultation Session</h2>
-            <asp:Label ID="lblCustomerInfo" runat="server" />
-        </div>
-
         <!-- Video Call Interface -->
         <div id="videoCallInterface" class="video-container">
-            <div class="video-wrapper">
-                <h3>Your Video</h3>
-                <video id="localVideo" autoplay muted playsinline></video>
+            <h3 style="color: #051D40; margin-bottom: 20px;">📹 Active Video Session</h3>
+            
+            <!-- Expert Video (Always Visible) -->
+            <div class="expert-video-section">
+                <div class="expert-video">
+                    <h4>🎯 You (Expert)</h4>
+                    <video id="localVideo" autoplay="autoplay" muted="muted" playsinline="playsinline"></video>
+                    <div class="video-controls">
+                        <button type="button" onclick="toggleMute()" id="muteBtn">🎤 Mute</button>
+                        <button type="button" onclick="toggleVideo()" id="videoBtn">📹 Video</button>
+                    </div>
+                </div>
             </div>
-            <div class="video-wrapper">
-                <h3>Participant Video</h3>
-                <video id="remoteVideo" autoplay playsinline></video>
+            
+            <!-- Participants Grid -->
+            <div class="participants-video-grid" id="participantsGrid">
+                <div class="no-participants-connected">
+                    <p><strong>No participants connected yet</strong></p>
+                    <p>Participants will appear here when they join the session</p>
+                    <p><small>Registered participants can join using their session links</small></p>
+                </div>
             </div>
         </div>
 
+        <!-- Control Panel -->
         <div class="control-panel">
-            <button type="button" class="btn-control" onclick="startCall()" id="startCallBtn" style="display: none;">Start Call</button>
-            <button type="button" class="btn-control" onclick="endCall()" id="endCallBtn" style="display: none;">End Consultation</button>
-            <asp:Label ID="lblStatus" runat="server" CssClass="status-message" />
-            <div id="debugInfo" class="debug-info" style="display: none;"></div>
+            <h3 style="color: #051D40; margin-bottom: 20px;">📞 Video Controls</h3>
+            
+            <div class="control-buttons">
+                <button type="button" class="btn-control" onclick="connectToAllParticipants()">
+                    📢 Connect to All Participants
+                </button>
+                <button type="button" class="btn-control secondary" onclick="refreshParticipantsList()">
+                    🔄 Refresh Participants
+                </button>
+                <button type="button" class="btn-control danger" onclick="endAllCalls()">
+                    📞 End All Calls
+                </button>
+            </div>
+            
+            <!-- Status Display -->
+            <asp:Label ID="lblStatus" runat="server" CssClass="status-message info" Text="Initializing expert video system..." />
+        </div>
+
+        <!-- Registered Participants List -->
+        <div class="participants-section">
+            <div class="section-header">
+                <h3 class="section-title">📋 Registered Participants</h3>
+                <span class="participant-count">
+                    <asp:Label ID="lblRegisteredCount" runat="server" Text="0" />
+                </span>
+            </div>
+
+            <div id="registeredParticipants">
+                <asp:Repeater ID="rptRegisteredParticipants" runat="server">
+                    <ItemTemplate>
+                        <div class="participant-card" data-phone="<%# Eval("CustomerPhone") %>" data-name="<%# Eval("CustomerName") %>">
+                            <div class="participant-info">
+                                <div class="participant-details">
+                                    <h4>
+                                        <span class="status-indicator status-waiting" id="status_<%# System.Text.RegularExpressions.Regex.Replace(Eval("CustomerPhone").ToString(), @"[^\d]", "") %>"></span>
+                                        <%# Eval("CustomerName") %>
+                                    </h4>
+                                    <div class="participant-meta">
+                                        <span>📱 <%# Eval("CustomerPhone") %></span>
+                                        <span>📧 <%# Eval("CustomerEmail") %></span>
+                                        <span>📅 <%# Eval("BookingDate", "{0:dd/MM HH:mm}") %></span>
+                                        <span>🎯 <%# Eval("ScamConcerns") ?? "General" %></span>
+                                    </div>
+                                </div>
+                                <div class="participant-actions">
+                                    <button type="button" class="btn-connect" 
+                                            onclick="connectToParticipant('<%# Eval("CustomerPhone") %>', '<%# Eval("CustomerName") %>')"
+                                            id="btn_<%# System.Text.RegularExpressions.Regex.Replace(Eval("CustomerPhone").ToString(), @"[^\d]", "") %>">
+                                        📞 Connect
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </asp:Repeater>
+
+                <asp:Panel ID="pnlNoRegistered" runat="server" CssClass="no-participants" Visible="false">
+                    <p><strong>No registered participants</strong></p>
+                    <p>Participants will appear here once they register for this session.</p>
+                </asp:Panel>
+            </div>
         </div>
     </div>
 
     <script type="text/javascript">
+        // FIXED: Expert Video Call System with Proper Connection Management
         let peer;
-        let currentCall;
         let localStream;
-        let isConnectionActive = false;
-        let currentCustomerPhone = null;
+        let connections = new Map();
+        let activeParticipants = new Map();
         let sessionId = null;
-        let refreshInterval;
+        let isConnectionActive = false;
+        let sessionStartTime = null;
+        let statusUpdateInterval = null;
 
-        function updateDebugInfo(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.style.display = 'block';
-            const timestamp = new Date().toLocaleTimeString();
-            debugDiv.innerHTML += `${timestamp}: ${message}<br>`;
-            debugDiv.scrollTop = debugDiv.scrollHeight;
+        function debugLog(message) {
+            console.log('🔍 STAFF DEBUG:', message);
         }
 
-        function showStatus(message, type = 'info') {
-            const statusElement = document.getElementById('<%= lblStatus.ClientID %>');
-            statusElement.innerText = message;
-            statusElement.className = `status-message ${type}`;
+        // FIXED: Initialize expert system on page load
+        window.onload = function () {
+            debugLog('Staff video call page loaded');
 
-            const phoneStatus = document.getElementById('phoneStatus');
-            phoneStatus.innerText = message;
-            phoneStatus.className = `status-message ${type}`;
-            phoneStatus.style.display = 'block';
-        }
-
-        async function connectToCustomer() {
-            const phoneInput = document.getElementById('phoneInput');
-            const phone = phoneInput.value.trim();
-
-            if (!phone) {
-                showStatus('Please enter a participant phone number', 'error');
+            // Get session ID
+            const hdnSessionIdElement = document.getElementById('<%= hdnSessionId.ClientID %>');
+            if (hdnSessionIdElement && hdnSessionIdElement.value) {
+                sessionId = hdnSessionIdElement.value;
+                debugLog('Session ID found: ' + sessionId);
+            } else {
+                debugLog('No session ID found');
+                updateStatus('Session ID not found. Please select a session first.', 'error');
                 return;
             }
 
-            // Format phone number
-            const formattedPhone = formatPhoneNumber(phone);
-            if (!formattedPhone) {
-                showStatus('Please enter a valid phone number', 'error');
-                return;
-            }
-
-            currentCustomerPhone = formattedPhone;
-            document.getElementById('<%= hdnCustomerPhone.ClientID %>').value = currentCustomerPhone;
-
-            // Disable connect button
-            document.getElementById('connectBtn').disabled = true;
-            showStatus('Looking for participant session...', 'info');
-
-            try {
-                // Check if customer session exists
-                const sessionData = await checkCustomerSession(currentCustomerPhone);
-                if (sessionData.success) {
-                    sessionId = sessionData.sessionId;
-                    document.getElementById('<%= hdnSessionId.ClientID %>').value = sessionId;
-                    
-                    // Hide phone lookup, show session info
-                    document.getElementById('phoneLookupSection').style.display = 'none';
-                    document.getElementById('waitingCustomersSection').style.display = 'none';
-                    document.getElementById('sessionInfo').style.display = 'block';
-                    
-                    // Load session details
-                    loadSessionDetails(sessionData);
-                    
-                    // Initialize video call
-                    await initializeCall();
-                } else {
-                    showStatus(sessionData.message || 'No active participant session found with this phone number', 'error');
-                    document.getElementById('connectBtn').disabled = false;
-                }
-            } catch (error) {
-                updateDebugInfo(`Error connecting to participant: ${error.message}`);
-                showStatus('Error connecting to participant session. Please try again.', 'error');
-                document.getElementById('connectBtn').disabled = false;
-            }
-        }
-
-        function formatPhoneNumber(phone) {
-            // Remove all non-digit characters
-            const cleaned = phone.replace(/\D/g, '');
+            // Initialize the expert system
+            initializeExpertSystem();
             
-            // Check for valid length
-            if (cleaned.length < 8 || cleaned.length > 15) {
-                return null;
-            }
-            
-            // Format as needed (Singapore format)
-            if (cleaned.length === 8) {
-                return `+65${cleaned}`;
-            } else if (cleaned.startsWith('65') && cleaned.length === 10) {
-                return `+${cleaned}`;
-            } else if (cleaned.startsWith('0')) {
-                return `+65${cleaned.substring(1)}`;
-            }
-            
-            return `+${cleaned}`;
-        }
+            // Start session timer
+            sessionStartTime = new Date();
+            setInterval(updateSessionTimer, 1000);
 
-        async function checkCustomerSession(phone) {
+            // Start status updates
+            statusUpdateInterval = setInterval(updateParticipantStatuses, 5000);
+        };
+
+        // FIXED: Initialize expert video system
+        async function initializeExpertSystem() {
             try {
-                const response = await fetch('StaffVideoCall.aspx/CheckCustomerSession', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ phoneNumber: phone })
-                });
-                
-                const data = await response.json();
-                return JSON.parse(data.d);
-            } catch (error) {
-                updateDebugInfo(`Check session error: ${error.message}`);
-                return { success: false, message: 'Connection error' };
-            }
-        }
+                debugLog('Initializing expert system...');
+                updateStatus('Getting camera and microphone access...', 'info');
 
-        function loadSessionDetails(sessionData) {
-            const sessionInfo = `
-                <div class='customer-details'>
-                    <p><strong>Session ID:</strong> ${sessionData.sessionId}</p>
-                    <p><strong>Participant:</strong> ${sessionData.customerName || 'Webinar Participant'}</p>
-                    <p><strong>Phone Number:</strong> ${sessionData.customerPhone}</p>
-                    <p><strong>Session Date:</strong> ${sessionData.sessionDate || new Date().toLocaleDateString()}</p>
-                    <p><strong>Session Time:</strong> ${sessionData.sessionTime || new Date().toLocaleTimeString()}</p>
-                    <p><strong>Type:</strong> Expert Video Consultation</p>
-                    <p><strong>Concerns:</strong> ${sessionData.concerns || 'General scam prevention inquiry'}</p>
-                </div>`;
-                
-            document.getElementById('<%= lblCustomerInfo.ClientID %>').innerHTML = sessionInfo;
-        }
-
-        async function initializeCall() {
-            try {
-                updateDebugInfo('Starting expert initialization...');
-
+                // Get media first
                 localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
+                    video: { width: 640, height: 480 },
                     audio: true
                 });
 
-                updateDebugInfo('Got media stream');
-                document.getElementById('localVideo').srcObject = localStream;
+                const localVideo = document.getElementById('localVideo');
+                if (localVideo) {
+                    localVideo.srcObject = localStream;
+                    debugLog('Local video stream set');
+                }
 
-                // Create peer ID using expert identifier
-                const peerId = `expert_${currentCustomerPhone.replace(/[^0-9]/g, '')}`;
-                updateDebugInfo(`Expert Peer ID: ${peerId}`);
+                // Create peer connection
+                await createExpertPeer();
 
-                peer = new Peer(peerId, {
-                    host: 'localhost',
-                    port: 3001,
+            } catch (err) {
+                debugLog('Media error: ' + err.message);
+                updateStatus('Camera/microphone access required. Please allow permissions and refresh.', 'error');
+            }
+        }
+
+        // FIXED: Create expert peer with proper ID
+        async function createExpertPeer() {
+            try {
+                const expertId = `expert_session_${sessionId}`;
+                debugLog('Creating expert peer with ID: ' + expertId);
+
+                peer = new Peer(expertId, {
+                    host: '0.peerjs.com',
+                    port: 443,
                     path: '/',
-                    debug: 3
+                    secure: true,
+                    debug: 2
                 });
 
                 peer.on('open', (id) => {
-                    updateDebugInfo(`Peer connection opened with ID: ${id}`);
-                    showStatus('Connected. Ready to start consultation.', 'success');
+                    debugLog('✅ Expert peer ready: ' + id);
                     isConnectionActive = true;
+                    updateStatus('✅ Expert system ready! Waiting for participants to connect...', 'success');
+                    
+                    // Start checking for participants
+                    setTimeout(checkForParticipants, 2000);
+                });
 
-                    // Show video interface and controls
-                    document.getElementById('videoCallInterface').style.display = 'flex';
-                    document.getElementById('startCallBtn').style.display = 'inline-block';
-                    document.getElementById('endCallBtn').style.display = 'inline-block';
+                peer.on('call', (call) => {
+                    debugLog('📞 Incoming call from: ' + call.peer);
+                    handleIncomingCall(call);
                 });
 
                 peer.on('error', (err) => {
-                    updateDebugInfo(`Peer error: ${err.type} - ${err.message}`);
-                    isConnectionActive = false;
-                    let message = 'Connection error: ';
-
-                    switch (err.type) {
-                        case 'invalid-id':
-                            message += 'Please refresh and try again';
-                            break;
-                        case 'peer-unavailable':
-                            message += 'Participant not connected yet';
-                            break;
-                        case 'network':
-                            message += 'Network connection issue';
-                            break;
-                        default:
-                            message += err.message;
-                    }
-
-                    showStatus(message, 'error');
+                    debugLog('❌ Peer error: ' + err.type + ' - ' + err.message);
+                    updateStatus('Connection error: ' + err.message, 'error');
+                    
+                    // Try to reconnect
+                    setTimeout(() => {
+                        if (!isConnectionActive) {
+                            createExpertPeer();
+                        }
+                    }, 5000);
                 });
 
                 peer.on('disconnected', () => {
-                    updateDebugInfo('Peer disconnected, attempting reconnection...');
+                    debugLog('⚠️ Peer disconnected, attempting reconnection...');
                     isConnectionActive = false;
-                    showStatus('Connection lost. Attempting to reconnect...', 'info');
-                    peer.reconnect();
+                    updateStatus('Connection lost. Attempting to reconnect...', 'info');
+
+                    setTimeout(() => {
+                        if (peer && !peer.destroyed) {
+                            peer.reconnect();
+                        }
+                    }, 2000);
                 });
 
             } catch (err) {
-                updateDebugInfo(`Setup error: ${err.message}`);
-                showStatus('Error accessing camera/microphone. Please ensure they are connected and permitted.', 'error');
+                debugLog('Error creating peer: ' + err.message);
+                updateStatus('Failed to create peer connection. Please refresh and try again.', 'error');
             }
         }
 
-        function startCall() {
-            if (!currentCustomerPhone) {
-                showStatus('No participant phone number available', 'error');
-                return;
+        // FIXED: Handle incoming calls from participants with better duplicate prevention
+        function handleIncomingCall(call) {
+            const participantId = call.peer;
+            debugLog('Handling incoming call from: ' + participantId);
+
+            // FIXED: Check for existing connection and close it first
+            if (connections.has(participantId)) {
+                debugLog('⚠️ Participant already connected, closing old connection: ' + participantId);
+                const oldConnection = connections.get(participantId);
+                if (oldConnection && oldConnection !== call) {
+                    oldConnection.close();
+                }
+                // Remove old UI element
+                removeParticipantFromGrid(participantId);
             }
 
-            const customerId = `customer_${currentCustomerPhone.replace(/[^0-9]/g, '')}`;
-            updateDebugInfo(`Attempting to call participant: ${customerId}`);
-
-            if (peer && localStream && isConnectionActive) {
-                showStatus('Calling participant...', 'info');
-
-                const call = peer.call(customerId, localStream);
-                setupCall(call);
-            } else {
-                updateDebugInfo('Cannot start call - connection not ready');
-                showStatus('Cannot start call - please refresh the page', 'error');
-            }
-        }
-
-        function setupCall(call) {
-            currentCall = call;
-            updateDebugInfo('Setting up call object');
+            // Answer the call with local stream
+            call.answer(localStream);
 
             call.on('stream', (remoteStream) => {
-                updateDebugInfo('Received participant stream');
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-                showStatus('Connected with participant - consultation in progress', 'success');
-
-                // Hide start button, show end button
-                document.getElementById('startCallBtn').style.display = 'none';
-                document.getElementById('endCallBtn').style.display = 'inline-block';
+                debugLog('✅ Received stream from: ' + participantId);
+                addParticipantToGrid(participantId, remoteStream, call);
+                updateConnectedCount();
             });
 
             call.on('close', () => {
-                updateDebugInfo('Call closed');
-                document.getElementById('remoteVideo').srcObject = null;
-                showStatus('Consultation ended', 'info');
-                resetInterface();
+                debugLog('📞 Call ended with: ' + participantId);
+                removeParticipantFromGrid(participantId);
+                updateConnectedCount();
             });
 
             call.on('error', (err) => {
-                updateDebugInfo(`Call error: ${err.message}`);
-                showStatus('Call error: ' + err.message, 'error');
+                debugLog('📞 Call error with ' + participantId + ': ' + err.message);
+                removeParticipantFromGrid(participantId);
+                updateConnectedCount();
+            });
+
+            // Store the new connection
+            connections.set(participantId, call);
+        }
+
+        // FIXED: Add participant to video grid with better duplicate prevention and naming
+        function addParticipantToGrid(participantId, stream, call) {
+            debugLog('Adding participant to grid: ' + participantId);
+
+            // FIXED: More thorough duplicate removal
+            const existingElement = document.getElementById(`participant_${participantId}`);
+            if (existingElement) {
+                debugLog('Removing existing participant element: ' + participantId);
+                existingElement.remove();
+                activeParticipants.delete(participantId);
+            }
+
+            // Also check for any elements with similar IDs (in case of phone number variations)
+            const participantPhoneFromId = participantId.replace('customer_', '');
+            const allParticipantElements = document.querySelectorAll('[id^="participant_customer_"]');
+            allParticipantElements.forEach(element => {
+                const elementPhone = element.id.replace('participant_customer_', '');
+                if (elementPhone === participantPhoneFromId && element.id !== `participant_${participantId}`) {
+                    debugLog('Removing duplicate participant element: ' + element.id);
+                    element.remove();
+                }
+            });
+
+            const grid = document.getElementById('participantsGrid');
+            
+            // Remove "no participants" message if present
+            const noParticipantsMsg = grid.querySelector('.no-participants-connected');
+            if (noParticipantsMsg) {
+                noParticipantsMsg.remove();
+            }
+
+            // FIXED: Get participant name from server using phone number
+            const participantPhoneNumber = participantId.replace('customer_', '');
+            getParticipantRealNameFromServer(participantPhoneNumber).then(participantName => {
+                // Double-check no duplicate was created while we were getting the name
+                const finalCheck = document.getElementById(`participant_${participantId}`);
+                if (finalCheck) {
+                    finalCheck.remove();
+                }
+
+                const participantDiv = document.createElement('div');
+                participantDiv.className = 'participant-video-wrapper';
+                participantDiv.id = `participant_${participantId}`;
+
+                participantDiv.innerHTML = `
+                    <div class="participant-video-header">
+                        <h4>👤 ${participantName}</h4>
+                        <span class="participant-status">Connected</span>
+                    </div>
+                    <video autoplay playsinline></video>
+                `;
+
+                grid.appendChild(participantDiv);
+
+                const video = participantDiv.querySelector('video');
+                if (video) {
+                    video.srcObject = stream;
+                    // FIXED: Ensure audio is enabled
+                    video.muted = false;
+                    video.volume = 1.0;
+                    
+                    // FIXED: Add error handling for video
+                    video.onerror = function(e) {
+                        debugLog('Video error for participant ' + participantId + ': ' + e.target.error);
+                    };
+                }
+
+                activeParticipants.set(participantId, { stream, call, name: participantName });
+                
+                // FIXED: Update grid layout based on number of participants
+                updateGridLayout();
+                
+                debugLog('✅ Participant successfully added to grid: ' + participantName);
+                
+                // FIXED: Update participant button status in the registered list
+                updateParticipantButtonStatus(participantPhoneNumber, true);
             });
         }
 
-        function endCall() {
-            if (currentCall) {
-                updateDebugInfo('Ending current call');
-                currentCall.close();
-                currentCall = null;
-            }
-
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-
-            if (peer && isConnectionActive) {
-                peer.destroy();
-            }
-
-            document.getElementById('remoteVideo').srcObject = null;
-            showStatus('Consultation ended', 'info');
-
-            resetInterface();
-        }
-
-        function resetInterface() {
-            // Show phone lookup section again
-            document.getElementById('phoneLookupSection').style.display = 'block';
-            document.getElementById('waitingCustomersSection').style.display = 'block';
-            document.getElementById('sessionInfo').style.display = 'none';
-            document.getElementById('videoCallInterface').style.display = 'none';
-            document.getElementById('startCallBtn').style.display = 'none';
-            document.getElementById('endCallBtn').style.display = 'none';
-
-            // Reset form
-            document.getElementById('phoneInput').value = '';
-            document.getElementById('connectBtn').disabled = false;
-
-            // Clear variables
-            currentCustomerPhone = null;
-            sessionId = null;
-
-            // Restart waiting list refresh
-            startWaitingListRefresh();
-        }
-
-        async function refreshWaitingList() {
+        // FIXED: Get real participant name from server
+        async function getParticipantRealNameFromServer(phoneNumber) {
             try {
-                const response = await fetch('StaffVideoCall.aspx/GetWaitingParticipants', {
+                debugLog('Getting real name for phone: ' + phoneNumber);
+
+                const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/GetParticipantRealName") %>', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: parseInt(sessionId),
+                        phoneNumber: phoneNumber
+                    })
                 });
 
                 const data = await response.json();
-                const participants = JSON.parse(data.d);
+                const result = JSON.parse(data.d);
 
-                const waitingList = document.getElementById('waitingList');
-                waitingList.innerHTML = '';
-
-                if (participants && participants.length > 0) {
-                    participants.forEach(participant => {
-                        const participantDiv = document.createElement('div');
-                        participantDiv.className = 'customer-item';
-                        participantDiv.innerHTML = `
-                            <div class="customer-info">
-                                <div class="customer-phone">${participant.phone}</div>
-                                <div class="customer-waiting-time">Waiting since ${participant.waitingTime}</div>
-                                <div style="font-size: 12px; color: #666;">
-                                    Concerns: ${participant.concerns || 'General inquiry'}
-                                </div>
-                            </div>
-                            <button class="quick-connect-btn" onclick="quickConnect('${participant.phone}')">
-                                Connect Now
-                            </button>
-                        `;
-                        waitingList.appendChild(participantDiv);
-                    });
-                } else {
-                    waitingList.innerHTML = `
-                        <div class="customer-item">
-                            <div class="customer-info">
-                                <div class="customer-phone">No participants currently waiting</div>
-                                <div class="customer-waiting-time">Check back in a few minutes</div>
-                            </div>
-                        </div>
-                    `;
+                if (result.success && result.name) {
+                    debugLog('Real name found: ' + result.name);
+                    return result.name;
                 }
             } catch (error) {
-                updateDebugInfo(`Error refreshing waiting list: ${error.message}`);
-            }
-        }
-
-        function quickConnect(phone) {
-            document.getElementById('phoneInput').value = phone;
-            connectToCustomer();
-        }
-
-        function startWaitingListRefresh() {
-            // Refresh waiting list every 30 seconds
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
+                debugLog('Error getting participant real name: ' + error.message);
             }
 
-            refreshInterval = setInterval(() => {
-                if (document.getElementById('phoneLookupSection').style.display !== 'none') {
-                    refreshWaitingList();
+            // Fallback: look in registered participants list
+            const participantCards = document.querySelectorAll('.participant-card');
+            for (let card of participantCards) {
+                const cardPhone = card.getAttribute('data-phone');
+                const cleanCardPhone = cardPhone ? cardPhone.replace(/[^0-9]/g, '') : '';
+                
+                if (cleanCardPhone === phoneNumber) {
+                    const name = card.getAttribute('data-name');
+                    if (name && name.trim() !== '') {
+                        debugLog('Found name in UI: ' + name);
+                        return name;
+                    }
                 }
-            }, 30000);
-
-            // Initial refresh
-            refreshWaitingList();
+            }
+            
+            // Final fallback
+            return `Participant (${phoneNumber.substring(0, 4)}...${phoneNumber.substring(phoneNumber.length - 4)})`;
         }
 
-        window.onload = function () {
-            startWaitingListRefresh();
-            document.getElementById('phoneInput').focus();
-        };
+        // FIXED: Update grid layout based on number of participants
+        function updateGridLayout() {
+            const grid = document.getElementById('participantsGrid');
+            const participantCount = activeParticipants.size;
+            
+            if (participantCount === 1) {
+                grid.classList.add('single-participant');
+            } else {
+                grid.classList.remove('single-participant');
+            }
+        }
 
-        window.onbeforeunload = function () {
+        // FIXED: Remove participant from grid with better cleanup
+        function removeParticipantFromGrid(participantId) {
+            debugLog('Removing participant from grid: ' + participantId);
+            
+            const element = document.getElementById(`participant_${participantId}`);
+            if (element) {
+                element.remove();
+                debugLog('✅ Removed participant UI element: ' + participantId);
+            }
+
+            activeParticipants.delete(participantId);
+            connections.delete(participantId);
+
+            // FIXED: Update participant button status in the registered list
+            const participantPhoneFromId = participantId.replace('customer_', '');
+            updateParticipantButtonStatus(participantPhoneFromId, false);
+
+            // FIXED: Update grid layout after removal
+            updateGridLayout();
+
+            // Show "no participants" message if no one is connected
+            const grid = document.getElementById('participantsGrid');
+            if (grid.children.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-participants-connected">
+                        <p><strong>No participants connected</strong></p>
+                        <p>Waiting for participants to join...</p>
+                    </div>
+                `;
+                grid.classList.remove('single-participant');
+            }
+        }
+
+        // FIXED: Update participant button status in the registered participants list
+        function updateParticipantButtonStatus(phoneNumber, isConnected) {
+            const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+            const buttonId = `btn_${cleanPhone}`;
+            const button = document.getElementById(buttonId);
+            
+            if (button) {
+                if (isConnected) {
+                    button.textContent = '✅ Connected';
+                    button.disabled = true;
+                    button.style.background = '#6c757d';
+                } else {
+                    button.textContent = '📞 Connect';
+                    button.disabled = false;
+                    button.style.background = '#28a745';
+                }
+            }
+        }
+
+        // FIXED: Connect to specific participant - THIS WAS MISSING
+        function connectToParticipant(phone, name) {
+            if (!peer || !localStream || !isConnectionActive) {
+                updateStatus('Expert system not ready. Please wait...', 'error');
+                return;
+            }
+
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            const participantId = `customer_${cleanPhone}`;
+
+            debugLog('Attempting to connect to: ' + participantId + ' (' + name + ')');
+
+            // Check if already connected
+            if (connections.has(participantId)) {
+                updateStatus(`Already connected to ${name}`, 'info');
+                return;
+            }
+
+            try {
+                const call = peer.call(participantId, localStream);
+
+                if (call) {
+                    debugLog('Call initiated to: ' + participantId);
+
+                    call.on('stream', (remoteStream) => {
+                        debugLog('Connected to participant: ' + name);
+                        addParticipantToGrid(participantId, remoteStream, call);
+                        updateConnectedCount();
+                        updateStatus(`Connected to ${name}!`, 'success');
+                    });
+
+                    call.on('error', (err) => {
+                        debugLog('Call error: ' + err.message);
+                        updateStatus(`Failed to connect to ${name}: ${err.message}`, 'error');
+                    });
+
+                    call.on('close', () => {
+                        debugLog('Call closed with: ' + name);
+                        removeParticipantFromGrid(participantId);
+                        updateConnectedCount();
+                        updateStatus(`${name} disconnected`, 'info');
+                    });
+
+                    connections.set(participantId, call);
+                    updateStatus(`Connecting to ${name}...`, 'info');
+                } else {
+                    updateStatus(`Failed to initiate call to ${name}`, 'error');
+                }
+            } catch (err) {
+                debugLog('Error calling participant: ' + err.message);
+                updateStatus(`Error connecting to ${name}: ${err.message}`, 'error');
+            }
+        }
+
+        // FIXED: Connect to all registered participants
+        function connectToAllParticipants() {
+            if (!peer || !localStream || !isConnectionActive) {
+                updateStatus('Expert system not ready. Please wait...', 'error');
+                return;
+            }
+
+            debugLog('Connecting to all participants...');
+            const participantCards = document.querySelectorAll('.participant-card');
+
+            if (participantCards.length === 0) {
+                updateStatus('No registered participants found', 'info');
+                return;
+            }
+
+            let connectCount = 0;
+            participantCards.forEach((card, index) => {
+                const phone = card.getAttribute('data-phone');
+                const name = card.getAttribute('data-name');
+
+                if (phone && name) {
+                    // Stagger connections to avoid overwhelming the system
+                    setTimeout(() => {
+                        connectToParticipant(phone, name);
+                    }, index * 1000);
+                    connectCount++;
+                }
+            });
+
+            updateStatus(`Connecting to ${connectCount} participants...`, 'info');
+        }
+
+        // FIXED: Check for participants periodically
+        async function checkForParticipants() {
+            if (!sessionId) return;
+
+            try {
+                const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/GetParticipantUpdates") %>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sessionId: parseInt(sessionId) })
+                });
+
+                const data = await response.json();
+                const result = JSON.parse(data.d);
+
+                if (result.success && result.participants) {
+                    updateOnlineParticipants(result.participants.length);
+                }
+            } catch (error) {
+                debugLog('Error checking participants: ' + error.message);
+            }
+
+            // Check again in 10 seconds
+            setTimeout(checkForParticipants, 10000);
+        }
+
+        // Update UI counters
+        function updateConnectedCount() {
+            const connectedElement = document.getElementById('connectedParticipants');
+            if (connectedElement) {
+                connectedElement.textContent = activeParticipants.size;
+            }
+        }
+
+        function updateOnlineParticipants(count) {
+            const onlineElement = document.getElementById('onlineParticipants');
+            if (onlineElement) {
+                onlineElement.textContent = count;
+            }
+        }
+
+        function updateSessionTimer() {
+            if (sessionStartTime) {
+                const now = new Date();
+                const diff = now - sessionStartTime;
+                const minutes = Math.floor(diff / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+
+                const durationElement = document.getElementById('sessionDuration');
+                if (durationElement) {
+                    durationElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+        }
+
+        // Control functions
+        function toggleMute() {
+            if (localStream) {
+                const audioTracks = localStream.getAudioTracks();
+                audioTracks.forEach(track => {
+                    track.enabled = !track.enabled;
+                });
+
+                const muteBtn = document.getElementById('muteBtn');
+                if (muteBtn) {
+                    muteBtn.textContent = audioTracks[0]?.enabled ? '🎤 Mute' : '🔊 Unmute';
+                }
+            }
+        }
+
+        function toggleVideo() {
+            if (localStream) {
+                const videoTracks = localStream.getVideoTracks();
+                videoTracks.forEach(track => {
+                    track.enabled = !track.enabled;
+                });
+
+                const videoBtn = document.getElementById('videoBtn');
+                if (videoBtn) {
+                    videoBtn.textContent = videoTracks[0]?.enabled ? '📹 Video Off' : '📹 Video On';
+                }
+            }
+        }
+
+        function refreshParticipantsList() {
+            window.location.reload();
+        }
+
+        function endAllCalls() {
+            debugLog('Ending all calls...');
+
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
-            if (currentCall) {
-                currentCall.close();
-            }
-            if (peer && isConnectionActive) {
+
+            connections.forEach((call) => {
+                call.close();
+            });
+
+            connections.clear();
+            activeParticipants.clear();
+
+            if (peer) {
                 peer.destroy();
             }
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
+
+            if (statusUpdateInterval) {
+                clearInterval(statusUpdateInterval);
+            }
+
+            updateStatus('All calls ended', 'info');
+            
+            // Reset the grid
+            const grid = document.getElementById('participantsGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="no-participants-connected">
+                        <p><strong>Session ended</strong></p>
+                        <p>Refresh the page to start a new session</p>
+                    </div>
+                `;
+            }
+        }
+
+        // FIXED: Update status function with better error handling
+        function updateStatus(message, type) {
+            debugLog(`Status (${type}): ${message}`);
+
+            let statusLabel = document.getElementById('<%= lblStatus.ClientID %>');
+
+            if (!statusLabel) {
+                statusLabel = document.querySelector('.status-message');
+            }
+
+            if (statusLabel) {
+                statusLabel.textContent = message;
+                statusLabel.className = `status-message ${type}`;
+            } else {
+                console.warn('Status label not found');
+            }
+        }
+
+        // FIXED: Update participant statuses
+        function updateParticipantStatuses() {
+            const participantCards = document.querySelectorAll('.participant-card');
+            participantCards.forEach(card => {
+                const phone = card.getAttribute('data-phone');
+                if (phone) {
+                    const cleanPhone = phone.replace(/[^0-9]/g, '');
+                    const participantId = `customer_${cleanPhone}`;
+                    const statusIndicator = card.querySelector('.status-indicator');
+                    const connectBtn = card.querySelector('.btn-connect');
+
+                    if (connections.has(participantId)) {
+                        if (statusIndicator) {
+                            statusIndicator.className = 'status-indicator status-connected';
+                            statusIndicator.style.background = '#007bff';
+                        }
+                        if (connectBtn) {
+                            connectBtn.textContent = '✅ Connected';
+                            connectBtn.disabled = true;
+                            connectBtn.style.background = '#6c757d';
+                        }
+                    } else {
+                        if (statusIndicator) {
+                            statusIndicator.className = 'status-indicator status-waiting';
+                            statusIndicator.style.background = '#ffc107';
+                        }
+                        if (connectBtn) {
+                            connectBtn.textContent = '📞 Connect';
+                            connectBtn.disabled = false;
+                            connectBtn.style.background = '#28a745';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cleanup on page unload
+        window.onbeforeunload = function () {
+            debugLog('Cleaning up resources...');
+
+            if (statusUpdateInterval) {
+                clearInterval(statusUpdateInterval);
+            }
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+
+            if (peer && isConnectionActive) {
+                peer.destroy();
             }
         };
     </script>

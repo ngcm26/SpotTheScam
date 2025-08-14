@@ -109,9 +109,19 @@
             background: none;
             transition: background 0.2s, color 0.2s;
         }
-        .dropdown-item.text-danger:hover, .dropdown-item.text-danger:focus {
-            background: #dc3545 !important;
-            color: #fff !important;
+
+            .dropdown-item.text-danger:hover, .dropdown-item.text-danger:focus {
+                background: #dc3545 !important;
+                color: #fff !important;
+            }
+
+        .badge-pill {
+            margin-left: 6px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #ef4444;
+            color: #fff;
+            font-size: .8rem
         }
     </style>
 
@@ -151,31 +161,46 @@
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="protectionDropdown" role="button">Blogs & Forum</a>
-                            <ul class="dropdown-menu" aria-labelledby="protectionDropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="blogsForumDropdown" role="button">Blogs & Forum</a>
+                            <ul class="dropdown-menu" aria-labelledby="blogsForumDropdown">
                                 <li><a class="dropdown-item" href="UserBlog.aspx">Blogs</a></li>
                                 <li><a class="dropdown-item" href="ForumPage.aspx">Forum</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management</a>
                             <ul class="dropdown-menu" aria-labelledby="accountDropdown">
                                 <li><a class="dropdown-item" href="UserTransactionLogs.aspx">Transaction Logs</a></li>
-                                <li><a class="dropdown-item" href="UserBankAccounts.aspx">Bank Accounts & Cards</a></li>
-                                <li><a class="dropdown-item" href="FamilyGroupManagement.aspx">Family Group Management</a></li>
-                                <!-- Add more related features here as needed -->
+                                <!-- replace this block inside the Account & Family Management dropdown -->
+                                <li>
+                                    <a href="<%= ResolveUrl("~/User/Invites.aspx") %>">My Invites
+                                        <asp:Literal ID="litInviteCount" runat="server" />
+                                    </a>
+                                </li>
                             </ul>
                         </li>
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="expertWebinarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Expert Webinar Session
+                            <a class="nav-link dropdown-toggle" href="#" id="expertWebinarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Expert Webinar Session
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="expertWebinarDropdown">
                                 <li><a class="dropdown-item" href="ExpertWebinarHomepage.aspx">Expert Webinar Session</a></li>
                                 <li><a class="dropdown-item" href="UserMySessions.aspx">My Sessions</a></li>
                             </ul>
                         </li>
-                                            </ul>
+
+                        <!-- NEW POINTS SYSTEM DROPDOWN -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="pointsSystemDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Points & Rewards
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="pointsSystemDropdown">
+                                <li><a class="dropdown-item" href="UserPointsStore.aspx">Points Store</a></li>
+                                <li><a class="dropdown-item" href="UserAchievements.aspx">Achievements</a></li>
+                                <li><a class="dropdown-item" href="UserMyStats.aspx">My Stats</a></li>
+                            </ul>
+                        </li>
+                    </ul>
 
                     <!-- Right Buttons -->
                     <ul class="navbar-nav ms-auto d-flex align-items-center">
@@ -192,8 +217,40 @@
                         <!-- For LOGGED-IN USERS ONLY -->
                         <asp:PlaceHolder ID="phUser" runat="server" Visible="false">
                             <li class="nav-item dropdown me-3">
-                                <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    👋 Welcome, <asp:Label ID="lblUsername" runat="server" />
+                                <a class="nav-link dropdown-toggle fw-bold text-dark position-relative"
+                                    href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications
+    <asp:Literal ID="litBellCount" runat="server" />
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 320px">
+                                    <asp:PlaceHolder ID="phNoInvites" runat="server" Visible="false">
+                                        <li><span class="dropdown-item-text text-muted">No new invites</span></li>
+                                    </asp:PlaceHolder>
+
+                                    <asp:Repeater ID="rptInvites" runat="server">
+                                        <ItemTemplate>
+                                            <li>
+                                                <a class="dropdown-item" href="<%# ResolveUrl("~/User/Invites.aspx") %>">
+                                                    <strong><%# System.Web.HttpUtility.HtmlEncode(Eval("GroupName")) %></strong>
+                                                    <div class="small text-muted">
+                                                        Invited as <%# System.Web.HttpUtility.HtmlEncode(Eval("Role")) %> •
+                                                        <%# Convert.ToDateTime(Eval("InvitedAt")).ToString("dd MMM yyyy, h:mm tt") %>
+                                                    </div>
+
+                                                </a>
+                                            </li>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+                                    <li><a class="dropdown-item" href="<%= ResolveUrl("~/User/Invites.aspx") %>">View all invites</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown me-3">
+                                <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome,
+                                    <asp:Label ID="lblUsername" runat="server" />
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
                                     <li><a class="dropdown-item" href="UserProfile.aspx">Profile Settings</a></li>
@@ -207,7 +264,7 @@
         </nav>
 
         <!-- Page Content -->
-        <div class="main-content-area" style="width:100%;padding:0;margin:0;">
+        <div class="main-content-area" style="width: 100%; padding: 0; margin: 0;">
             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server" />
         </div>
 

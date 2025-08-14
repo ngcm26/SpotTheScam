@@ -7,146 +7,110 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SpotTheScam.User
+namespace SpotTheScam.Staff
 {
 
 
-    public partial class AddBankAccounts
+    public partial class IndividualForum
     {
 
         /// <summary>
-        /// btnSeedMockAccounts control.
+        /// lblMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnSeedMockAccounts;
+        protected global::System.Web.UI.WebControls.Label lblMessage;
 
         /// <summary>
-        /// AlertPanel control.
+        /// btn_backForum control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel AlertPanel;
+        protected global::System.Web.UI.WebControls.Button btn_backForum;
 
         /// <summary>
-        /// AlertIcon control.
+        /// Label1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AlertIcon;
+        protected global::System.Web.UI.WebControls.Label Label1;
 
         /// <summary>
-        /// AlertMessage control.
+        /// lb_username control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label AlertMessage;
+        protected global::System.Web.UI.WebControls.Label lb_username;
 
         /// <summary>
-        /// txtBankName control.
+        /// lb_createdAt control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtBankName;
+        protected global::System.Web.UI.WebControls.Label lb_createdAt;
 
         /// <summary>
-        /// rfvBankName control.
+        /// lb_title control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvBankName;
+        protected global::System.Web.UI.WebControls.Label lb_title;
 
         /// <summary>
-        /// txtAccountType control.
+        /// lb_description control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAccountType;
+        protected global::System.Web.UI.WebControls.Label lb_description;
 
         /// <summary>
-        /// txtAccountNumber control.
+        /// img_forum control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAccountNumber;
+        protected global::System.Web.UI.WebControls.Image img_forum;
 
         /// <summary>
-        /// rfvAccountNumber control.
+        /// rptComments control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvAccountNumber;
+        protected global::System.Web.UI.WebControls.Repeater rptComments;
 
         /// <summary>
-        /// txtAccountNickname control.
+        /// tb_comment control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAccountNickname;
+        protected global::System.Web.UI.WebControls.TextBox tb_comment;
 
         /// <summary>
-        /// txtBalance control.
+        /// btnSubmitComment control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtBalance;
-
-        /// <summary>
-        /// rfvBalance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvBalance;
-
-        /// <summary>
-        /// cvBalance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CompareValidator cvBalance;
-
-        /// <summary>
-        /// btnAddAccount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddAccount;
-
-        /// <summary>
-        /// btnBack control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnBack;
+        protected global::System.Web.UI.WebControls.Button btnSubmitComment;
     }
 }
