@@ -694,7 +694,7 @@
                 noParticipantsMsg.remove();
             }
 
-            // FIXED: Get participant name from server using phone number
+            // FIXED: Get participant name from server using phone number with retry mechanism
             const participantPhoneNumber = participantId.replace('customer_', '');
             getParticipantRealNameFromServer(participantPhoneNumber).then(participantName => {
                 // Double-check no duplicate was created while we were getting the name
@@ -742,29 +742,48 @@
             });
         }
 
-        // FIXED: Get real participant name from server
+        // FIXED: Get real participant name from server with multiple retry attempts
         async function getParticipantRealNameFromServer(phoneNumber) {
-            try {
-                debugLog('Getting real name for phone: ' + phoneNumber);
+            let retryCount = 0;
+            const maxRetries = 3;
+            
+            while (retryCount < maxRetries) {
+                try {
+                    debugLog(`Getting real name for phone: ${phoneNumber} (attempt ${retryCount + 1})`);
 
-                const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/GetParticipantRealName") %>', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sessionId: parseInt(sessionId),
-                        phoneNumber: phoneNumber
-                    })
-                });
+                    const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/GetParticipantRealName") %>', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionId: parseInt(sessionId),
+                            phoneNumber: phoneNumber
+                        })
+                    });
 
-                const data = await response.json();
-                const result = JSON.parse(data.d);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-                if (result.success && result.name) {
-                    debugLog('Real name found: ' + result.name);
-                    return result.name;
+                    const data = await response.json();
+                    const result = JSON.parse(data.d);
+
+                    if (result.success && result.name) {
+                        debugLog('Real name found: ' + result.name);
+                        return result.name;
+                    }
+                    
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        debugLog(`Name not found, retrying in ${retryCount * 500}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, retryCount * 500));
+                    }
+                } catch (error) {
+                    debugLog(`Error getting participant real name (attempt ${retryCount + 1}): ${error.message}`);
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, retryCount * 500));
+                    }
                 }
-            } catch (error) {
-                debugLog('Error getting participant real name: ' + error.message);
             }
 
             // Fallback: look in registered participants list

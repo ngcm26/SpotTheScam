@@ -157,6 +157,10 @@
             display: none;
         }
 
+        .other-participants-section.show {
+            display: block;
+        }
+
         .other-participants-section h3 {
             color: #051D40;
             margin-bottom: 15px;
@@ -318,6 +322,7 @@
             <div class="control-buttons" id="controlButtons" style="display: none;">
                 <button type="button" class="btn-control" onclick="toggleMute()" id="muteBtn">🎤 Mute</button>
                 <button type="button" class="btn-control" onclick="toggleVideo()" id="videoBtn">📹 Video</button>
+                <button type="button" class="btn-control" onclick="manualDiscovery()" id="refreshBtn">🔄 Find Participants</button>
                 <button type="button" class="btn-control danger" onclick="endCall()" id="endCallBtn">📞 End Call</button>
             </div>
         </div>
@@ -327,7 +332,7 @@
     </div>
 
     <script type="text/javascript">
-        // COMPLETE: User Video Call System with Working Participant Discovery
+        // ENHANCED USER VIDEO CALL SYSTEM - IMMEDIATE PARTICIPANT DISCOVERY
         let peer;
         let localStream;
         let expertCall;
@@ -339,8 +344,11 @@
         let connectionRetryCount = 0;
         let maxRetries = 3;
         let participantDiscoveryInterval = null;
+        let rapidDiscoveryInterval = null; // NEW: For faster initial discovery
         let myPeerId = null;
         let lastParticipantCheck = [];
+        let participantSectionCreated = false;
+        let isSearchingForParticipants = false;
 
         function debugLog(message) {
             console.log('🔍 USER DEBUG:', message);
@@ -397,9 +405,9 @@
                     customerPhone = phone;
 
                     // Update hidden fields
-                    document.getElementById('<%= hdnSessionId.ClientID %>').value = sessionId;
-                    document.getElementById('<%= hdnCustomerPhone.ClientID %>').value = phone;
-                    document.getElementById('<%= hdnUserPhone.ClientID %>').value = phone;
+                    document.getElementById('<%=hdnSessionId.ClientID%>').value = sessionId;
+                    document.getElementById('<%=hdnCustomerPhone.ClientID%>').value = phone;
+                    document.getElementById('<%=hdnUserPhone.ClientID%>').value = phone;
 
                     // Update UI
                     document.getElementById('phoneEntrySection').style.display = 'none';
@@ -452,7 +460,7 @@
             }
         }
 
-        // Create peer connection with aggressive participant discovery
+        // ENHANCED: Create peer connection with immediate and aggressive participant discovery
         async function createPeerConnection() {
             try {
                 const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
@@ -490,18 +498,38 @@
                     // Connect to expert first
                     setTimeout(() => connectToExpert(), 2000);
 
-                    // Start aggressive participant discovery
+                    // CRITICAL ENHANCEMENT: Start IMMEDIATE and AGGRESSIVE participant discovery
                     setTimeout(() => {
-                        debugLog('🚀 Starting aggressive participant discovery');
+                        debugLog('🚀 Starting IMMEDIATE participant discovery');
+                        
+                        // First discovery attempt immediately
                         discoverParticipants();
 
-                        // Set up frequent participant discovery - every 3 seconds for better responsiveness
-                        participantDiscoveryInterval = setInterval(() => {
+                        // RAPID discovery for the first 30 seconds (every 1 second)
+                        rapidDiscoveryInterval = setInterval(() => {
                             if (sessionId && peer && !peer.destroyed) {
+                                debugLog('🔄 Rapid participant discovery...');
                                 discoverParticipants();
                             }
-                        }, 3000);
-                    }, 1000);
+                        }, 1000);
+
+                        // After 30 seconds, switch to normal discovery (every 2 seconds)
+                        setTimeout(() => {
+                            if (rapidDiscoveryInterval) {
+                                clearInterval(rapidDiscoveryInterval);
+                                rapidDiscoveryInterval = null;
+                                debugLog('🔄 Switching to normal discovery interval');
+                            }
+
+                            // Set up normal participant discovery - every 2 seconds for better responsiveness
+                            participantDiscoveryInterval = setInterval(() => {
+                                if (sessionId && peer && !peer.destroyed) {
+                                    discoverParticipants();
+                                }
+                            }, 2000);
+                        }, 30000);
+
+                    }, 500); // Start discovery almost immediately
                 });
 
                 peer.on('call', (call) => {
@@ -613,9 +641,9 @@
             }
         }
 
-        // Handle incoming calls
+        // ENHANCED: Handle incoming calls with immediate UI updates
         function handleIncomingCall(call) {
-            debugLog('Handling incoming call from: ' + call.peer);
+            debugLog('📞 Handling incoming call from: ' + call.peer);
 
             if (call.peer.includes('expert_session_')) {
                 debugLog('Expert is calling us directly');
@@ -626,10 +654,10 @@
                 }
                 expertCall = call;
             } else if (call.peer.includes('customer_')) {
-                const participantId = call.peer;
+                var participantId = call.peer;
 
                 if (participantConnections.has(participantId)) {
-                    const existing = participantConnections.get(participantId);
+                    var existing = participantConnections.get(participantId);
                     if (existing.call && existing.call !== call) {
                         debugLog('Closing existing participant call: ' + participantId);
                         existing.call.close();
@@ -640,17 +668,24 @@
 
             call.answer(localStream);
 
-            call.on('stream', (remoteStream) => {
-                debugLog('Received stream from: ' + call.peer);
+            call.on('stream', function(remoteStream) {
+                debugLog('✅ Received stream from: ' + call.peer);
 
                 if (call.peer.includes('expert_session_')) {
                     handleExpertStream(remoteStream);
                 } else if (call.peer.includes('customer_')) {
+                    // IMMEDIATE participant handling
                     handleParticipantStream(call.peer, remoteStream, call);
+                    
+                    // CRITICAL: Force immediate participant discovery to sync with database
+                    setTimeout(function() {
+                        debugLog('🔄 Force discovering participants after incoming call');
+                        discoverParticipants(true);
+                    }, 1000);
                 }
             });
 
-            call.on('close', () => {
+            call.on('close', function() {
                 debugLog('Call closed from: ' + call.peer);
                 if (call.peer.includes('expert_session_')) {
                     expertCall = null;
@@ -660,7 +695,7 @@
                 }
             });
 
-            call.on('error', (err) => {
+            call.on('error', function(err) {
                 debugLog('Call error from ' + call.peer + ': ' + err.message);
                 if (call.peer.includes('expert_session_')) {
                     expertCall = null;
@@ -684,11 +719,11 @@
                 isConnected = true;
                 updateStatus('🎉 Connected with expert! Looking for other participants...', 'success');
 
-                // Continue participant discovery after expert connection
+                // Continue aggressive participant discovery after expert connection
                 setTimeout(() => {
                     debugLog('Continuing participant discovery after expert connection');
                     discoverParticipants();
-                }, 1000);
+                }, 500);
             }
         }
 
@@ -708,116 +743,197 @@
             setTimeout(() => connectToExpert(), 3000);
         }
 
-        // Handle participant stream with guaranteed UI display
+        // ENHANCED: Handle participant stream with immediate UI updates and proper name resolution
         function handleParticipantStream(participantId, stream, call) {
             debugLog('✅ Adding participant stream: ' + participantId);
 
             participantConnections.set(participantId, { call, stream });
 
-            // Get real participant name
-            getParticipantRealName(participantId).then(realName => {
-                participantNames.set(participantId, realName);
-                addParticipantToUI(participantId, stream, realName);
+            // ENHANCED: Check if we already have the name from discovery results first
+            let existingName = participantNames.get(participantId);
+            
+            if (existingName && !existingName.includes('Participant (')) {
+                debugLog('📝 Using existing participant name: ' + existingName);
+                
+                // IMMEDIATE UI update with existing name
+                addParticipantToUI(participantId, stream, existingName);
 
-                // CRITICAL FIX: Always update status and ensure section is visible
+                // Update status and ensure section is visible
                 const participantCount = participantConnections.size;
                 updateStatus(`🎉 Connected with expert and ${participantCount} other participant(s)!`, 'success');
-
-                // Ensure participant section is visible
+                
+                // CRITICAL: Ensure participant section is visible immediately
                 ensureParticipantSectionVisible();
 
                 debugLog(`📺 Total participants now: ${participantCount}`);
+                
+                return; // Exit early since we already have the name
+            }
+
+            // If we don't have the name, get it from server
+            getParticipantRealName(participantId).then(realName => {
+                participantNames.set(participantId, realName);
+                
+                // Check if participant was already added with a temporary name
+                var existingElement = document.getElementById('participant_' + participantId);
+                if (existingElement) {
+                    // Update existing element with real name
+                    var nameElement = existingElement.querySelector('h4');
+                    if (nameElement) {
+                        nameElement.textContent = '👤 ' + realName;
+                        debugLog('🔄 Updated existing participant name to: ' + realName);
+                    }
+                } else {
+                    // Add new participant with real name
+                    addParticipantToUI(participantId, stream, realName);
+                }
+
+                // Update status and ensure section is visible
+                const participantCount = participantConnections.size;
+                updateStatus(`🎉 Connected with expert and ${participantCount} other participant(s)!`, 'success');
+                
+                // CRITICAL: Ensure participant section is visible immediately
+                ensureParticipantSectionVisible();
+
+                debugLog(`📺 Total participants now: ${participantCount}`);
+            }).catch(error => {
+                debugLog('❌ Error getting participant name, using fallback: ' + error.message);
+                
+                // Use fallback name
+                const cleanPhone = participantId.replace('customer_', '');
+                const fallbackName = `Participant (${cleanPhone.substring(0, 4)}...${cleanPhone.substring(cleanPhone.length - 4)})`;
+                
+                participantNames.set(participantId, fallbackName);
+                addParticipantToUI(participantId, stream, fallbackName);
+                
+                const participantCount = participantConnections.size;
+                updateStatus(`🎉 Connected with expert and ${participantCount} other participant(s)!`, 'success');
+                ensureParticipantSectionVisible();
             });
         }
 
-        // Get participant name from server
+        // ENHANCED: Get participant name from server with multiple retry attempts
         async function getParticipantRealName(participantId) {
-            try {
-                const cleanPhone = participantId.replace('customer_', '');
+            let retryCount = 0;
+            const maxRetries = 3;
+            
+            while (retryCount < maxRetries) {
+                try {
+                    const cleanPhone = participantId.replace('customer_', '');
+                    debugLog(`Getting real name for phone: ${cleanPhone} (attempt ${retryCount + 1})`);
 
-                const response = await fetch('VideoCall.aspx/GetParticipantName', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sessionId: parseInt(sessionId),
-                        phoneNumber: cleanPhone
-                    })
-                });
+                    const response = await fetch('VideoCall.aspx/GetParticipantName', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionId: parseInt(sessionId),
+                            phoneNumber: cleanPhone
+                        })
+                    });
 
-                const data = await response.json();
-                const result = JSON.parse(data.d);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-                if (result.success && result.name) {
-                    return result.name;
+                    const data = await response.json();
+                    const result = JSON.parse(data.d);
+
+                    if (result.success && result.name && result.name.trim() !== '') {
+                        debugLog('Real name found: ' + result.name);
+                        return result.name;
+                    }
+                    
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        debugLog(`Name not found, retrying in ${retryCount * 500}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, retryCount * 500));
+                    }
+                } catch (error) {
+                    debugLog(`Error getting participant real name (attempt ${retryCount + 1}): ${error.message}`);
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, retryCount * 500));
+                    }
                 }
-            } catch (error) {
-                debugLog('Error getting participant name: ' + error.message);
             }
 
+            // ENHANCED: Try to get name from participant discovery data
             const cleanPhone = participantId.replace('customer_', '');
+            
+            // Check if we have this participant in our last discovery results
+            if (window.lastDiscoveryResults && window.lastDiscoveryResults.participants) {
+                for (let participant of window.lastDiscoveryResults.participants) {
+                    if (participant.phone === cleanPhone && participant.name && 
+                        !participant.name.includes('Participant (') && 
+                        participant.name.trim() !== '') {
+                        debugLog('Found name in discovery results: ' + participant.name);
+                        return participant.name;
+                    }
+                }
+            }
+            
+            // Final fallback with better formatting
             return `Participant (${cleanPhone.substring(0, Math.min(4, cleanPhone.length))}...${cleanPhone.substring(Math.max(0, cleanPhone.length - 4))})`;
         }
 
-        // Add participant to UI with guaranteed visibility
+        // ENHANCED: Add participant to UI with guaranteed immediate visibility
         function addParticipantToUI(participantId, stream, participantName) {
             debugLog('📺 Adding participant to UI: ' + participantName + ' (' + participantId + ')');
 
+            // ENHANCED: Create participant section if it doesn't exist
             let participantsSection = document.querySelector('.other-participants-section');
             if (!participantsSection) {
-                const mainContainer = document.querySelector('.main-container');
-                participantsSection = document.createElement('div');
-                participantsSection.className = 'other-participants-section';
-                participantsSection.innerHTML = `
-                    <h3>👥 Other Participants</h3>
-                    <div class="participants-grid" id="participantsGrid"></div>
-                `;
-                mainContainer.appendChild(participantsSection);
-                debugLog('✅ Created participants section');
+                createParticipantSection();
+                participantsSection = document.querySelector('.other-participants-section');
             }
 
-            // CRITICAL FIX: Always show the section when we have participants
+            // CRITICAL: Always show the section immediately when we have participants
             participantsSection.style.display = 'block';
+            participantsSection.classList.add('show');
             debugLog('✅ Participant section is now visible');
 
-            const existingParticipant = document.getElementById(`participant_${participantId}`);
+            var existingParticipant = document.getElementById('participant_' + participantId);
             if (existingParticipant) {
                 debugLog('Participant already exists in UI, updating stream');
-                const existingVideo = existingParticipant.querySelector('video');
+                var existingVideo = existingParticipant.querySelector('video');
                 if (existingVideo) {
                     existingVideo.srcObject = stream;
                 }
 
-                const nameElement = existingParticipant.querySelector('h4');
+                var nameElement = existingParticipant.querySelector('h4');
                 if (nameElement) {
-                    nameElement.textContent = `👤 ${participantName}`;
+                    nameElement.textContent = '👤 ' + participantName;
                 }
                 return;
             }
 
-            const grid = document.getElementById('participantsGrid');
-            const participantDiv = document.createElement('div');
-            participantDiv.className = 'participant-video-card';
-            participantDiv.id = `participant_${participantId}`;
+            var grid = document.getElementById('participantsGrid');
+            if (!grid) {
+                debugLog('ERROR: Participants grid not found');
+                return;
+            }
 
-            participantDiv.innerHTML = `
-                <div class="participant-header">
-                    <h4>👤 ${participantName}</h4>
-                    <span class="participant-status">Online</span>
-                </div>
-                <video autoplay playsinline></video>
-            `;
+            var participantDiv = document.createElement('div');
+            participantDiv.className = 'participant-video-card';
+            participantDiv.id = 'participant_' + participantId;
+
+            participantDiv.innerHTML = 
+                '<div class="participant-header">' +
+                    '<h4>👤 ' + participantName + '</h4>' +
+                    '<span class="participant-status">Online</span>' +
+                '</div>' +
+                '<video autoplay playsinline></video>';
 
             grid.appendChild(participantDiv);
 
-            const video = participantDiv.querySelector('video');
+            var video = participantDiv.querySelector('video');
             if (video) {
                 video.srcObject = stream;
                 video.muted = false;
                 video.volume = 1.0;
 
-                // Add error handling for video
                 video.onerror = function (e) {
-                    debugLog('❌ Video error for participant ' + participantId + ': ' + e.message);
+                    debugLog('❌ Video error for participant ' + participantId + ': ' + e.target.error);
                 };
 
                 video.onloadedmetadata = function () {
@@ -827,92 +943,184 @@
 
             debugLog('✅ Participant added to UI successfully: ' + participantName);
 
-            // FINAL CHECK: Ensure the section is definitely visible
-            setTimeout(() => {
+            // FINAL CHECK: Ensure the section is definitely visible with animation
+            setTimeout(function() {
                 if (participantsSection.style.display !== 'block') {
                     participantsSection.style.display = 'block';
+                    participantsSection.classList.add('show');
                     debugLog('🔧 Force-showing participant section');
                 }
+                
+                // Scroll to participant section to make it obvious
+                participantsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         }
 
-        // Enhanced participant discovery with better connection logic AND fallback for incoming calls
-        async function discoverParticipants() {
+        // ENHANCED: New function to create participant section
+        function createParticipantSection() {
+            var mainContainer = document.querySelector('.main-container');
+            var participantsSection = document.createElement('div');
+            participantsSection.className = 'other-participants-section';
+            participantsSection.innerHTML = 
+                '<h3>👥 Other Participants</h3>' +
+                '<div class="participants-grid" id="participantsGrid"></div>';
+            mainContainer.appendChild(participantsSection);
+            participantSectionCreated = true;
+            debugLog('✅ Created participants section');
+        }
+
+        // ENHANCED: Function to ensure participant section is visible
+        function ensureParticipantSectionVisible() {
+            var participantsSection = document.querySelector('.other-participants-section');
+            if (!participantsSection && participantConnections.size > 0) {
+                debugLog('🔧 Creating participant section as it does not exist');
+                createParticipantSection();
+                participantsSection = document.querySelector('.other-participants-section');
+            }
+
+            if (participantsSection && participantConnections.size > 0) {
+                participantsSection.style.display = 'block';
+                participantsSection.classList.add('show');
+                debugLog('✅ Participant section is now visible');
+            }
+        }
+
+        // ENHANCED: Participant discovery with better responsiveness and immediate connection attempts
+        async function discoverParticipants(forceConnect) {
+            if (forceConnect === undefined) forceConnect = false;
+            
             if (!sessionId || !peer || peer.destroyed) {
                 debugLog('Cannot discover participants - requirements not met');
                 return;
             }
 
-            try {
-                debugLog('🔍 Discovering participants for session: ' + sessionId);
+            // Prevent multiple simultaneous discovery calls
+            if (isSearchingForParticipants && !forceConnect) {
+                debugLog('🔄 Discovery already in progress, skipping...');
+                return;
+            }
 
-                const response = await fetch('VideoCall.aspx/GetSessionParticipants', {
+            isSearchingForParticipants = true;
+
+            try {
+                debugLog('🔍 Discovering participants for session: ' + sessionId + (forceConnect ? ' (FORCED)' : ''));
+
+                var response = await fetch('VideoCall.aspx/GetSessionParticipants', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ sessionId: parseInt(sessionId) })
                 });
 
-                const data = await response.json();
-                const result = JSON.parse(data.d);
+                var data = await response.json();
+                var result = JSON.parse(data.d);
+
+                // ENHANCED: Store discovery results globally for name resolution
+                window.lastDiscoveryResults = result;
 
                 if (result.success && result.participants) {
-                    debugLog(`📊 Found ${result.participants.length} total participants for session ${sessionId}`);
+                    debugLog('📊 Found ' + result.participants.length + ' total participants for session ' + sessionId);
 
-                    const myPhone = customerPhone.replace(/[^0-9]/g, '');
-                    let newParticipantsFound = 0;
-                    let validParticipants = [];
+                    var myPhone = customerPhone.replace(/[^0-9]/g, '');
+                    var newParticipantsFound = 0;
+                    var validParticipants = [];
 
-                    result.participants.forEach((participant) => {
-                        const cleanPhone = participant.phone.replace(/[^0-9]/g, '');
+                    result.participants.forEach(function(participant) {
+                        var cleanPhone = participant.phone.replace(/[^0-9]/g, '');
 
-                        // Skip self, empty phones, and test phones
-                        if (cleanPhone === myPhone || !cleanPhone || cleanPhone === '' || cleanPhone === '12345678') {
-                            debugLog(`⏭️ Skipping invalid/self phone: ${cleanPhone} (my phone: ${myPhone})`);
+                        // Skip invalid or self phone numbers
+                        if (cleanPhone === myPhone || !cleanPhone || cleanPhone === '' || cleanPhone.length < 4) {
+                            debugLog('⏭️ Skipping invalid/self phone: ' + cleanPhone + ' (my phone: ' + myPhone + ')');
                             return;
                         }
 
                         validParticipants.push(participant);
-                        const participantId = `customer_${cleanPhone}`;
+                        var participantId = 'customer_' + cleanPhone;
+
+                        // ENHANCED: Store participant name for quick access
+                        if (participant.name && !participant.name.includes('Participant (')) {
+                            participantNames.set(participantId, participant.name);
+                            debugLog('📝 Stored participant name: ' + participant.name + ' for ID: ' + participantId);
+                        }
 
                         if (!participantConnections.has(participantId)) {
-                            debugLog(`🆕 Found new participant: ${participantId} (${participant.name})`);
+                            debugLog('🆕 Found new participant: ' + participantId + ' (' + participant.name + ')');
                             newParticipantsFound++;
 
-                            // Try to connect immediately and also with a slight delay for better success rate
-                            setTimeout(() => {
+                            // ENHANCED: SUPER AGGRESSIVE connection attempts with immediate staggered timing
+                            setTimeout(function() {
                                 connectToParticipant(participantId, participant.name);
-                            }, Math.random() * 1000);
+                            }, newParticipantsFound * 100); // Faster stagger: 100ms instead of 200ms
 
-                            // Also try again after a delay in case the first attempt fails
-                            setTimeout(() => {
+                            // First retry after 1 second (faster)
+                            setTimeout(function() {
                                 if (!participantConnections.has(participantId)) {
-                                    debugLog(`🔄 Retry connecting to: ${participantId}`);
+                                    debugLog('🔄 First retry connecting to: ' + participantId);
                                     connectToParticipant(participantId, participant.name);
                                 }
-                            }, 3000 + Math.random() * 2000);
+                            }, 1000 + (newParticipantsFound * 100));
+
+                            // Second retry after 3 seconds 
+                            setTimeout(function() {
+                                if (!participantConnections.has(participantId)) {
+                                    debugLog('🔄 Second retry connecting to: ' + participantId);
+                                    connectToParticipant(participantId, participant.name);
+                                }
+                            }, 3000 + (newParticipantsFound * 100));
+
+                            // Third retry after 6 seconds
+                            setTimeout(function() {
+                                if (!participantConnections.has(participantId)) {
+                                    debugLog('🔄 Third retry connecting to: ' + participantId);
+                                    connectToParticipant(participantId, participant.name);
+                                }
+                            }, 6000 + (newParticipantsFound * 100));
+
+                            // Final retry after 10 seconds
+                            setTimeout(function() {
+                                if (!participantConnections.has(participantId)) {
+                                    debugLog('🔄 Final retry connecting to: ' + participantId);
+                                    connectToParticipant(participantId, participant.name);
+                                }
+                            }, 10000 + (newParticipantsFound * 100));
                         } else {
-                            debugLog(`✅ Already connected to: ${participantId}`);
+                            debugLog('✅ Already connected to: ' + participantId);
+                            
+                            // ENHANCED: Update the name if we have a better one
+                            if (participant.name && !participant.name.includes('Participant (')) {
+                                var existingConnection = participantConnections.get(participantId);
+                                if (existingConnection) {
+                                    participantNames.set(participantId, participant.name);
+                                    
+                                    // Update UI with better name
+                                    var participantElement = document.getElementById('participant_' + participantId);
+                                    if (participantElement) {
+                                        var nameElement = participantElement.querySelector('h4');
+                                        if (nameElement) {
+                                            nameElement.textContent = '👤 ' + participant.name;
+                                            debugLog('🔄 Updated participant name in UI: ' + participant.name);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     });
 
                     // Update status based on discovery results
                     if (newParticipantsFound > 0) {
-                        debugLog(`🚀 Attempting to connect to ${newParticipantsFound} new participants`);
-                        updateStatus(`Found ${newParticipantsFound} other participants. Connecting...`, 'info');
+                        debugLog('🚀 Attempting to connect to ' + newParticipantsFound + ' new participants');
+                        updateStatus('Found ' + newParticipantsFound + ' other participants. Connecting...', 'info');
                     } else if (validParticipants.length > 0) {
-                        debugLog(`👥 All ${validParticipants.length} other participants already connected`);
+                        debugLog('👥 All ' + validParticipants.length + ' other participants already connected');
                         if (isConnected) {
-                            updateStatus(`🎉 Connected with expert and ${participantConnections.size} other participant(s)!`, 'success');
+                            updateStatus('🎉 Connected with expert and ' + participantConnections.size + ' other participant(s)!', 'success');
                         }
                     } else {
-                        debugLog(`👤 Only you in this session currently (or database discovery failed)`);
+                        debugLog('👤 Only you in this session currently');
 
-                        // CRITICAL FIX: If database discovery failed but we have active connections, still update UI
+                        // If database discovery failed but we have active connections, still update UI
                         if (isConnected && participantConnections.size > 0) {
-                            debugLog(`📺 Database discovery failed but we have ${participantConnections.size} active connections`);
-                            updateStatus(`🎉 Connected with expert and ${participantConnections.size} other participant(s)!`, 'success');
-
-                            // Ensure participant section is visible
+                            debugLog('📺 Database discovery shows no participants but we have ' + participantConnections.size + ' active connections');
+                            updateStatus('🎉 Connected with expert and ' + participantConnections.size + ' other participant(s)!', 'success');
                             ensureParticipantSectionVisible();
                         } else if (isConnected) {
                             updateStatus('🎉 Connected with expert! Waiting for other participants...', 'success');
@@ -920,87 +1128,83 @@
                     }
 
                     // Keep track of current participants for comparison
-                    lastParticipantCheck = validParticipants.map(p => p.phone);
+                    lastParticipantCheck = validParticipants.map(function(p) { return p.phone; });
 
                 } else {
                     debugLog('❌ Database discovery failed: ' + (result.message || 'Unknown error'));
 
-                    // CRITICAL FIX: Even if database discovery fails, check if we have active connections
+                    // Even if database discovery fails, check if we have active connections
                     if (isConnected && participantConnections.size > 0) {
-                        debugLog(`📺 Database discovery failed but we have ${participantConnections.size} active connections via incoming calls`);
-                        updateStatus(`🎉 Connected with expert and ${participantConnections.size} other participant(s)!`, 'success');
-
-                        // Ensure participant section is visible
+                        debugLog('📺 Database discovery failed but we have ' + participantConnections.size + ' active connections via incoming calls');
+                        updateStatus('🎉 Connected with expert and ' + participantConnections.size + ' other participant(s)!', 'success');
                         ensureParticipantSectionVisible();
                     }
                 }
             } catch (error) {
                 debugLog('❌ Error discovering participants: ' + error.message);
 
-                // CRITICAL FIX: Even if there's an error, check if we have active connections
+                // Even if there's an error, check if we have active connections
                 if (isConnected && participantConnections.size > 0) {
-                    debugLog(`📺 Discovery error but we have ${participantConnections.size} active connections via incoming calls`);
-                    updateStatus(`🎉 Connected with expert and ${participantConnections.size} other participant(s)!`, 'success');
-
-                    // Ensure participant section is visible
+                    debugLog('📺 Discovery error but we have ' + participantConnections.size + ' active connections via incoming calls');
+                    updateStatus('🎉 Connected with expert and ' + participantConnections.size + ' other participant(s)!', 'success');
                     ensureParticipantSectionVisible();
                 }
+            } finally {
+                isSearchingForParticipants = false;
             }
         }
 
-        // CRITICAL FIX: New function to ensure participant section is visible
-        function ensureParticipantSectionVisible() {
-            let participantsSection = document.querySelector('.other-participants-section');
-            if (!participantsSection && participantConnections.size > 0) {
-                debugLog('🔧 Creating participant section as it does not exist');
-                const mainContainer = document.querySelector('.main-container');
-                participantsSection = document.createElement('div');
-                participantsSection.className = 'other-participants-section';
-                participantsSection.innerHTML = `
-                    <h3>👥 Other Participants</h3>
-                    <div class="participants-grid" id="participantsGrid"></div>
-                `;
-                mainContainer.appendChild(participantsSection);
-            }
-
-            if (participantsSection && participantConnections.size > 0) {
-                participantsSection.style.display = 'block';
-                debugLog('✅ Participant section is now visible');
-            }
-        }
-
-        // Connect to participant with better error handling and retry logic
+        // ENHANCED: Connect to participant with better error handling and immediate feedback
         function connectToParticipant(participantId, participantName) {
             if (!peer || !localStream || peer.destroyed) {
-                debugLog('Cannot connect to participant - peer not ready');
+                debugLog('❌ Cannot connect to participant - peer not ready');
+                debugLog('   - Peer exists: ' + !!peer);
+                debugLog('   - Peer destroyed: ' + (peer ? peer.destroyed : 'N/A'));
+                debugLog('   - Local stream: ' + !!localStream);
                 return;
             }
 
             debugLog('🤝 Connecting to participant: ' + participantId + ' (' + participantName + ')');
+            debugLog('   - My Peer ID: ' + myPeerId);
+            debugLog('   - Target Peer ID: ' + participantId);
+            debugLog('   - Peer connection state: ' + (peer.disconnected ? 'disconnected' : 'connected'));
 
             try {
-                const call = peer.call(participantId, localStream);
+                // Check if peer is in correct state
+                if (peer.disconnected) {
+                    debugLog('⚠️ Peer is disconnected, attempting reconnect first');
+                    peer.reconnect();
+                    setTimeout(function() {
+                        connectToParticipant(participantId, participantName);
+                    }, 2000);
+                    return;
+                }
+
+                var call = peer.call(participantId, localStream);
 
                 if (call) {
+                    debugLog('✅ Call object created for ' + participantId);
+                    
                     // Set a timeout for the connection attempt
-                    const connectionTimeout = setTimeout(() => {
+                    var connectionTimeout = setTimeout(function() {
                         if (!participantConnections.has(participantId)) {
                             debugLog('⏰ Connection timeout for: ' + participantId);
                             if (call && !call.open) {
                                 call.close();
                             }
                         }
-                    }, 10000); // 10 second timeout
+                    }, 12000); // 12 second timeout
 
-                    call.on('stream', (remoteStream) => {
+                    call.on('stream', function(remoteStream) {
                         clearTimeout(connectionTimeout);
-                        debugLog('✅ Connected to participant: ' + participantId);
+                        debugLog('✅ SUCCESS: Received stream from participant: ' + participantId);
                         handleParticipantStream(participantId, remoteStream, call);
                     });
 
-                    call.on('error', (err) => {
+                    call.on('error', function(err) {
                         clearTimeout(connectionTimeout);
-                        debugLog('❌ Participant call error: ' + err.message);
+                        debugLog('❌ Participant call error for ' + participantId + ': ' + err.message);
+                        debugLog('   - Error type: ' + err.type);
 
                         // Remove any partial connection
                         if (participantConnections.has(participantId)) {
@@ -1008,26 +1212,30 @@
                         }
                     });
 
-                    call.on('close', () => {
+                    call.on('close', function() {
                         clearTimeout(connectionTimeout);
                         debugLog('📞 Participant call closed: ' + participantId);
                         removeParticipant(participantId);
                     });
 
                     // Store the connection attempt
-                    participantConnections.set(participantId, { call, stream: null, name: participantName });
+                    participantConnections.set(participantId, { call: call, stream: null, name: participantName });
+                    debugLog('💾 Stored connection attempt for ' + participantId);
 
                 } else {
-                    debugLog('❌ Failed to create call to participant: ' + participantId);
+                    debugLog('❌ Failed to create call object to participant: ' + participantId);
                 }
             } catch (err) {
-                debugLog('❌ Error connecting to participant: ' + err.message);
+                debugLog('❌ Exception in connectToParticipant: ' + err.message);
+                debugLog('   - Stack: ' + err.stack);
             }
         }
 
-        // Remove participant
+        // ENHANCED: Remove participant with proper cleanup
         function removeParticipant(participantId) {
-            const element = document.getElementById(`participant_${participantId}`);
+            var participantName = participantNames.get(participantId) || 'Participant';
+            
+            var element = document.getElementById('participant_' + participantId);
             if (element) {
                 element.remove();
                 debugLog('✅ Removed participant UI element: ' + participantId);
@@ -1038,33 +1246,77 @@
             debugLog('✅ Removed participant from connections: ' + participantId);
 
             // Hide participants section if no more participants
-            const grid = document.getElementById('participantsGrid');
+            var grid = document.getElementById('participantsGrid');
             if (grid && grid.children.length === 0) {
-                const participantsSection = document.querySelector('.other-participants-section');
+                var participantsSection = document.querySelector('.other-participants-section');
                 if (participantsSection) {
                     participantsSection.style.display = 'none';
+                    participantsSection.classList.remove('show');
                 }
             }
 
             // Update status
             if (isConnected) {
-                const remainingCount = participantConnections.size;
+                var remainingCount = participantConnections.size;
                 if (remainingCount > 0) {
-                    updateStatus(`🎉 Connected with expert and ${remainingCount} other participant(s)!`, 'success');
+                    updateStatus('🎉 Connected with expert and ' + remainingCount + ' other participant(s)!', 'success');
                 } else {
                     updateStatus('🎉 Connected with expert! Waiting for other participants...', 'success');
                 }
             }
         }
 
+        // FIXED: Manual discovery function for the refresh button
+        function manualDiscovery() {
+            debugLog('🔄 Manual participant discovery triggered');
+            
+            // FORCE clear the discovery flag to allow immediate discovery
+            isSearchingForParticipants = false;
+            
+            // Clear existing intervals and restart discovery
+            if (participantDiscoveryInterval) {
+                clearInterval(participantDiscoveryInterval);
+            }
+            if (rapidDiscoveryInterval) {
+                clearInterval(rapidDiscoveryInterval);
+            }
+
+            // IMMEDIATE forced discovery
+            setTimeout(function() {
+                discoverParticipants(true);
+            }, 100);
+
+            // Restart rapid discovery for 20 seconds after manual trigger
+            var rapidCount = 0;
+            rapidDiscoveryInterval = setInterval(function() {
+                if (rapidCount < 20 && sessionId && peer && !peer.destroyed) {
+                    debugLog('🔄 Manual rapid discovery... (' + rapidCount + '/20)');
+                    discoverParticipants(true);
+                    rapidCount++;
+                } else {
+                    clearInterval(rapidDiscoveryInterval);
+                    rapidDiscoveryInterval = null;
+                    
+                    debugLog('🔄 Manual discovery complete, resuming normal discovery');
+                    
+                    // Resume normal discovery
+                    participantDiscoveryInterval = setInterval(function() {
+                        if (sessionId && peer && !peer.destroyed) {
+                            discoverParticipants();
+                        }
+                    }, 1500);
+                }
+            }, 1000);
+        }
+
         // Handle network errors
         function handleNetworkError() {
             updateStatus('Network issue detected. Checking connection...', 'info');
 
-            setTimeout(() => {
+            setTimeout(function() {
                 if (!isConnected && connectionRetryCount < maxRetries) {
                     connectionRetryCount++;
-                    debugLog(`Network retry attempt ${connectionRetryCount}/${maxRetries}`);
+                    debugLog('Network retry attempt ' + connectionRetryCount + '/' + maxRetries);
                     createPeerConnection();
                 } else if (connectionRetryCount >= maxRetries) {
                     updateStatus('Unable to establish stable connection. Please check your internet and refresh.', 'error');
@@ -1075,51 +1327,57 @@
         // Control functions
         function toggleMute() {
             if (localStream) {
-                const audioTracks = localStream.getAudioTracks();
-                audioTracks.forEach(track => {
+                var audioTracks = localStream.getAudioTracks();
+                audioTracks.forEach(function(track) {
                     track.enabled = !track.enabled;
                 });
 
-                const muteBtn = document.getElementById('muteBtn');
+                var muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
-                    muteBtn.textContent = audioTracks[0]?.enabled ? '🎤 Mute' : '🔊 Unmute';
+                    muteBtn.textContent = audioTracks[0] && audioTracks[0].enabled ? '🎤 Mute' : '🔊 Unmute';
                 }
             }
         }
 
         function toggleVideo() {
             if (localStream) {
-                const videoTracks = localStream.getVideoTracks();
-                videoTracks.forEach(track => {
+                var videoTracks = localStream.getVideoTracks();
+                videoTracks.forEach(function(track) {
                     track.enabled = !track.enabled;
                 });
 
-                const videoBtn = document.getElementById('videoBtn');
+                var videoBtn = document.getElementById('videoBtn');
                 if (videoBtn) {
-                    videoBtn.textContent = videoTracks[0]?.enabled ? '📹 Video Off' : '📹 Video On';
+                    videoBtn.textContent = videoTracks[0] && videoTracks[0].enabled ? '📹 Video Off' : '📹 Video On';
                 }
             }
         }
 
-        // End call function
+        // ENHANCED: End call function with proper cleanup
         function endCall() {
             debugLog('Ending call...');
 
-            // Clear participant discovery interval
+            // Clear all intervals
             if (participantDiscoveryInterval) {
                 clearInterval(participantDiscoveryInterval);
                 participantDiscoveryInterval = null;
             }
+            if (rapidDiscoveryInterval) {
+                clearInterval(rapidDiscoveryInterval);
+                rapidDiscoveryInterval = null;
+            }
 
             if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
+                localStream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
             }
 
             if (expertCall) {
                 expertCall.close();
             }
 
-            participantConnections.forEach((connection) => {
+            participantConnections.forEach(function(connection) {
                 if (connection.call) {
                     connection.call.close();
                 }
@@ -1139,7 +1397,7 @@
             document.getElementById('phoneInput').value = '';
             document.getElementById('phoneInput').style.display = 'block';
 
-            const participantsSection = document.querySelector('.other-participants-section');
+            var participantsSection = document.querySelector('.other-participants-section');
             if (participantsSection) {
                 participantsSection.remove();
             }
@@ -1149,6 +1407,8 @@
             isConnected = false;
             connectionRetryCount = 0;
             lastParticipantCheck = [];
+            participantSectionCreated = false;
+            isSearchingForParticipants = false;
 
             updateStatus('Call ended. You can start a new session above.', 'info');
         }
@@ -1157,7 +1417,7 @@
         function updateStatus(message, type) {
             debugLog('Status (' + type + '): ' + message);
 
-            const statusLabel = document.getElementById('<%= lblStatus.ClientID %>');
+            var statusLabel = document.getElementById('<%=lblStatus.ClientID%>');
             if (statusLabel) {
                 statusLabel.textContent = message;
                 statusLabel.className = 'status-message ' + type;
@@ -1165,25 +1425,25 @@
         }
 
         function getSessionId() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionFromUrl = urlParams.get('sessionId');
+            var urlParams = new URLSearchParams(window.location.search);
+            var sessionFromUrl = urlParams.get('sessionId');
             if (sessionFromUrl) return sessionFromUrl;
-            
-            const sessionField = document.getElementById('<%= hdnSessionId.ClientID %>');
+
+            var sessionField = document.getElementById('<%=hdnSessionId.ClientID%>');
             if (sessionField && sessionField.value) return sessionField.value;
-            
+
             return null;
         }
 
         function getCustomerPhone() {
-            const phoneField = document.getElementById('<%= hdnCustomerPhone.ClientID %>') || 
-                              document.getElementById('<%= hdnUserPhone.ClientID %>');
+            var phoneField = document.getElementById('<%=hdnCustomerPhone.ClientID%>') ||
+                document.getElementById('<%=hdnUserPhone.ClientID%>');
             if (phoneField && phoneField.value) return phoneField.value;
 
             return '';
         }
 
-        // Cleanup on page unload
+        // ENHANCED: Cleanup on page unload
         window.onbeforeunload = function () {
             debugLog('Page unloading, cleaning up...');
 
@@ -1191,8 +1451,14 @@
                 clearInterval(participantDiscoveryInterval);
             }
 
+            if (rapidDiscoveryInterval) {
+                clearInterval(rapidDiscoveryInterval);
+            }
+
             if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
+                localStream.getTracks().forEach(function (track) {
+                    track.stop();
+                });
             }
 
             if (peer && !peer.destroyed) {
