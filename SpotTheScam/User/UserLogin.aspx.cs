@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Web.Configuration;
+using SpotTheScam.Utils;
 
 namespace SpotTheScam
 {
@@ -9,7 +10,15 @@ namespace SpotTheScam
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (!IsPostBack)
+            {
+                var reset = Request.QueryString["reset"];
+                if (!string.IsNullOrEmpty(reset) && reset.Equals("success", StringComparison.OrdinalIgnoreCase))
+                {
+                    lblMessage.ForeColor = Color.Green;
+                    lblMessage.Text = "Your password has been reset. Please log in.";
+                }
+            }
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
@@ -57,8 +66,31 @@ namespace SpotTheScam
 
                             if (!isVerified)
                             {
-                                lblMessage.ForeColor = Color.Red;
-                                lblMessage.Text = "Please verify your email to continue. Check your inbox for the verification code.";
+                                reader.Close();
+
+                                // Check if an active OTP exists
+                                bool hasActiveOtp = false;
+                                using (var check = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Email=@e AND VerifyCode IS NOT NULL AND VerifyCodeExpiresAt > GETUTCDATE()", con))
+                                {
+                                    check.Parameters.AddWithValue("@e", email);
+                                    hasActiveOtp = ((int)check.ExecuteScalar()) > 0;
+                                }
+
+                                // If no active code, generate a new one and send
+                                if (!hasActiveOtp)
+                                {
+                                    var otp = new Random().Next(100000, 999999).ToString();
+                                    using (var set = new SqlCommand("UPDATE Users SET VerifyCode=@c, VerifyCodeExpiresAt=@exp WHERE Email=@e AND Verify=0", con))
+                                    {
+                                        set.Parameters.AddWithValue("@c", otp);
+                                        set.Parameters.AddWithValue("@exp", DateTime.UtcNow.AddMinutes(10));
+                                        set.Parameters.AddWithValue("@e", email);
+                                        set.ExecuteNonQuery();
+                                    }
+                                    try { EmailService.Send(email, "Your Spot The Scam verification code", $"<p>Your verification code is:</p><h2>{otp}</h2><p>This code expires in 10 minutes.</p>"); } catch { }
+                                }
+
+                                Response.Redirect("VerifyEmail.aspx?email=" + Server.UrlEncode(email));
                                 return;
                             }
 

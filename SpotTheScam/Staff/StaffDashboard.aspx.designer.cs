@@ -40,5 +40,40 @@ namespace SpotTheScam.Staff
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder phPleaseLogin;
+
+        /// <summary>
+        /// ddlRange control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.DropDownList ddlRange;
+
+        /// <summary>
+        /// btnApply control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnApply;
+
+        /// <summary>
+        /// lblMessage control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblMessage;
+
+        /// <summary>
+        /// gvTopTypes control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvTopTypes;
+
+        /// <summary>
+        /// gvTopChannels control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvTopChannels;
+
+        /// <summary>
+        /// gvGaps control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvGaps;
+
+        /// <summary>
+        /// lblGapsHint control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblGapsHint;
     }
 }

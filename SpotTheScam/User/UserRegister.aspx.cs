@@ -2,6 +2,8 @@
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Web.Configuration;
+using System.Web;
+using SpotTheScam.Utils;
 
 namespace SpotTheScam
 {
@@ -53,8 +55,8 @@ namespace SpotTheScam
                         }
                     }
 
-                    // Step 2: If no existing user, insert the new user record as NOT verified with active status and OTP code
-                    string insertQuery = "INSERT INTO Users (Username, Email, Password, Role, Verify, Status, VerifyCode) VALUES (@Username, @Email, @Password, @Role, @Verify, @Status, @VerifyCode)";
+                    // Step 2: If no existing user, insert the new user record as NOT verified with active status and OTP code and expiry
+                    string insertQuery = "INSERT INTO Users (Username, Email, Password, Role, Verify, Status, VerifyCode, VerifyCodeExpiresAt) VALUES (@Username, @Email, @Password, @Role, @Verify, @Status, @VerifyCode, @VerifyCodeExpiresAt)";
                     using (SqlCommand cmd = new SqlCommand(insertQuery, con))
                     {
                         cmd.Parameters.AddWithValue("@Username", username);
@@ -66,16 +68,20 @@ namespace SpotTheScam
                         // Simple 6-digit OTP; replace with stronger generator if needed
                         var otp = new Random().Next(100000, 999999).ToString();
                         cmd.Parameters.AddWithValue("@VerifyCode", otp);
+                        // Expire in 10 minutes
+                        cmd.Parameters.AddWithValue("@VerifyCodeExpiresAt", DateTime.UtcNow.AddMinutes(10));
 
                         cmd.ExecuteNonQuery();
 
-                        lblMessage.ForeColor = Color.Green;
-                        lblMessage.Text = "Account created. Please check your email for the verification code to activate your account.";
-                        btnRegister.Enabled = false;
+                        // Send OTP email
+                        try { EmailService.Send(email, "Your Spot The Scam verification code", $"<p>Your verification code is:</p><h2>{otp}</h2><p>This code expires in 10 minutes.</p>"); } catch { }
+
+                        // Redirect to verification page with email prefilled
+                        Response.Redirect("VerifyEmail.aspx?email=" + HttpUtility.UrlEncode(email));
                     }
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // In case of a database error, show a generic error message.
                     lblMessage.ForeColor = Color.Red;

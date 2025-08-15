@@ -128,6 +128,9 @@
             <div class="register-link">
                 Don't have an account? <a href="UserRegister.aspx">Sign Up </a>
             </div>
+            <div class="register-link">
+                <a href="ForgotPassword.aspx">Forgot your password?</a>
+            </div>
         </div>
     </div>
 </asp:Content>

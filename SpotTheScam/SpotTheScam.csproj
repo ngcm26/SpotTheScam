@@ -228,8 +228,11 @@
     <Content Include="User\UserProfile.aspx" />
     <Content Include="User\UserTransactionLogs.aspx" />
     <Content Include="User\UserWebinarRegistration.aspx" />
+    <Content Include="User\VerifyEmail.aspx" />
     <Content Include="User\UserWebinarSessionListing.aspx" />
     <Content Include="User\ExpertWebinarHomepage.aspx" />
+    <Content Include="User\ForgotPassword.aspx" />
+    <Content Include="User\ResetPassword.aspx" />
     <Content Include="Staff\ManageUsers.aspx" />
     <Content Include="Staff\StaffDashboard.aspx" />
     <Content Include="Staff\StaffLogout.aspx" />
@@ -667,7 +670,29 @@
     <Compile Include="User\WebinarRegistrationSuccess.aspx.designer.cs">
       <DependentUpon>WebinarRegistrationSuccess.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\VerifyEmail.aspx.cs">
+      <DependentUpon>VerifyEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\VerifyEmail.aspx.designer.cs">
+      <DependentUpon>VerifyEmail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ForgotPassword.aspx.cs">
+      <DependentUpon>ForgotPassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ForgotPassword.aspx.designer.cs">
+      <DependentUpon>ForgotPassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\ResetPassword.aspx.cs">
+      <DependentUpon>ResetPassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\ResetPassword.aspx.designer.cs">
+      <DependentUpon>ResetPassword.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Utils\WhitelistHelper.cs" />
+    <Compile Include="Utils\EmailService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Staff\Staff.Master" />
