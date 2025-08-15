@@ -196,6 +196,7 @@
     <Content Include="Staff\StaffManageSessions.aspx" />
     <Content Include="Staff\StaffVideoCall.aspx" />
     <Content Include="Staff\ViewModules.aspx" />
+    <Content Include="Staff\TrendAnalytics.aspx" />
     <Content Include="User\AcceptInvite.aspx" />
     <Content Include="User\AddTransactions.aspx" />
     <Content Include="User\ConnectBank.aspx" />
@@ -585,6 +586,13 @@
     </Compile>
     <Compile Include="Staff\StaffLogout.aspx.designer.cs">
       <DependentUpon>StaffLogout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\TrendAnalytics.aspx.cs">
+      <DependentUpon>TrendAnalytics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\TrendAnalytics.aspx.designer.cs">
+      <DependentUpon>TrendAnalytics.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\UserHome.aspx.cs">
       <DependentUpon>UserHome.aspx</DependentUpon>

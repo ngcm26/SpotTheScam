@@ -90,6 +90,7 @@
                             <li class="nav-item"><a class="nav-link" href="StaffVideoCall.aspx">Staff Video Call</a></li>
                             <li class="nav-item"><a class="nav-link" href="StaffManageSessions.aspx">Manage Sessions</a></li>
                             <li class="nav-item"><a class="nav-link" href="ViewModules.aspx">Modules</a></li>
+                            <li class="nav-item"><a class="nav-link" href="TrendAnalytics.aspx">Trend Radar</a></li>
                             <li class="nav-item"><a class="nav-link btn btn-sm btn-danger text-white ms-2" href="StaffLogout.aspx">Logout</a></li>
                         </asp:PlaceHolder>
                     </ul>

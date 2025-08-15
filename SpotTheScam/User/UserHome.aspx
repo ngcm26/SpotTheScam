@@ -387,6 +387,37 @@
                 font-size: 1rem;
             }
         </style>
+
+        <!-- Trend Radar -->
+        <div class="container mt-5" style="max-width: 900px;">
+            <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <h3 style="color:#D36F2D;margin-bottom:8px;">Trend Radar (last 7 days)</h3>
+                <canvas id="trendChart" height="110"></canvas>
+                <ul style="margin-top:10px;">
+                    <% foreach (var t in topTrends) { %>
+                        <li><%= t.Label %> — <%= t.Count %></li>
+                    <% } %>
+                </ul>
+                <% if (!string.IsNullOrEmpty(suggestedUrl)) { %>
+                    <a class="btn btn-primary" href="<%= ResolveUrl(suggestedUrl) %>">Recommended module</a>
+                <% } %>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            (function(){
+                var labels = <%= chartLabelsJson %>;
+                var data = <%= chartDataJson %>;
+                var ctx = document.getElementById('trendChart');
+                if (ctx && labels && data) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: labels, datasets: [{ label: 'Scans', data: data, backgroundColor: '#D36F2D' }] },
+                        options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    });
+                }
+            })();
+        </script>
     </asp:PlaceHolder>
 
     <!-- Hero section shown if user is NOT logged in -->
