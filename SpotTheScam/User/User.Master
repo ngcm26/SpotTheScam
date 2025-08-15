@@ -170,17 +170,19 @@
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button">Account & Family Management</a>
-                            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="UserTransactionLogs.aspx">Transaction Logs</a></li>
-                                <!-- replace this block inside the Account & Family Management dropdown -->
+                            <a class="nav-link dropdown-toggle" href="#" id="familyHubDropdown" role="button">Family Hub</a>
+                            <ul class="dropdown-menu" aria-labelledby="familyHubDropdown">
                                 <li>
-                                    <a href="<%= ResolveUrl("~/User/Invites.aspx") %>">My Invites
-                                        <asp:Literal ID="litInviteCount" runat="server" />
+                                    <a class="dropdown-item" href="UserTransactionLogs.aspx">Transaction Logs</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<%= ResolveUrl("~/User/Invites.aspx") %>">Invites
+                <asp:Literal ID="litInviteCount" runat="server" />
                                     </a>
                                 </li>
                             </ul>
                         </li>
+
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="expertWebinarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Expert Webinar Session
@@ -302,36 +304,6 @@
         </footer>
 
         <!-- Offcanvas Family Hub -->
-        <asp:PlaceHolder ID="phFamilyHub" runat="server" Visible="false">
-            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFamilyHub" aria-labelledby="offcanvasFamilyHubLabel">
-                <div class="offcanvas-header">
-                    <h5 id="offcanvasFamilyHubLabel">Family Hub</h5>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <a href="MyGroups.aspx">My Groups</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="CreateGroup.aspx">Create Group</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="Invites.aspx">Invites</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="ConnectBank.aspx">Connect Bank</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="AddTransactions.aspx">Add Transactions</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="UserTransactionLogs.aspx">Transaction Logs</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </asp:PlaceHolder>
 
 
 
