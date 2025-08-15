@@ -104,6 +104,7 @@
                     <asp:TemplateField HeaderText="Actions">
                         <ItemTemplate>
                             <span class="inline-actions">
+                                <asp:HyperLink ID="hlView" runat="server" Text="View Accounts" />
                                 <asp:LinkButton ID="lnkRestrict" runat="server" CommandName="Restrict"
                                     CommandArgument='<%# Eval("UserId") %>' Text="Set Restrictions" />
                                 <asp:LinkButton ID="lnkRemove" runat="server" CommandName="Remove"

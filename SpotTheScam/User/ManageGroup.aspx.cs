@@ -165,6 +165,20 @@ namespace SpotTheScam.User
                     if (li != null) { ddlRoleRow.ClearSelection(); li.Selected = true; }
                 }
             }
+
+            var hlView = (HyperLink)e.Row.FindControl("hlView");
+            if (hlView != null)
+            {
+                bool canView = (MyRole == "GroupOwner" || MyRole == "Guardian")
+                               && role == "Primary" && status == "Active";
+                hlView.Visible = canView;
+                if (canView)
+                {
+                    int uid = Convert.ToInt32(drv["UserId"]);
+                    hlView.NavigateUrl = $"~/User/MemberAccounts.aspx?groupId={GroupId}&userId={uid}";
+                }
+            }
+
         }
 
         protected void gvMembers_RowCommand(object sender, GridViewCommandEventArgs e)

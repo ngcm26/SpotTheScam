@@ -208,6 +208,8 @@
     <Content Include="User\JoinSession.aspx" />
     <Content Include="User\LinkChecker.aspx" />
     <Content Include="User\ManageGroup.aspx" />
+    <Content Include="User\MemberAccounts.aspx" />
+    <Content Include="User\MemberTransactionLogs.aspx" />
     <Content Include="User\ModuleInformation.aspx" />
     <Content Include="User\MyGroups.aspx" />
     <Content Include="User\PhoneScamsQuiz.aspx" />
@@ -425,6 +427,20 @@
     </Compile>
     <Compile Include="User\ManageGroup.aspx.designer.cs">
       <DependentUpon>ManageGroup.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\MemberAccounts.aspx.cs">
+      <DependentUpon>MemberAccounts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\MemberAccounts.aspx.designer.cs">
+      <DependentUpon>MemberAccounts.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\MemberTransactionLogs.aspx.cs">
+      <DependentUpon>MemberTransactionLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\MemberTransactionLogs.aspx.designer.cs">
+      <DependentUpon>MemberTransactionLogs.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ModuleInformation.aspx.cs">
       <DependentUpon>ModuleInformation.aspx</DependentUpon>
