@@ -84,6 +84,8 @@
             border-color: var(--brand-orange);
             color: var(--brand-navy);
             font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 14px;
         }
 
             .btn-outline-dark:hover {
@@ -93,11 +95,16 @@
 
         .btn-warning {
             background-color: var(--brand-orange);
-            border: none;
+            border-color: var(--brand-orange);
+            color: #fff;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 700;
         }
 
             .btn-warning:hover {
                 background-color: #b45a22;
+                border-color: #b45a22;
             }
 
         footer {
