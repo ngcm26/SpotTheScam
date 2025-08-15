@@ -47,7 +47,6 @@
           </asp:TemplateField>
         </Columns>
       </asp:GridView>
-
       <div style="margin-top:16px">
         <a class="btn" href='<%# "~/User/MemberAccounts.aspx?groupId=" + Request["groupId"] + "&userId=" + Request["userId"] %>'>Back to accounts</a>
       </div>

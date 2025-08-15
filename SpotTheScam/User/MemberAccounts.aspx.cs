@@ -17,16 +17,22 @@ namespace SpotTheScam.User
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserId"] == null) { Response.Redirect("~/User/UserLogin.aspx"); return; }
-            if (GroupId <= 0 || MemberUserId <= 0) { Show("Missing parameters.", false); return; }
+            if (GroupId <= 0 || MemberUserId <= 0) {
+                Show("Missing parameters.", false); 
+                gvAccounts.Visible = false;
+                return;
+            }
+
 
             if (!IsPostBack)
             {
                 int viewer = Convert.ToInt32(Session["UserId"]);
 
                 if (!ViewerIsGuardianOrOwner(viewer, GroupId) || !TargetIsActivePrimary(MemberUserId, GroupId))
-                { Show("You do not have permission to view this member.", false); return; }
+                { Show("You do not have permission to view this member.", false); gvAccounts.Visible = false; return; }
 
                 lblMember.Text = GetUsername(MemberUserId);
+                hlBack.NavigateUrl = $"~/User/ManageGroup.aspx?groupId={GroupId}";
                 BindAccounts();
             }
         }
