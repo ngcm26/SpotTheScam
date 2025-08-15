@@ -1,14 +1,63 @@
 ﻿<%@ Page Title="Staff Dashboard" Language="C#" MasterPageFile="Staff.master" AutoEventWireup="true" CodeBehind="StaffDashboard.aspx.cs" Inherits="SpotTheScam.Staff.StaffDashboard" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server"></asp:Content>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <style>
+        .filter-btn { background:#D36F2D; color:#fff; padding:8px 14px; border-radius:8px; text-decoration:none; border:none; cursor:pointer; }
+    </style>
+</asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <!-- Shown if logged in -->
     <asp:PlaceHolder ID="phDashboard" runat="server" Visible="false">
-        <h1 class="mb-4">Welcome, <asp:Label ID="lblStaffName" runat="server" /></h1>
-        <p class="lead">This is your staff dashboard. Choose an action:</p>
-        <a href="ManageUsers.aspx" class="btn btn-primary btn-lg me-2">Manage Users</a>
-        <a href="StaffLogout.aspx" class="btn btn-danger btn-lg">Logout</a>
+        <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1 class="mb-1" style="color:#C46A1D; font-weight:600;">Welcome, <asp:Label ID="lblStaffName" runat="server" /></h1>
+                <div style="color:#344054;">Weekly insights from user scans. Use this to plan new modules and quizzes.</div>
+            </div>
+        </div>
+
+        <div class="filter-bar" style="display:flex; gap:10px; align-items:center; margin-bottom:14px;">
+            <label for="ddlRange">Range</label>
+            <asp:DropDownList ID="ddlRange" runat="server">
+                <asp:ListItem Text="Last 7 days" Value="7" Selected="True" />
+                <asp:ListItem Text="Last 30 days" Value="30" />
+            </asp:DropDownList>
+            <asp:Button ID="btnApply" runat="server" Text="Apply" CssClass="filter-btn" OnClick="btnApply_Click" />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+        </div>
+
+        <div class="cards" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+            <div class="card" style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <h3 style="margin:0 0 10px 0; color:#051D40; font-size:1.1rem;">Top Scam Types</h3>
+                <asp:GridView ID="gvTopTypes" runat="server" AutoGenerateColumns="False" CssClass="table" GridLines="None" ShowHeaderWhenEmpty="true">
+                    <Columns>
+                        <asp:BoundField DataField="scam_type" HeaderText="Scam Type" />
+                        <asp:BoundField DataField="cnt" HeaderText="Count" />
+                    </Columns>
+                </asp:GridView>
+            </div>
+
+            <div class="card" style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <h3 style="margin:0 0 10px 0; color:#051D40; font-size:1.1rem;">Top Channels</h3>
+                <asp:GridView ID="gvTopChannels" runat="server" AutoGenerateColumns="False" CssClass="table" GridLines="None" ShowHeaderWhenEmpty="true">
+                    <Columns>
+                        <asp:BoundField DataField="channel" HeaderText="Channel" />
+                        <asp:BoundField DataField="cnt" HeaderText="Count" />
+                    </Columns>
+                </asp:GridView>
+            </div>
+
+            <div class="card" style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <h3 style="margin:0 0 10px 0; color:#051D40; font-size:1.1rem;">Opportunities (No Module Mapping Yet)</h3>
+                <asp:GridView ID="gvGaps" runat="server" AutoGenerateColumns="False" CssClass="table" GridLines="None" ShowHeaderWhenEmpty="true">
+                    <Columns>
+                        <asp:BoundField DataField="scam_type" HeaderText="Scam Type" />
+                        <asp:BoundField DataField="cnt" HeaderText="Count" />
+                    </Columns>
+                </asp:GridView>
+                <asp:Label ID="lblGapsHint" runat="server" CssClass="empty" />
+            </div>
+        </div>
     </asp:PlaceHolder>
 
     <!-- Shown if NOT logged in -->

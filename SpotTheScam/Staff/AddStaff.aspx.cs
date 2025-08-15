@@ -62,7 +62,7 @@ namespace SpotTheScam.Staff
                         }
                     }
 
-                    using (var cmd = new SqlCommand("INSERT INTO Users (Username, Email, PhoneNumber, Role, Password) VALUES (@u, @e, @p, 'staff', @pwd)", conn))
+                    using (var cmd = new SqlCommand("INSERT INTO Users (Username, Email, PhoneNumber, Role, Password, Verify, Status, VerifyCode, VerifyCodeExpiresAt) VALUES (@u, @e, @p, 'staff', @pwd, 1, 'active', NULL, NULL)", conn))
                     {
                         cmd.Parameters.AddWithValue("@u", username);
                         cmd.Parameters.AddWithValue("@e", email);

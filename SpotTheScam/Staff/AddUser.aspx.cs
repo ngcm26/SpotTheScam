@@ -63,8 +63,8 @@ namespace SpotTheScam.Staff
                                 }
                             }
                         }
-                        // Insert new user
-                        string query = "INSERT INTO Users (Username, Email, PhoneNumber, Role, Password) VALUES (@Username, @Email, @PhoneNumber, @Role, @Password)";
+                        // Insert new user (auto-verified, active, with no OTP)
+                        string query = "INSERT INTO Users (Username, Email, PhoneNumber, Role, Password, Verify, Status, VerifyCode, VerifyCodeExpiresAt) VALUES (@Username, @Email, @PhoneNumber, @Role, @Password, @Verify, @Status, @VerifyCode, @VerifyCodeExpiresAt)";
                         using (SqlCommand cmd = new SqlCommand(query, conn))
                         {
                             cmd.Parameters.AddWithValue("@Username", username);
@@ -72,6 +72,10 @@ namespace SpotTheScam.Staff
                             cmd.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
                             cmd.Parameters.AddWithValue("@Role", role);
                             cmd.Parameters.AddWithValue("@Password", password);
+                            cmd.Parameters.AddWithValue("@Verify", 1);
+                            cmd.Parameters.AddWithValue("@Status", "active");
+                            cmd.Parameters.AddWithValue("@VerifyCode", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@VerifyCodeExpiresAt", (object)DBNull.Value);
                             cmd.ExecuteNonQuery();
                         }
                     }
