@@ -92,6 +92,37 @@ namespace SpotTheScam.User
                 }
             }
         }
+        private string GetTimeAgo(DateTime dateTime)
+        {
+            TimeSpan timeSpan = DateTime.Now - dateTime;
+
+            if (timeSpan.TotalSeconds < 60)
+                return $"{Math.Floor(timeSpan.TotalSeconds)} seconds ago";
+            if (timeSpan.TotalMinutes < 60)
+                return $"{Math.Floor(timeSpan.TotalMinutes)} minutes ago";
+            if (timeSpan.TotalHours < 24)
+                return $"{Math.Floor(timeSpan.TotalHours)} hours ago";
+            if (timeSpan.TotalDays < 30)
+                return $"{Math.Floor(timeSpan.TotalDays)} days ago";
+            if (timeSpan.TotalDays < 365)
+                return $"{Math.Floor(timeSpan.TotalDays / 30)} months ago";
+
+            return $"{Math.Floor(timeSpan.TotalDays / 365)} years ago";
+        }
+        protected void rptDiscussions_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                Label lblCreatedAt = (Label)e.Item.FindControl("lblCreatedAt");
+                if (lblCreatedAt != null)
+                {
+                    DateTime createdAt = Convert.ToDateTime(DataBinder.Eval(e.Item.DataItem, "CreatedAt"));
+                    lblCreatedAt.Text = GetTimeAgo(createdAt);
+                }
+            }
+        }
+
+
 
     }
 }

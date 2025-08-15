@@ -203,6 +203,7 @@
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\CreateGroup.aspx" />
     <Content Include="User\ForumPage.aspx" />
+    <Content Include="User\IndividualBlogUser.aspx" />
     <Content Include="User\IndividualForum.aspx" />
     <Content Include="User\Invites.aspx" />
     <Content Include="User\JoinSession.aspx" />
@@ -392,6 +393,13 @@
     </Compile>
     <Compile Include="User\ForumPage.aspx.designer.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\IndividualBlogUser.aspx.cs">
+      <DependentUpon>IndividualBlogUser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\IndividualBlogUser.aspx.designer.cs">
+      <DependentUpon>IndividualBlogUser.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\IndividualForum.aspx.cs">
       <DependentUpon>IndividualForum.aspx</DependentUpon>
