@@ -406,16 +406,16 @@
 
         <!-- Video Call Interface -->
         <div id="videoCallInterface" class="video-container">
-            <h3 style="color: #051D40; margin-bottom: 20px;">📹 Active Video Session</h3>
+            <h3 style="color: #051D40; margin-bottom: 20px;">Active Video Session</h3>
             
             <!-- Expert Video (Always Visible) -->
             <div class="expert-video-section">
                 <div class="expert-video">
-                    <h4>🎯 You (Expert)</h4>
+                    <h4>Your Screen</h4>
                     <video id="localVideo" autoplay="autoplay" muted="muted" playsinline="playsinline"></video>
                     <div class="video-controls">
-                        <button type="button" onclick="toggleMute()" id="muteBtn">🎤 Mute</button>
-                        <button type="button" onclick="toggleVideo()" id="videoBtn">📹 Video</button>
+                        <button type="button" onclick="toggleMute()" id="muteBtn">Mute</button>
+                        <button type="button" onclick="toggleVideo()" id="videoBtn">Video</button>
                     </div>
                 </div>
             </div>
@@ -432,7 +432,7 @@
 
         <!-- Control Panel -->
         <div class="control-panel">
-            <h3 style="color: #051D40; margin-bottom: 20px;">📞 Video Controls</h3>
+            <h3 style="color: #051D40; margin-bottom: 20px;">Video Controls</h3>
             
             <div class="control-buttons">
                 <button type="button" class="btn-control" onclick="connectToAllParticipants()">
