@@ -509,7 +509,7 @@ namespace SpotTheScam.User
                                 UpdateSessionParticipantCount(conn, sessionId);
                                 System.Diagnostics.Debug.WriteLine($"✅ Session participant count updated");
 
-                                ShowSuccessMessage("Registration successful! You will receive a confirmation email shortly.");
+                                ShowSuccessMessage("Registration successful! You will receive webinar details shortly.");
 
                                 // Refresh points display after successful registration
                                 LoadUserCurrentPoints();

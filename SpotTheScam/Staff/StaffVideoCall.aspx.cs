@@ -305,6 +305,129 @@ namespace SpotTheScam.Staff
             }
         }
 
+        // NEW: Web method for getting updated participants list - for auto-refresh functionality
+        [WebMethod]
+        public static string GetUpdatedParticipantsList(int sessionId)
+        {
+            try
+            {
+                var participants = new List<object>();
+
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
+                {
+                    conn.Open();
+
+                    // ENHANCED: Query with real-time participant data and better name resolution
+                    string query = @"
+                        SELECT 
+                            vcb.UserId,
+                            CASE 
+                                WHEN vcb.CustomerName IS NOT NULL AND LEN(TRIM(vcb.CustomerName)) > 0 
+                                     AND vcb.CustomerName NOT LIKE 'Participant %'
+                                THEN vcb.CustomerName
+                                WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
+                                THEN vcb.FirstName + ' ' + vcb.LastName
+                                WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                                     AND u.Username NOT LIKE 'test%' AND LEN(TRIM(u.Username)) > 2
+                                THEN u.Username
+                                WHEN u.Email IS NOT NULL AND u.Email NOT LIKE 'participant%@%'
+                                     AND u.Email NOT LIKE 'test%@%' AND u.Email LIKE '%@%.%'
+                                THEN CASE 
+                                    WHEN CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) > 0
+                                    THEN UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) - 2)) + ' ' +
+                                         UPPER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 1, 1)) +
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 2, 50))
+                                    ELSE UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 50))
+                                END
+                                ELSE 'Participant ' + RIGHT('000' + CAST(ISNULL(vcb.UserId, 1) as VARCHAR), 3)
+                            END as CustomerName,
+                            
+                            CASE 
+                                WHEN vcb.CustomerEmail IS NOT NULL AND LEN(TRIM(vcb.CustomerEmail)) > 0 
+                                THEN vcb.CustomerEmail
+                                WHEN u.Email IS NOT NULL 
+                                THEN u.Email
+                                ELSE 'participant' + CAST(vcb.UserId as VARCHAR) + '@example.com'
+                            END as CustomerEmail,
+                            
+                            CASE 
+                                WHEN vcb.CustomerPhone IS NOT NULL AND LEN(TRIM(vcb.CustomerPhone)) > 0 
+                                THEN vcb.CustomerPhone
+                                WHEN u.PhoneNumber IS NOT NULL 
+                                THEN u.PhoneNumber
+                                ELSE '12345678'
+                            END as CustomerPhone,
+                            
+                            vcb.BookingDate,
+                            ISNULL(vcb.PointsUsed, 0) as PointsUsed,
+                            vcb.BookingStatus,
+                            CASE 
+                                WHEN vcb.ScamConcerns IS NOT NULL AND LEN(TRIM(vcb.ScamConcerns)) > 0 
+                                THEN vcb.ScamConcerns
+                                WHEN vcb.MainSecurityConcerns IS NOT NULL 
+                                THEN vcb.MainSecurityConcerns
+                                ELSE 'General consultation'
+                            END as ScamConcerns,
+                            vcb.SessionId
+                        FROM VideoCallBookings vcb
+                        LEFT JOIN Users u ON vcb.UserId = u.Id
+                        WHERE vcb.SessionId = @SessionId 
+                        AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
+                        ORDER BY vcb.BookingDate DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@SessionId", sessionId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                participants.Add(new
+                                {
+                                    name = reader["CustomerName"].ToString(),
+                                    phone = reader["CustomerPhone"].ToString(),
+                                    email = reader["CustomerEmail"].ToString(),
+                                    bookingDate = reader["BookingDate"].ToString(),
+                                    scamConcerns = reader["ScamConcerns"].ToString(),
+                                    bookingStatus = reader["BookingStatus"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+
+                var result = new
+                {
+                    success = true,
+                    participants = participants,
+                    timestamp = DateTime.Now.ToString("HH:mm:ss")
+                };
+
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error getting updated participants list: {ex.Message}");
+
+                var result = new
+                {
+                    success = false,
+                    participants = new List<object>(),
+                    message = "Error: " + ex.Message,
+                    timestamp = DateTime.Now.ToString("HH:mm:ss")
+                };
+
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+        }
+
         // Web method for getting participant updates
         [WebMethod]
         public static string GetParticipantUpdates(int sessionId)
@@ -418,7 +541,7 @@ namespace SpotTheScam.Staff
             }
         }
 
-        // ENHANCED: Web method for getting participant real names with aggressive retry mechanism
+        // ENHANCED: Web method for getting participant real names with aggressive retry mechanism and better caching
         [WebMethod]
         public static string GetParticipantRealName(int sessionId, string phoneNumber)
         {
@@ -462,7 +585,8 @@ namespace SpotTheScam.Staff
                             u.Email,
                             u.Username,
                             u.FirstName,
-                            u.LastName
+                            u.LastName,
+                            vcb.BookingDate
                         FROM VideoCallBookings vcb
                         LEFT JOIN Users u ON vcb.UserId = u.Id
                         WHERE vcb.SessionId = @SessionId 
@@ -485,6 +609,12 @@ namespace SpotTheScam.Staff
                                 string username = reader["Username"]?.ToString();
                                 string firstName = reader["FirstName"]?.ToString();
                                 string lastName = reader["LastName"]?.ToString();
+
+                                System.Diagnostics.Debug.WriteLine($"🔍 Name resolution for {phoneNumber}:");
+                                System.Diagnostics.Debug.WriteLine($"  - ParticipantName: {participantName}");
+                                System.Diagnostics.Debug.WriteLine($"  - FirstName: {firstName}, LastName: {lastName}");
+                                System.Diagnostics.Debug.WriteLine($"  - Username: {username}");
+                                System.Diagnostics.Debug.WriteLine($"  - CustomerEmail: {customerEmail}, UserEmail: {userEmail}");
 
                                 // If we have a good name, use it
                                 if (!string.IsNullOrEmpty(participantName))

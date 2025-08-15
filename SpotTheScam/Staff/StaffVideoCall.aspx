@@ -497,7 +497,7 @@
     </div>
 
     <script type="text/javascript">
-        // FIXED: Expert Video Call System with Proper Connection Management
+        // FIXED: Expert Video Call System with Enhanced Name Resolution and Auto-Refresh
         let peer;
         let localStream;
         let connections = new Map();
@@ -506,6 +506,8 @@
         let isConnectionActive = false;
         let sessionStartTime = null;
         let statusUpdateInterval = null;
+        let participantListRefreshInterval = null; // NEW: Auto-refresh participant list
+        let pendingNameResolutions = new Map(); // NEW: Track pending name resolutions
 
         function debugLog(message) {
             console.log('🔍 STAFF DEBUG:', message);
@@ -535,6 +537,9 @@
 
             // Start status updates
             statusUpdateInterval = setInterval(updateParticipantStatuses, 5000);
+
+            // NEW: Start auto-refresh of participant list every 10 seconds
+            participantListRefreshInterval = setInterval(refreshRegisteredParticipantsList, 10000);
         };
 
         // FIXED: Initialize expert video system
@@ -622,7 +627,7 @@
             }
         }
 
-        // FIXED: Handle incoming calls from participants with better duplicate prevention
+        // FIXED: Handle incoming calls from participants with enhanced name resolution
         function handleIncomingCall(call) {
             const participantId = call.peer;
             debugLog('Handling incoming call from: ' + participantId);
@@ -663,7 +668,7 @@
             connections.set(participantId, call);
         }
 
-        // FIXED: Add participant to video grid with better duplicate prevention and naming
+        // ENHANCED: Add participant to grid with better name resolution and auto-refresh
         function addParticipantToGrid(participantId, stream, call) {
             debugLog('Adding participant to grid: ' + participantId);
 
@@ -694,8 +699,20 @@
                 noParticipantsMsg.remove();
             }
 
-            // FIXED: Get participant name from server using phone number with retry mechanism
+            // ENHANCED: Get participant name with enhanced resolution and auto-refresh
             const participantPhoneNumber = participantId.replace('customer_', '');
+            
+            // First check if we already have this name from recent registered participants refresh
+            let cachedName = getCachedParticipantName(participantPhoneNumber);
+            
+            if (cachedName && !cachedName.includes('Participant (')) {
+                debugLog('✅ Using cached participant name: ' + cachedName);
+                createParticipantUI(participantId, participantPhoneNumber, stream, cachedName);
+                updateParticipantButtonStatus(participantPhoneNumber, true);
+                return;
+            }
+
+            // If not cached, get from server with enhanced retry
             getParticipantRealNameFromServer(participantPhoneNumber).then(participantName => {
                 // Double-check no duplicate was created while we were getting the name
                 const finalCheck = document.getElementById(`participant_${participantId}`);
@@ -703,47 +720,102 @@
                     finalCheck.remove();
                 }
 
-                const participantDiv = document.createElement('div');
-                participantDiv.className = 'participant-video-wrapper';
-                participantDiv.id = `participant_${participantId}`;
+                createParticipantUI(participantId, participantPhoneNumber, stream, participantName);
+                updateParticipantButtonStatus(participantPhoneNumber, true);
 
-                participantDiv.innerHTML = `
-                    <div class="participant-video-header">
-                        <h4>👤 ${participantName}</h4>
-                        <span class="participant-status">Connected</span>
-                    </div>
-                    <video autoplay playsinline></video>
-                `;
+                // NEW: Trigger a participant list refresh to ensure registered list is up to date
+                setTimeout(() => {
+                    refreshRegisteredParticipantsList();
+                }, 2000);
 
-                grid.appendChild(participantDiv);
-
-                const video = participantDiv.querySelector('video');
-                if (video) {
-                    video.srcObject = stream;
-                    // FIXED: Ensure audio is enabled
-                    video.muted = false;
-                    video.volume = 1.0;
-                    
-                    // FIXED: Add error handling for video
-                    video.onerror = function(e) {
-                        debugLog('Video error for participant ' + participantId + ': ' + e.target.error);
-                    };
-                }
-
-                activeParticipants.set(participantId, { stream, call, name: participantName });
-                
-                // FIXED: Update grid layout based on number of participants
-                updateGridLayout();
-                
-                debugLog('✅ Participant successfully added to grid: ' + participantName);
-                
-                // FIXED: Update participant button status in the registered list
+            }).catch(error => {
+                debugLog('❌ Error getting participant name: ' + error.message);
+                const fallbackName = `Participant (${participantPhoneNumber.substring(0, 4)}...${participantPhoneNumber.substring(participantPhoneNumber.length - 4)})`;
+                createParticipantUI(participantId, participantPhoneNumber, stream, fallbackName);
                 updateParticipantButtonStatus(participantPhoneNumber, true);
             });
         }
 
-        // FIXED: Get real participant name from server with multiple retry attempts
+        // NEW: Function to get cached participant name from the registered participants list
+        function getCachedParticipantName(phoneNumber) {
+            const participantCards = document.querySelectorAll('.participant-card');
+            for (let card of participantCards) {
+                const cardPhone = card.getAttribute('data-phone');
+                const cleanCardPhone = cardPhone ? cardPhone.replace(/[^0-9]/g, '') : '';
+                
+                if (cleanCardPhone === phoneNumber) {
+                    const name = card.getAttribute('data-name');
+                    if (name && name.trim() !== '' && !name.includes('Participant (')) {
+                        debugLog('📝 Found cached name: ' + name + ' for phone: ' + phoneNumber);
+                        return name;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // NEW: Create participant UI element
+        function createParticipantUI(participantId, participantPhoneNumber, stream, participantName) {
+            const grid = document.getElementById('participantsGrid');
+            
+            const participantDiv = document.createElement('div');
+            participantDiv.className = 'participant-video-wrapper';
+            participantDiv.id = `participant_${participantId}`;
+
+            participantDiv.innerHTML = `
+                <div class="participant-video-header">
+                    <h4>👤 ${participantName}</h4>
+                    <span class="participant-status">Connected</span>
+                </div>
+                <video autoplay playsinline></video>
+            `;
+
+            grid.appendChild(participantDiv);
+
+            const video = participantDiv.querySelector('video');
+            if (video) {
+                video.srcObject = stream;
+                // FIXED: Ensure audio is enabled
+                video.muted = false;
+                video.volume = 1.0;
+                
+                // FIXED: Add error handling for video
+                video.onerror = function(e) {
+                    debugLog('Video error for participant ' + participantId + ': ' + e.target.error);
+                };
+            }
+
+            activeParticipants.set(participantId, { stream, call: connections.get(participantId), name: participantName });
+            
+            // FIXED: Update grid layout based on number of participants
+            updateGridLayout();
+            
+            debugLog('✅ Participant successfully added to grid: ' + participantName);
+        }
+
+        // ENHANCED: Get real participant name from server with multiple retry attempts and caching
         async function getParticipantRealNameFromServer(phoneNumber) {
+            // Check if we have a pending resolution for this phone number
+            if (pendingNameResolutions.has(phoneNumber)) {
+                debugLog('📋 Name resolution already pending for: ' + phoneNumber);
+                return pendingNameResolutions.get(phoneNumber);
+            }
+
+            const namePromise = performNameResolution(phoneNumber);
+            pendingNameResolutions.set(phoneNumber, namePromise);
+
+            try {
+                const name = await namePromise;
+                pendingNameResolutions.delete(phoneNumber);
+                return name;
+            } catch (error) {
+                pendingNameResolutions.delete(phoneNumber);
+                throw error;
+            }
+        }
+
+        // NEW: Perform the actual name resolution with enhanced retry logic
+        async function performNameResolution(phoneNumber) {
             let retryCount = 0;
             const maxRetries = 3;
             
@@ -803,6 +875,145 @@
             
             // Final fallback
             return `Participant (${phoneNumber.substring(0, 4)}...${phoneNumber.substring(phoneNumber.length - 4)})`;
+        }
+
+        // NEW: Refresh registered participants list to show new registrations
+        async function refreshRegisteredParticipantsList() {
+            if (!sessionId) return;
+
+            try {
+                debugLog('🔄 Refreshing registered participants list...');
+
+                const response = await fetch('<%= Page.ResolveUrl("~/Staff/StaffVideoCall.aspx/GetUpdatedParticipantsList") %>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: parseInt(sessionId) })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const result = JSON.parse(data.d);
+
+                if (result.success && result.participants) {
+                    updateRegisteredParticipantsUI(result.participants);
+                    
+                    // Update counters
+                    const totalElement = document.getElementById('totalParticipants');
+                    const registeredElement = document.getElementById('<%= lblRegisteredCount.ClientID %>');
+                    
+                    if (totalElement) totalElement.textContent = result.participants.length;
+                    if (registeredElement) registeredElement.textContent = result.participants.length;
+
+                    debugLog('✅ Participant list refreshed: ' + result.participants.length + ' participants');
+                }
+            } catch (error) {
+                debugLog('❌ Error refreshing participant list: ' + error.message);
+            }
+        }
+
+        // NEW: Update the registered participants UI with fresh data
+        function updateRegisteredParticipantsUI(participants) {
+            const container = document.getElementById('registeredParticipants');
+            if (!container) return;
+
+            // Find the repeater container
+            const repeaterContainer = container.querySelector('[id*="rptRegisteredParticipants"]') || container;
+            
+            // Clear existing items (except the repeater itself)
+            const existingCards = container.querySelectorAll('.participant-card');
+            existingCards.forEach(card => card.remove());
+
+            if (participants.length === 0) {
+                const noParticipantsPanel = document.getElementById('<%= pnlNoRegistered.ClientID %>');
+                if (noParticipantsPanel) {
+                    noParticipantsPanel.style.display = 'block';
+                }
+                return;
+            }
+
+            // Hide no participants panel
+            const noParticipantsPanel = document.getElementById('<%= pnlNoRegistered.ClientID %>');
+            if (noParticipantsPanel) {
+                noParticipantsPanel.style.display = 'none';
+            }
+
+            // Add updated participant cards
+            participants.forEach(participant => {
+                const participantCard = createParticipantCard(participant);
+                container.appendChild(participantCard);
+            });
+        }
+
+        // NEW: Create participant card element
+        function createParticipantCard(participant) {
+            const cleanPhone = participant.phone.replace(/[^0-9]/g, '');
+            
+            // FIXED: Better date handling to prevent "Invalid Date"
+            let formattedDate = 'Not Available';
+            try {
+                if (participant.bookingDate && participant.bookingDate !== '' && participant.bookingDate !== 'Not Available') {
+                    // If the date is already formatted from C#, use it directly
+                    if (participant.bookingDate.includes('/')) {
+                        formattedDate = participant.bookingDate;
+                    } else {
+                        // Try to parse if it's a raw date string
+                        const date = new Date(participant.bookingDate);
+                        if (!isNaN(date.getTime())) {
+                            formattedDate = date.toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
+                    }
+                }
+            } catch (error) {
+                debugLog('Date formatting error: ' + error.message);
+                formattedDate = 'Date Error';
+            }
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'participant-card';
+            cardDiv.setAttribute('data-phone', participant.phone);
+            cardDiv.setAttribute('data-name', participant.name);
+
+            cardDiv.innerHTML = `
+                <div class="participant-info">
+                    <div class="participant-details">
+                        <h4>
+                            <span class="status-indicator status-waiting" id="status_${cleanPhone}"></span>
+                            ${participant.name}
+                        </h4>
+                        <div class="participant-meta">
+                            <span>📱 ${participant.phone}</span>
+                            <span>📧 ${participant.email}</span>
+                            <span>📅 ${formattedDate}</span>
+                            <span>🎯 ${participant.scamConcerns || 'General'}</span>
+                        </div>
+                    </div>
+                    <div class="participant-actions">
+                        <button type="button" class="btn-connect" 
+                                onclick="connectToParticipant('${participant.phone}', '${participant.name}')"
+                                id="btn_${cleanPhone}">
+                            📞 Connect
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Update button status if participant is already connected
+            const participantId = `customer_${cleanPhone}`;
+            if (connections.has(participantId)) {
+                setTimeout(() => {
+                    updateParticipantButtonStatus(cleanPhone, true);
+                }, 100);
+            }
+
+            return cardDiv;
         }
 
         // FIXED: Update grid layout based on number of participants
@@ -869,7 +1080,7 @@
             }
         }
 
-        // FIXED: Connect to specific participant - THIS WAS MISSING
+        // FIXED: Connect to specific participant
         function connectToParticipant(phone, name) {
             if (!peer || !localStream || !isConnectionActive) {
                 updateStatus('Expert system not ready. Please wait...', 'error');
@@ -1041,7 +1252,9 @@
         }
 
         function refreshParticipantsList() {
-            window.location.reload();
+            // Trigger immediate refresh of participants list
+            refreshRegisteredParticipantsList();
+            updateStatus('Refreshing participant list...', 'info');
         }
 
         function endAllCalls() {
@@ -1064,6 +1277,10 @@
 
             if (statusUpdateInterval) {
                 clearInterval(statusUpdateInterval);
+            }
+
+            if (participantListRefreshInterval) {
+                clearInterval(participantListRefreshInterval);
             }
 
             updateStatus('All calls ended', 'info');
@@ -1140,6 +1357,10 @@
 
             if (statusUpdateInterval) {
                 clearInterval(statusUpdateInterval);
+            }
+
+            if (participantListRefreshInterval) {
+                clearInterval(participantListRefreshInterval);
             }
 
             if (localStream) {
