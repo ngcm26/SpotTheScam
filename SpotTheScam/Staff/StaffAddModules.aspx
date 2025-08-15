@@ -2,6 +2,8 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <title>Add New Module</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -130,37 +132,69 @@
     </style>
     
     <script type="text/javascript">
+        var cropperInstance = null;
+        var cropperModal = null;
+        var cropperImage = null;
+
+        function openCropper(dataUrl) {
+            cropperModal = document.getElementById('cropperModal');
+            cropperImage = document.getElementById('cropperImage');
+            cropperImage.src = dataUrl;
+            cropperModal.style.display = 'flex';
+            // Aspect ratio ~2:1 to match ~320x160 display on user modules grid
+            cropperInstance = new Cropper(cropperImage, {
+                aspectRatio: 2,
+                viewMode: 1,
+                autoCropArea: 1,
+                background: true,
+                movable: false,
+                zoomable: true,
+                scalable: false,
+                responsive: true
+            });
+        }
+
+        function closeCropper() {
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+            if (cropperModal) {
+                cropperModal.style.display = 'none';
+            }
+        }
+
+        function applyCrop() {
+            if (!cropperInstance) return;
+            var canvas = cropperInstance.getCroppedCanvas({ width: 1200, height: 600 });
+            var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+            // Update preview box
+            var preview = document.getElementById('coverImagePreview');
+            preview.innerHTML = '';
+            var img = document.createElement('img');
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '16px';
+            img.src = dataUrl;
+            preview.appendChild(img);
+
+            // Persist in hidden field for server upload
+            document.getElementById('<%= hdnCoverImageBase64.ClientID %>').value = dataUrl;
+
+            closeCropper();
+
+            // Postback to persist server-side and update preview to server URL
+            setTimeout(function() { __doPostBack('<%= btnUploadCover.UniqueID %>', ''); }, 0);
+        }
+
         function previewCoverImage(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    var preview = document.getElementById('coverImagePreview');
-                    var placeholder = document.getElementById('coverImagePlaceholder');
-                    
-                    // Clear existing content
-                    preview.innerHTML = '';
-                    
-                    // Create image element
-                    var img = document.createElement('img');
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    img.style.borderRadius = '16px';
-                    img.src = e.target.result;
-                    preview.appendChild(img);
-                    
-                    // Create remove button
-                    var removeBtn = document.createElement('button');
-                    removeBtn.type = 'button';
-                    removeBtn.innerHTML = '✕';
-                    removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; font-weight: bold;';
-                    removeBtn.onclick = function() { removeCoverImage(); };
-                    preview.appendChild(removeBtn);
-                    
-                    // Hide placeholder text
-                    if (placeholder) {
-                        placeholder.style.display = 'none';
-                    }
+                    // Open cropper modal instead of immediately previewing
+                    openCropper(e.target.result);
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -234,7 +268,11 @@
                 <span id="coverImagePlaceholder" class="placeholder-text">Cover image</span>
             </div>
             <asp:FileUpload ID="fuCoverImage" runat="server" CssClass="form-input" style="display:none;" onchange="previewCoverImage(this);" />
+            <asp:HiddenField ID="hdnCoverImagePath" runat="server" />
+            <asp:HiddenField ID="hdnCoverImageBase64" runat="server" />
+            <asp:LinkButton ID="btnUploadCover" runat="server" OnClick="btnUploadCover_Click" style="display:none;" />
             <label for="<%= fuCoverImage.ClientID %>" class="cover-image-label" style="cursor:pointer;">Change cover image</label>
+            <asp:RequiredFieldValidator ID="rfvCoverImage" runat="server" ControlToValidate="hdnCoverImagePath" ErrorMessage="Cover image is required." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
         </div>
         <!-- Right: Module Information -->
         <div class="module-info-section">
@@ -256,6 +294,17 @@
             </asp:DropDownList>
             <asp:RequiredFieldValidator ID="rfvStatus" runat="server" ControlToValidate="ddlStatus" InitialValue="" ErrorMessage="Please select a status: Draft or Published" ForeColor="Red" Display="Dynamic" CssClass="rfv-error" />
             <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
+        </div>
+    </div>
+
+    <!-- Simple Cropper Modal -->
+    <div id="cropperModal" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.6); z-index: 9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:16px; border-radius:12px; max-width:90vw; max-height:85vh; width:900px;">
+            <div style="width:100%; height:60vh; overflow:hidden;"><img id="cropperImage" alt="Crop image" style="max-width:100%; display:block;" /></div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+                <button type="button" class="btn btn-secondary" onclick="closeCropper()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyCrop()">Apply Crop</button>
+            </div>
         </div>
     </div>
 
@@ -309,11 +358,14 @@
         <label for="fuImage1" class="form-label">Image 1:</label>
         <asp:FileUpload ID="fuImage1" runat="server" CssClass="form-input" onchange="previewImage1(this);" />
         <div id="image1Preview"></div>
+        <asp:RequiredFieldValidator ID="rfvImage1" runat="server" ControlToValidate="fuImage1" ErrorMessage="Image 1 is required." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
         <label for="fuImage2" class="form-label">Image 2:</label>
         <asp:FileUpload ID="fuImage2" runat="server" CssClass="form-input" onchange="previewImage2(this);" />
         <div id="image2Preview"></div>
-        <div class="form-actions">
+        <asp:RequiredFieldValidator ID="rfvImage2" runat="server" ControlToValidate="fuImage2" ErrorMessage="Image 2 is required." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
+        <div class="form-actions" style="display:flex; gap:8px; align-items:center;">
             <asp:Button ID="btnAddModule" runat="server" Text="Add Module" OnClick="btnAddModule_Click" CssClass="btn btn-primary" />
+            <asp:HyperLink ID="lnkPreviewNew" runat="server" CssClass="btn btn-secondary" Text="Preview" Visible="false" NavigateUrl="#" />
         </div>
     </div>
 </asp:Content>

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="ModuleInformation.aspx.cs" Inherits="SpotTheScam.User.ModuleInformation" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="ModuleInformation.aspx.cs" Inherits="SpotTheScam.User.ModuleInformation" MaintainScrollPositionOnPostBack="true" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <link href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap" rel="stylesheet" />
     <style>
@@ -11,12 +11,32 @@
             padding: 48px 32px 40px 32px;
             font-family: 'DM Sans', Arial, sans-serif;
         }
+		.article-action-bar {
+			max-width: 800px;
+			margin: 24px auto 0 auto;
+			display: flex;
+			gap: 12px;
+			justify-content: flex-end;
+		}
+		.action-btn {
+			background: #f3f4f6;
+			color: #051D40;
+			border: 1px solid #e5e7eb;
+			border-radius: 10px;
+			padding: 10px 14px;
+			font-size: 0.98rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background 0.2s, border-color 0.2s;
+		}
+		.action-btn:hover { background: #eef0f3; border-color: #d5d7db; }
         .article-title {
             color: #D36F2D;
             font-size: 2.3rem;
             font-weight: 700;
             margin-bottom: 0.3em;
             font-family: 'DM Sans', Arial, sans-serif;
+            display: block;
         }
         .article-intro {
             color: #686464;
@@ -77,6 +97,42 @@
             .article-container { padding: 12px 2vw 18px 2vw; }
             .article-title { font-size: 1.5rem; }
         }
+		.quiz-btn {
+			display: block;
+			width: 260px;
+			margin: 14px auto 0 auto;
+			background: #2563eb;
+			color: #fff;
+			border: none;
+			border-radius: 8px;
+			padding: 12px 0;
+			font-size: 1.1rem;
+			font-weight: 600;
+			text-align: center;
+			text-decoration: none;
+			transition: background 0.2s;
+			font-family: 'DM Sans', Arial, sans-serif;
+		}
+		.quiz-btn:hover { background: #1d4ed8; color: #fff; }
+		/* Empty state */
+		.unavailable {
+			max-width: 800px;
+			margin: 40px auto;
+			padding: 28px 20px;
+			text-align: center;
+			background: #fff7ed;
+			border: 1px solid #ffedd5;
+			border-radius: 14px;
+			font-family: 'DM Sans', Arial, sans-serif;
+		}
+		.unavailable h2 { color: #D36F2D; margin-bottom: 8px; }
+		.unavailable p { color: #6b7280; margin-bottom: 16px; }
+
+		/* Print styles: hide action bar/buttons */
+		@media print {
+			.article-action-bar, .complete-btn, .back-to-modules-btn { display: none !important; }
+			.article-container { box-shadow: none; border-radius: 0; margin: 0; max-width: 100%; }
+		}
     .complete-btn {
         background: #64C35C;
         color: #fff;
@@ -132,7 +188,14 @@
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div class="article-container">
+	<!-- Actions above the article -->
+	<div class="article-action-bar">
+		<asp:HyperLink ID="lnkBackToEdit" runat="server" CssClass="action-btn" Visible="false" Text="← Back to Edit" NavigateUrl="#" />
+		<button type="button" class="action-btn" onclick="window.print()">Print / Save as PDF</button>
+	</div>
+
+	<asp:Panel ID="pnlContent" runat="server">
+	<div class="article-container">
         <asp:Label ID="lblModuleName" runat="server" CssClass="article-title" />
         <asp:Label ID="lblIntroduction" runat="server" CssClass="article-intro" />
         <div class="article-byline">
@@ -154,6 +217,16 @@
         <asp:Label ID="lblHeader5Text" runat="server" CssClass="article-section-text" Visible="false" />
         <asp:Label ID="lblCompleteMessage" runat="server" CssClass="complete-message" />
         <asp:Button ID="btnCompleteModule" runat="server" Text="Mark Module as Complete" OnClick="btnCompleteModule_Click" Visible="false" CssClass="complete-btn" />
-        <a href="UserModules.aspx" class="back-to-modules-btn">Back to Modules</a>
+		<asp:HyperLink ID="lnkTakeQuiz" runat="server" CssClass="quiz-btn" Visible="false" Text="Take the Quiz" NavigateUrl="#" />
+        <asp:HyperLink ID="lnkBackToModules" runat="server" CssClass="back-to-modules-btn" NavigateUrl="UserModules.aspx" Text="Back to Modules" />
     </div>
+	</asp:Panel>
+
+	<asp:Panel ID="pnlUnavailable" runat="server" Visible="false">
+		<div class="unavailable">
+			<h2>Module unavailable</h2>
+			<p>The module you are trying to view is not available or has not been published yet.</p>
+			<a href="UserModules.aspx" class="back-to-modules-btn" style="margin-top: 0;">Back to Modules</a>
+		</div>
+	</asp:Panel>
 </asp:Content>

@@ -33,19 +33,34 @@ namespace SpotTheScam.Staff
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
-                        // Check for duplicate email AND phone number (must match both)
-                        string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email AND PhoneNumber = @PhoneNumber";
-                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                        // Check for duplicate email
+                        using (SqlCommand emailCmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Email = @Email", conn))
                         {
-                            checkCmd.Parameters.AddWithValue("@Email", email);
-                            checkCmd.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
-                            int count = (int)checkCmd.ExecuteScalar();
-                            if (count > 0)
+                            emailCmd.Parameters.AddWithValue("@Email", email);
+                            int emailCount = (int)emailCmd.ExecuteScalar();
+                            if (emailCount > 0)
                             {
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "userExists", "alert('A user with this email and/or phone number already exists.');", true);
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "dupEmail", "alert('This email is already in use. Please use a different email.');", true);
                                 lblMessage.Visible = false;
                                 lblSuccess.Visible = false;
                                 return;
+                            }
+                        }
+
+                        // Check for duplicate phone (if provided)
+                        if (!string.IsNullOrWhiteSpace(phoneNumber))
+                        {
+                            using (SqlCommand phoneCmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE PhoneNumber = @PhoneNumber", conn))
+                            {
+                                phoneCmd.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+                                int phoneCount = (int)phoneCmd.ExecuteScalar();
+                                if (phoneCount > 0)
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "dupPhone", "alert('This phone number is already in use. Please use a different phone number.');", true);
+                                    lblMessage.Visible = false;
+                                    lblSuccess.Visible = false;
+                                    return;
+                                }
                             }
                         }
                         // Insert new user

@@ -69,6 +69,33 @@ namespace SpotTheScam.Staff
         protected global::System.Web.UI.WebControls.FileUpload fuCoverImage;
 
         /// <summary>
+        /// hdnCoverImagePath control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnCoverImagePath;
+
+        /// <summary>
+        /// hdnCoverImageBase64 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnCoverImageBase64;
+
+        /// <summary>
+        /// btnUploadCover control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnUploadCover;
+
+        /// <summary>
         /// lblAuthor control.
         /// </summary>
         /// <remarks>
@@ -121,6 +148,7 @@ namespace SpotTheScam.Staff
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnAddModule;
+        protected global::System.Web.UI.WebControls.HyperLink lnkPreviewNew;
 
         protected global::System.Web.UI.WebControls.TextBox txtDescription;
         protected global::System.Web.UI.WebControls.TextBox txtIntroduction;

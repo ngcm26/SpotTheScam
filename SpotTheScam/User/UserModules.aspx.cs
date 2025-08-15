@@ -38,38 +38,58 @@ namespace SpotTheScam.User
                 {
                     conn.Open();
                     // Get all published modules
-                    string query = "SELECT module_id, module_name, cover_image FROM Modules WHERE status = 'published'";
+                    string query = "SELECT module_id, module_name, cover_image FROM Modules WHERE status = @status";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.Parameters.AddWithValue("@status", "published");
                         SqlDataAdapter da = new SqlDataAdapter(cmd);
                         da.Fill(dt);
                     }
 
                     // Add completed column
                     dt.Columns.Add("completed", typeof(bool));
+                    // Default to false so UI bindings are safe even when user has no progress
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        row["completed"] = false;
+                    }
 
-                    // Get completed modules for this user
+                    // Get completed modules for this user, if the progress table exists
                     if (userId != 0 && dt.Rows.Count > 0)
                     {
-                        string completedQuery = "SELECT module_id FROM UserModuleProgress WHERE user_id = @user_id AND status = 'completed'";
-                        using (SqlCommand completedCmd = new SqlCommand(completedQuery, conn))
+                        bool hasUserModuleProgressTable = false;
+                        using (SqlCommand checkCmd = new SqlCommand(
+                            "SELECT 1 FROM sys.tables WHERE name = @tableName AND schema_id = SCHEMA_ID('dbo')",
+                            conn))
                         {
-                            completedCmd.Parameters.AddWithValue("@user_id", userId);
-                            using (SqlDataReader reader = completedCmd.ExecuteReader())
+                            checkCmd.Parameters.AddWithValue("@tableName", "UserModuleProgress");
+                            object existsResult = checkCmd.ExecuteScalar();
+                            hasUserModuleProgressTable = existsResult != null;
+                        }
+
+                        if (hasUserModuleProgressTable)
+                        {
+                            string completedQuery = "SELECT module_id FROM UserModuleProgress WHERE user_id = @user_id AND status = 'completed'";
+                            using (SqlCommand completedCmd = new SqlCommand(completedQuery, conn))
                             {
-                                var completedModules = new System.Collections.Generic.HashSet<int>();
-                                while (reader.Read())
+                                completedCmd.Parameters.AddWithValue("@user_id", userId);
+                                using (SqlDataReader reader = completedCmd.ExecuteReader())
                                 {
-                                    completedModules.Add(Convert.ToInt32(reader["module_id"]));
-                                }
-                                // Set completed flag for each module
-                                foreach (DataRow row in dt.Rows)
-                                {
-                                    int moduleId = Convert.ToInt32(row["module_id"]);
-                                    row["completed"] = completedModules.Contains(moduleId);
+                                    var completedModules = new System.Collections.Generic.HashSet<int>();
+                                    while (reader.Read())
+                                    {
+                                        completedModules.Add(Convert.ToInt32(reader["module_id"]));
+                                    }
+                                    // Set completed flag for each module
+                                    foreach (DataRow row in dt.Rows)
+                                    {
+                                        int moduleId = Convert.ToInt32(row["module_id"]);
+                                        row["completed"] = completedModules.Contains(moduleId);
+                                    }
                                 }
                             }
                         }
+                        // If the table doesn't exist, we keep the default false values
                     }
                 }
 

@@ -8,6 +8,7 @@ namespace SpotTheScam.Staff
     public partial class StaffAddModules : System.Web.UI.Page
     {
         private string connectionString = ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+        private const string TempCoverImageSessionKey = "TempCoverImagePath";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -17,6 +18,79 @@ namespace SpotTheScam.Staff
                 {
                     Response.Redirect("StaffDashboard.aspx");
                 }
+                // Load persisted preview if present
+                if (Session[TempCoverImageSessionKey] != null)
+                {
+                    hdnCoverImagePath.Value = Session[TempCoverImageSessionKey].ToString();
+                }
+            }
+        }
+
+        protected void btnUploadCover_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // If a cropped base64 image is provided, save it; else fallback to raw upload
+                if (!string.IsNullOrWhiteSpace(hdnCoverImageBase64.Value) && hdnCoverImageBase64.Value.StartsWith("data:image"))
+                {
+                    string base64 = hdnCoverImageBase64.Value;
+                    var commaIndex = base64.IndexOf(',');
+                    if (commaIndex > 0)
+                    {
+                        string meta = base64.Substring(0, commaIndex);
+                        string data = base64.Substring(commaIndex + 1);
+                        byte[] bytes = Convert.FromBase64String(data);
+
+                        string ext = meta.Contains("png") ? ".png" : ".jpg";
+                        string folderPath = Server.MapPath("~/Uploads/Modules/");
+                        if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+                        string filename = DateTime.Now.ToString("yyyyMMddHHmmss") + "_cropped" + ext;
+                        string savePath = Path.Combine(folderPath, filename);
+                        File.WriteAllBytes(savePath, bytes);
+                        string relativePath = "Uploads/Modules/" + filename;
+
+                        Session[TempCoverImageSessionKey] = relativePath;
+                        hdnCoverImagePath.Value = relativePath;
+                        hdnCoverImageBase64.Value = string.Empty;
+
+                        string script = "(function(){var p=document.getElementById('coverImagePreview'); if(p){p.innerHTML=''; var img=new Image(); img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover'; img.style.borderRadius='16px'; img.src='" + ResolveUrl("~/" + relativePath) + "'; p.appendChild(img);} })();";
+                        ClientScript.RegisterStartupScript(this.GetType(), "UpdateCoverPreview", script, true);
+                        return;
+                    }
+                }
+
+                if (fuCoverImage.HasFile)
+                {
+                    string folderPath = Server.MapPath("~/Uploads/Modules/");
+                    if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+                    string fileExtension = Path.GetExtension(fuCoverImage.FileName).ToLower();
+                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+                    if (Array.IndexOf(allowedExtensions, fileExtension) == -1)
+                    {
+                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        lblMessage.Text = "Please select a valid image file (jpg, jpeg, png, gif, bmp).";
+                        return;
+                    }
+
+                    string filename = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + Path.GetFileName(fuCoverImage.FileName);
+                    string savePath = Path.Combine(folderPath, filename);
+                    fuCoverImage.SaveAs(savePath);
+                    string relativePath = "Uploads/Modules/" + filename;
+
+                    // Persist path for later save and reflect in preview
+                    Session[TempCoverImageSessionKey] = relativePath;
+                    hdnCoverImagePath.Value = relativePath;
+
+                    // Update preview instantly with server path
+                    string script = "(function(){var p=document.getElementById('coverImagePreview'); if(p){p.innerHTML=''; var img=new Image(); img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover'; img.style.borderRadius='16px'; img.src='" + ResolveUrl("~/" + relativePath) + "'; p.appendChild(img);} })();";
+                    ClientScript.RegisterStartupScript(this.GetType(), "UpdateCoverPreview", script, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Error uploading image: " + ex.Message;
             }
         }
 
@@ -31,7 +105,7 @@ namespace SpotTheScam.Staff
             string moduleName = txtModuleName.Text.Trim();
             string author = Session["StaffName"]?.ToString() ?? "Unknown";
             string status = ddlStatus.SelectedValue;
-            string coverImagePath = "";
+            string coverImagePath = hdnCoverImagePath.Value ?? "";
             string description = txtDescription.Text.Trim();
             string introduction = txtIntroduction.Text.Trim();
             string header1 = txtHeader1.Text.Trim();
@@ -47,10 +121,26 @@ namespace SpotTheScam.Staff
             string image1Path = "";
             string image2Path = "";
 
-            if (string.IsNullOrEmpty(moduleName))
+            if (string.IsNullOrEmpty(moduleName) ||
+                string.IsNullOrEmpty(status) ||
+                string.IsNullOrWhiteSpace(description) ||
+                string.IsNullOrWhiteSpace(introduction) ||
+                string.IsNullOrWhiteSpace(header1) ||
+                string.IsNullOrWhiteSpace(header1Text) ||
+                string.IsNullOrWhiteSpace(header2) ||
+                string.IsNullOrWhiteSpace(header2Text) ||
+                string.IsNullOrWhiteSpace(header3) ||
+                string.IsNullOrWhiteSpace(header3Text) ||
+                string.IsNullOrWhiteSpace(header4) ||
+                string.IsNullOrWhiteSpace(header4Text) ||
+                string.IsNullOrWhiteSpace(header5) ||
+                string.IsNullOrWhiteSpace(header5Text) ||
+                string.IsNullOrWhiteSpace(coverImagePath) ||
+                (!fuImage1.HasFile && string.IsNullOrWhiteSpace(image1Path)) ||
+                (!fuImage2.HasFile && string.IsNullOrWhiteSpace(image2Path)))
             {
                 lblMessage.ForeColor = System.Drawing.Color.Red;
-                lblMessage.Text = "Module name is required.";
+                lblMessage.Text = "All fields and images are required.";
                 return;
             }
 
@@ -62,20 +152,10 @@ namespace SpotTheScam.Staff
                     Directory.CreateDirectory(folderPath);
                 }
 
-                if (fuCoverImage.HasFile)
+                // Use previously uploaded temp cover image if available
+                if (!string.IsNullOrWhiteSpace(hdnCoverImagePath.Value))
                 {
-                    string fileExtension = Path.GetExtension(fuCoverImage.FileName).ToLower();
-                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
-                    if (Array.IndexOf(allowedExtensions, fileExtension) == -1)
-                    {
-                        lblMessage.ForeColor = System.Drawing.Color.Red;
-                        lblMessage.Text = "Please select a valid image file (jpg, jpeg, png, gif, bmp).";
-                        return;
-                    }
-                    string filename = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + Path.GetFileName(fuCoverImage.FileName);
-                    string savePath = Path.Combine(folderPath, filename);
-                    fuCoverImage.SaveAs(savePath);
-                    coverImagePath = "Uploads/Modules/" + filename;
+                    coverImagePath = hdnCoverImagePath.Value;
                 }
 
                 if (fuImage1.HasFile)
@@ -172,8 +252,19 @@ namespace SpotTheScam.Staff
                 txtHeader5.Text = "";
                 txtHeader5Text.Text = "";
 
+                // Clear persisted temp image
+                hdnCoverImagePath.Value = "";
+                Session.Remove(TempCoverImageSessionKey);
+
                 lblMessage.ForeColor = System.Drawing.Color.Green;
                 lblMessage.Text = "Module and details added successfully!";
+
+                // Expose preview for the newly created module
+                if (lnkPreviewNew != null && newModuleId > 0)
+                {
+                    lnkPreviewNew.NavigateUrl = ResolveUrl("~/User/ModuleInformation.aspx?module_id=" + newModuleId + "&preview=1");
+                    lnkPreviewNew.Visible = true;
+                }
             }
             catch (Exception ex)
             {

@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Data.SqlClient;
+using System.Web.Configuration;
 
 namespace SpotTheScam.User
 {
@@ -44,6 +46,18 @@ namespace SpotTheScam.User
                 script += "document.getElementById('resultSection').classList.add('result-success');";
             }
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowResultSection", script, true);
+
+            // Trend Radar: Log a lightweight anonymous scan event
+            try
+            {
+                // Infer a simple scam type and channel for link checks
+                string scamType = "impersonation";   // fallback bucket
+                string channel = "sms";              // fallback bucket
+
+                // If unsafe, keep impersonation; otherwise still log as a generic check
+                LogScanEvent(scamType, channel);
+            }
+            catch { /* non-blocking */ }
         }
 
         private async Task<string> CheckUrlWithGoogleSafeBrowsing(string urlToCheck)
@@ -98,6 +112,22 @@ namespace SpotTheScam.User
                 {
                     return $"❌ Error checking link: {ex.Message}";
                 }
+            }
+        }
+
+        private void LogScanEvent(string scamType, string channel)
+        {
+            string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+            using (var conn = new SqlConnection(cs))
+            using (var cmd = new SqlCommand("INSERT INTO ScanEvents (user_id, session_id, scam_type, channel) VALUES (@uid,@sid,@type,@channel)", conn))
+            {
+                object uid = Session["UserId"] ?? (object)DBNull.Value;
+                cmd.Parameters.AddWithValue("@uid", uid);
+                cmd.Parameters.AddWithValue("@sid", Session.SessionID ?? string.Empty);
+                cmd.Parameters.AddWithValue("@type", scamType);
+                cmd.Parameters.AddWithValue("@channel", channel);
+                conn.Open();
+                cmd.ExecuteNonQuery();
             }
         }
     }

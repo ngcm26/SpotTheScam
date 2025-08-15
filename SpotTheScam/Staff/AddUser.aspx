@@ -135,7 +135,7 @@
             <asp:Label ID="lblMessage" runat="server" CssClass="error-message" Visible="false" />
             <div class="form-actions">
                 <asp:Button ID="btnAddUser" runat="server" Text="Add User" CssClass="btn btn-primary" OnClick="btnAddUser_Click" />
-                <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn btn-secondary" OnClick="btnCancel_Click" />
+                <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn btn-secondary" OnClick="btnCancel_Click" CausesValidation="False" />
             </div>
         </div>
     </div>

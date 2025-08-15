@@ -26,7 +26,7 @@ namespace SpotTheScam.Staff
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT Id, Username, Email, PhoneNumber, Role FROM Users";
+                string query = "SELECT Id, Username, Email, PhoneNumber, Role, Status FROM Users WHERE Role = 'user'";
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -46,15 +46,6 @@ namespace SpotTheScam.Staff
                 case "user":
                 default:
                     return "role-user";
-            }
-        }
-
-        protected void gvUsers_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            if (e.CommandName == "EditUser")
-            {
-                int userId = Convert.ToInt32(e.CommandArgument);
-                Response.Redirect($"EditUsers.aspx?user_id={userId}");
             }
         }
 
@@ -80,11 +71,11 @@ namespace SpotTheScam.Staff
             
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT Id, Username, Email, PhoneNumber, Role FROM Users";
+                string query = "SELECT Id, Username, Email, PhoneNumber, Role, Status FROM Users WHERE Role = 'user'";
                 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    query += " WHERE Username LIKE @SearchTerm OR Email LIKE @SearchTerm OR PhoneNumber LIKE @SearchTerm OR Role LIKE @SearchTerm";
+                    query += " AND (Username LIKE @SearchTerm OR Email LIKE @SearchTerm OR PhoneNumber LIKE @SearchTerm OR Status LIKE @SearchTerm)";
                 }
                 
                 SqlDataAdapter da = new SqlDataAdapter(query, conn);
@@ -99,6 +90,56 @@ namespace SpotTheScam.Staff
                 gvUsers.DataSource = dt;
                 gvUsers.DataBind();
             }
+        }
+
+        protected void gvUsers_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "EditUser")
+            {
+                int userId = Convert.ToInt32(e.CommandArgument);
+                Response.Redirect($"EditUsers.aspx?user_id={userId}");
+            }
+            else if (e.CommandName == "ToggleStatus")
+            {
+                var parts = e.CommandArgument.ToString().Split('|');
+                int userId = Convert.ToInt32(parts[0]);
+                string current = parts.Length > 1 ? parts[1] : "active";
+                string newStatus = current.Equals("active", StringComparison.OrdinalIgnoreCase) ? "suspended" : "active";
+                UpdateUserStatus(userId, newStatus);
+                LoadUsers();
+            }
+        }
+
+        private void UpdateUserStatus(int userId, string newStatus)
+        {
+            string actorRole = (Session["StaffRole"] as string ?? "").ToLower();
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string targetRole = "";
+                using (SqlCommand rc = new SqlCommand("SELECT Role FROM Users WHERE Id=@Id", conn))
+                {
+                    rc.Parameters.AddWithValue("@Id", userId);
+                    object r = rc.ExecuteScalar();
+                    targetRole = r?.ToString().ToLower() ?? "";
+                }
+                if (targetRole == "staff" && actorRole != "admin") return;
+
+                using (SqlCommand cmd = new SqlCommand("UPDATE Users SET Status=@s WHERE Id=@Id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@s", newStatus);
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        protected string GetUserConfirmScript(object statusObj)
+        {
+            string status = statusObj == null ? string.Empty : statusObj.ToString();
+            bool isActive = status.Equals("active", StringComparison.OrdinalIgnoreCase);
+            string message = isActive ? "Do you want to suspend this user?" : "Do you want to activate this user?";
+            return "return confirm('" + message.Replace("'", "\\'") + "');";
         }
 
         protected void btnClearFilters_Click(object sender, EventArgs e)

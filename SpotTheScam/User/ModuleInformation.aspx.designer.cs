@@ -11,6 +11,9 @@ namespace SpotTheScam.User
 {
     public partial class ModuleInformation
     {
+        protected global::System.Web.UI.WebControls.Panel pnlContent;
+        protected global::System.Web.UI.WebControls.Panel pnlUnavailable;
+        protected global::System.Web.UI.WebControls.HyperLink lnkBackToEdit;
         protected global::System.Web.UI.WebControls.Label lblModuleName;
         protected global::System.Web.UI.WebControls.Label lblIntroduction;
         protected global::System.Web.UI.WebControls.Label lblDescription;
@@ -30,5 +33,7 @@ namespace SpotTheScam.User
         protected global::System.Web.UI.WebControls.Image img2;
         protected global::System.Web.UI.WebControls.Label lblCompleteMessage;
         protected global::System.Web.UI.WebControls.Button btnCompleteModule;
+        protected global::System.Web.UI.WebControls.HyperLink lnkTakeQuiz;
+        protected global::System.Web.UI.WebControls.HyperLink lnkBackToModules;
     }
 }

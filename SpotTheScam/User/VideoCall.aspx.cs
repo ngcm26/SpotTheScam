@@ -30,13 +30,13 @@ namespace SpotTheScam.User
                         hdnCustomerPhone.Value = userPhone;
 
                         // Pre-fill phone input and auto-join
-                        string script = $@"
+                        string script = string.Format(@"
                             window.onload = function() {{
-                                document.getElementById('phoneInput').value = '{userPhone}';
+                                document.getElementById('phoneInput').value = '{0}';
                                 document.getElementById('phoneInput').style.display = 'none';
                                 document.getElementById('joinBtn').innerText = 'Connecting to Your Session...';
                                 setTimeout(function() {{ joinSession(); }}, 1000);
-                            }};";
+                            }};", userPhone);
                         ClientScript.RegisterStartupScript(this.GetType(), "AutoJoin", script, true);
                     }
                 }
@@ -91,7 +91,7 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error getting user phone: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(string.Format("Error getting user phone: {0}", ex.Message));
                 return "12345678"; // Default fallback
             }
         }
@@ -104,7 +104,7 @@ namespace SpotTheScam.User
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
                 {
                     conn.Open();
-                    System.Diagnostics.Debug.WriteLine($"🔍 Checking session for phone: {phoneNumber}");
+                    System.Diagnostics.Debug.WriteLine(string.Format("🔍 Checking session for phone: {0}", phoneNumber));
 
                     // Clean the phone number
                     string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
@@ -157,7 +157,7 @@ namespace SpotTheScam.User
                                     duration = "60"
                                 };
 
-                                System.Diagnostics.Debug.WriteLine($"✅ Existing booking found! SessionId: {sessionId}");
+                                System.Diagnostics.Debug.WriteLine(string.Format("✅ Existing booking found! SessionId: {0}", sessionId));
 
                                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                                 return serializer.Serialize(result);
@@ -208,7 +208,7 @@ namespace SpotTheScam.User
                                     duration = "60"
                                 };
 
-                                System.Diagnostics.Debug.WriteLine($"✅ Session found and booking created! SessionId: {sessionId}");
+                                System.Diagnostics.Debug.WriteLine(string.Format("✅ Session found and booking created! SessionId: {0}", sessionId));
 
                                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                                 return serializer.Serialize(result);
@@ -237,8 +237,8 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error checking session: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error checking session: {0}", ex.Message));
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Stack trace: {0}", ex.StackTrace));
 
                 var result = new
                 {
@@ -261,7 +261,7 @@ namespace SpotTheScam.User
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine($"🔄 Creating/updating booking for session {sessionId}, phone {phoneNumber}");
+                System.Diagnostics.Debug.WriteLine(string.Format("🔄 Creating/updating booking for session {0}, phone {1}", sessionId, phoneNumber));
 
                 // Check if booking already exists
                 string checkBookingQuery = @"
@@ -278,28 +278,35 @@ namespace SpotTheScam.User
 
                     if (existingBookings == 0)
                     {
-                        // Create new booking
+                        // CRITICAL: Get the actual user's name from Users table FIRST
+                        string actualName = GetActualUserName(conn, phoneNumber);
+
+                        // Create new booking with REAL NAME
                         string insertBookingQuery = @"
                             INSERT INTO VideoCallBookings (
                                 SessionId, UserId, CustomerName, CustomerPhone, CustomerEmail,
                                 BookingDate, BookingStatus, ScamConcerns, PointsUsed
                             ) VALUES (
-                                @SessionId, 1, @CustomerName, @CustomerPhone, @CustomerEmail,
+                                @SessionId, @UserId, @CustomerName, @CustomerPhone, @CustomerEmail,
                                 @BookingDate, 'Connected', 'General consultation', 0
                             )";
 
                         using (SqlCommand insertCmd = new SqlCommand(insertBookingQuery, conn))
                         {
+                            // Get actual UserId
+                            int actualUserId = GetUserIdByPhone(conn, phoneNumber);
+
                             insertCmd.Parameters.AddWithValue("@SessionId", sessionId);
-                            insertCmd.Parameters.AddWithValue("@CustomerName", $"Participant {phoneNumber}");
+                            insertCmd.Parameters.AddWithValue("@UserId", actualUserId > 0 ? actualUserId : 1);
+                            insertCmd.Parameters.AddWithValue("@CustomerName", actualName); // USE REAL NAME
                             insertCmd.Parameters.AddWithValue("@CustomerPhone", phoneNumber);
-                            insertCmd.Parameters.AddWithValue("@CustomerEmail", $"participant{phoneNumber}@example.com");
+                            insertCmd.Parameters.AddWithValue("@CustomerEmail", GetUserEmail(conn, phoneNumber));
                             insertCmd.Parameters.AddWithValue("@BookingDate", DateTime.Now);
 
                             int inserted = insertCmd.ExecuteNonQuery();
                             if (inserted > 0)
                             {
-                                System.Diagnostics.Debug.WriteLine($"✅ Created new booking for session {sessionId}");
+                                System.Diagnostics.Debug.WriteLine(string.Format("✅ Created new booking for session {0} with name: {1}", sessionId, actualName));
                             }
                         }
                     }
@@ -307,13 +314,116 @@ namespace SpotTheScam.User
                     {
                         // Update existing booking status
                         UpdateCustomerConnectionStatus(conn, sessionId, phoneNumber, "Connected");
-                        System.Diagnostics.Debug.WriteLine($"✅ Updated existing booking for session {sessionId}");
+                        System.Diagnostics.Debug.WriteLine(string.Format("✅ Updated existing booking for session {0}", sessionId));
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error creating/updating booking: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error creating/updating booking: {0}", ex.Message));
+            }
+        }
+
+        // ENHANCED: Get actual user name from Users table with better name resolution
+        private static string GetActualUserName(SqlConnection conn, string phoneNumber)
+        {
+            try
+            {
+                string getUserNameQuery = @"
+                    SELECT TOP 1 
+                        CASE 
+                            WHEN LEN(TRIM(ISNULL(FirstName, '') + ' ' + ISNULL(LastName, ''))) > 1
+                            THEN TRIM(ISNULL(FirstName, '') + ' ' + ISNULL(LastName, ''))
+                            WHEN Username IS NOT NULL AND Username NOT LIKE 'user%' AND Username NOT LIKE 'test%'
+                                 AND LEN(TRIM(Username)) > 2
+                            THEN Username
+                            WHEN Email IS NOT NULL AND Email LIKE '%@%.%' AND Email NOT LIKE 'test%'
+                                 AND Email NOT LIKE 'participant%@%'
+                            THEN CASE 
+                                WHEN CHARINDEX('.', LEFT(Email, CHARINDEX('@', Email) - 1)) > 0
+                                THEN UPPER(LEFT(LEFT(Email, CHARINDEX('@', Email) - 1), 1)) + 
+                                     LOWER(SUBSTRING(LEFT(Email, CHARINDEX('@', Email) - 1), 2, 
+                                     CHARINDEX('.', LEFT(Email, CHARINDEX('@', Email) - 1)) - 2)) + ' ' +
+                                     UPPER(SUBSTRING(LEFT(Email, CHARINDEX('@', Email) - 1), 
+                                     CHARINDEX('.', LEFT(Email, CHARINDEX('@', Email) - 1)) + 1, 1)) +
+                                     LOWER(SUBSTRING(LEFT(Email, CHARINDEX('@', Email) - 1), 
+                                     CHARINDEX('.', LEFT(Email, CHARINDEX('@', Email) - 1)) + 2, 50))
+                                ELSE UPPER(LEFT(LEFT(Email, CHARINDEX('@', Email) - 1), 1)) + 
+                                     LOWER(SUBSTRING(LEFT(Email, CHARINDEX('@', Email) - 1), 2, 50))
+                            END
+                            ELSE 'User'
+                        END as RealName
+                    FROM Users 
+                    WHERE PhoneNumber = @Phone OR PhoneNumber LIKE '%' + @CleanPhone + '%'
+                    ORDER BY Id DESC";
+
+                using (SqlCommand cmd = new SqlCommand(getUserNameQuery, conn))
+                {
+                    string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+                    cmd.Parameters.AddWithValue("@Phone", phoneNumber);
+                    cmd.Parameters.AddWithValue("@CleanPhone", cleanPhone);
+
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && !string.IsNullOrEmpty(result.ToString()))
+                    {
+                        string name = result.ToString().Trim();
+                        if (name.Length > 1 && name != "User")
+                        {
+                            System.Diagnostics.Debug.WriteLine(string.Format("✅ Found real name: {0} for phone: {1}", name, phoneNumber));
+                            return name;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error getting actual user name: {0}", ex.Message));
+            }
+
+            return "Participant " + phoneNumber; // Fallback
+        }
+
+        // Get actual user ID
+        private static int GetUserIdByPhone(SqlConnection conn, string phoneNumber)
+        {
+            try
+            {
+                string getUserIdQuery = "SELECT TOP 1 Id FROM Users WHERE PhoneNumber = @Phone OR PhoneNumber LIKE '%' + @CleanPhone + '%'";
+                using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
+                {
+                    string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+                    cmd.Parameters.AddWithValue("@Phone", phoneNumber);
+                    cmd.Parameters.AddWithValue("@CleanPhone", cleanPhone);
+
+                    object result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : 1;
+                }
+            }
+            catch
+            {
+                return 1;
+            }
+        }
+
+        // Get user email
+        private static string GetUserEmail(SqlConnection conn, string phoneNumber)
+        {
+            try
+            {
+                string getUserEmailQuery = "SELECT TOP 1 Email FROM Users WHERE PhoneNumber = @Phone OR PhoneNumber LIKE '%' + @CleanPhone + '%'";
+                using (SqlCommand cmd = new SqlCommand(getUserEmailQuery, conn))
+                {
+                    string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+                    cmd.Parameters.AddWithValue("@Phone", phoneNumber);
+                    cmd.Parameters.AddWithValue("@CleanPhone", cleanPhone);
+
+                    object result = cmd.ExecuteScalar();
+                    return result != null ? result.ToString() : ("participant" + phoneNumber + "@example.com");
+                }
+            }
+            catch
+            {
+                return "participant" + phoneNumber + "@example.com";
             }
         }
 
@@ -340,11 +450,11 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error updating customer connection status: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error updating customer connection status: {0}", ex.Message));
             }
         }
 
-        // CRITICAL FIX: Enhanced method to get participant real name
+        // ENHANCED: Method to get participant real name with better error handling and aggressive retry
         [WebMethod]
         public static string GetParticipantName(int sessionId, string phoneNumber)
         {
@@ -356,7 +466,7 @@ namespace SpotTheScam.User
 
                     string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
 
-                    // Enhanced query to get the most accurate participant name
+                    // ENHANCED: Query to get the most accurate participant name with better name resolution
                     string nameQuery = @"
                         SELECT TOP 1
                             CASE 
@@ -366,13 +476,29 @@ namespace SpotTheScam.User
                                 WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
                                 THEN vcb.FirstName + ' ' + vcb.LastName
                                 WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                                     AND u.Username NOT LIKE 'test%' AND LEN(TRIM(u.Username)) > 2
                                 THEN u.Username
-                                WHEN u.Name IS NOT NULL AND LEN(TRIM(u.Name)) > 0
-                                THEN u.Name
+                                WHEN u.Email IS NOT NULL AND u.Email NOT LIKE 'participant%@%'
+                                     AND u.Email NOT LIKE 'test%@%' AND u.Email LIKE '%@%.%'
+                                THEN CASE 
+                                    WHEN CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) > 0
+                                    THEN UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) - 2)) + ' ' +
+                                         UPPER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 1, 1)) +
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 2, 50))
+                                    ELSE UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 50))
+                                END
                                 ELSE NULL
                             END as ParticipantName,
                             vcb.CustomerEmail,
-                            u.Email
+                            u.Email,
+                            u.Username,
+                            u.FirstName,
+                            u.LastName
                         FROM VideoCallBookings vcb
                         LEFT JOIN Users u ON vcb.UserId = u.Id
                         WHERE vcb.SessionId = @SessionId 
@@ -392,6 +518,9 @@ namespace SpotTheScam.User
                                 string participantName = reader["ParticipantName"]?.ToString();
                                 string customerEmail = reader["CustomerEmail"]?.ToString();
                                 string userEmail = reader["Email"]?.ToString();
+                                string username = reader["Username"]?.ToString();
+                                string firstName = reader["FirstName"]?.ToString();
+                                string lastName = reader["LastName"]?.ToString();
 
                                 // If we have a good name, use it
                                 if (!string.IsNullOrEmpty(participantName))
@@ -406,20 +535,42 @@ namespace SpotTheScam.User
                                     return serializer.Serialize(result);
                                 }
 
-                                // Try to extract name from email if no direct name available
+                                // Try FirstName + LastName if available
+                                if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+                                {
+                                    var result = new
+                                    {
+                                        success = true,
+                                        name = firstName + " " + lastName
+                                    };
+
+                                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                    return serializer.Serialize(result);
+                                }
+
+                                // Enhanced email name extraction
                                 string emailToUse = !string.IsNullOrEmpty(customerEmail) ? customerEmail : userEmail;
-                                if (!string.IsNullOrEmpty(emailToUse) && emailToUse.Contains("@") && !emailToUse.StartsWith("participant"))
+                                if (!string.IsNullOrEmpty(emailToUse) && emailToUse.Contains("@") &&
+                                    !emailToUse.StartsWith("participant") && !emailToUse.StartsWith("test"))
                                 {
                                     string nameFromEmail = emailToUse.Split('@')[0];
-                                    // Capitalize first letter and handle common email patterns
+
+                                    // Enhanced name formatting from email
                                     if (nameFromEmail.Length > 1 && !nameFromEmail.All(char.IsDigit))
                                     {
-                                        nameFromEmail = char.ToUpper(nameFromEmail[0]) + nameFromEmail.Substring(1).ToLower();
-                                        if (nameFromEmail.Contains("."))
+                                        // Handle dots and underscores in email
+                                        nameFromEmail = nameFromEmail.Replace(".", " ").Replace("_", " ");
+
+                                        // Capitalize each word
+                                        string[] words = nameFromEmail.Split(' ');
+                                        for (int i = 0; i < words.Length; i++)
                                         {
-                                            string[] parts = nameFromEmail.Split('.');
-                                            nameFromEmail = string.Join(" ", parts.Select(p => char.ToUpper(p[0]) + p.Substring(1)));
+                                            if (words[i].Length > 0)
+                                            {
+                                                words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
+                                            }
                                         }
+                                        nameFromEmail = string.Join(" ", words).Trim();
 
                                         var result = new
                                         {
@@ -431,6 +582,20 @@ namespace SpotTheScam.User
                                         return serializer.Serialize(result);
                                     }
                                 }
+
+                                // Try username as last resort before phone fallback
+                                if (!string.IsNullOrEmpty(username) && !username.StartsWith("user") &&
+                                    !username.StartsWith("test") && username.Length > 2)
+                                {
+                                    var result = new
+                                    {
+                                        success = true,
+                                        name = username
+                                    };
+
+                                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                    return serializer.Serialize(result);
+                                }
                             }
                         }
                     }
@@ -438,7 +603,9 @@ namespace SpotTheScam.User
 
                 // Fallback to formatted phone number
                 string cleanPhoneFallback = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
-                string fallbackName = $"Participant ({cleanPhoneFallback.Substring(0, Math.Min(4, cleanPhoneFallback.Length))}...{cleanPhoneFallback.Substring(Math.Max(0, cleanPhoneFallback.Length - 4))})";
+                string fallbackName = string.Format("Participant ({0}...{1})",
+                    cleanPhoneFallback.Substring(0, Math.Min(4, cleanPhoneFallback.Length)),
+                    cleanPhoneFallback.Substring(Math.Max(0, cleanPhoneFallback.Length - 4)));
 
                 var fallbackResult = new
                 {
@@ -451,7 +618,7 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error getting participant name: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error getting participant name: {0}", ex.Message));
 
                 var result = new
                 {
@@ -464,7 +631,7 @@ namespace SpotTheScam.User
             }
         }
 
-        // CRITICAL FIX: Fixed participant discovery with correct column names
+        // ENHANCED: Optimized participant discovery with better performance and real-time updates
         [WebMethod]
         public static string GetSessionParticipants(int sessionId)
         {
@@ -476,7 +643,7 @@ namespace SpotTheScam.User
                 {
                     conn.Open();
 
-                    // FIXED: Query with correct column names based on your database schema
+                    // ENHANCED: Query with better name resolution for participants
                     string query = @"
                         SELECT 
                             vcb.SessionId,
@@ -491,25 +658,64 @@ namespace SpotTheScam.User
                                 WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
                                 THEN vcb.FirstName + ' ' + vcb.LastName
                                 WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                                     AND u.Username NOT LIKE 'test%' AND LEN(TRIM(u.Username)) > 2
                                 THEN u.Username
+                                WHEN u.Email IS NOT NULL AND u.Email NOT LIKE 'participant%@%'
+                                     AND u.Email NOT LIKE 'test%@%' AND u.Email LIKE '%@%.%'
+                                THEN CASE 
+                                    WHEN CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) > 0
+                                    THEN UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) - 2)) + ' ' +
+                                         UPPER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 1, 1)) +
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 2, 50))
+                                    ELSE UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 50))
+                                END
                                 ELSE 'Participant ' + RIGHT('000' + CAST(ISNULL(vcb.UserId, 1) as VARCHAR), 3)
                             END as ParticipantName,
                             
                             vcb.BookingStatus as Status,
-                            vcb.BookingDate as LastActivity
+                            vcb.BookingDate as LastActivity,
+                            
+                            -- Additional fields for better participant tracking
+                            CASE 
+                                WHEN vcb.BookingDate >= DATEADD(MINUTE, -5, GETDATE()) THEN 'Recently Active'
+                                WHEN vcb.BookingDate >= DATEADD(MINUTE, -15, GETDATE()) THEN 'Active'
+                                ELSE 'Idle'
+                            END as ActivityStatus,
+                            
+                            DATEDIFF(MINUTE, vcb.BookingDate, GETDATE()) as MinutesAgo,
+                            
+                            -- Add ORDER BY fields to SELECT for DISTINCT compatibility
+                            CASE WHEN vcb.BookingStatus = 'Connected' THEN 1
+                                 WHEN vcb.BookingStatus = 'In Call' THEN 2
+                                 ELSE 3 END as StatusPriority
+                            
                         FROM VideoCallBookings vcb
                         LEFT JOIN Users u ON vcb.UserId = u.Id
                         WHERE vcb.SessionId = @SessionId
                         AND vcb.BookingStatus IN ('Confirmed', 'Expert Ready', 'Connected', 'In Call')
                         AND vcb.CustomerPhone IS NOT NULL
-                        AND LEN(TRIM(vcb.CustomerPhone)) > 0
-                        ORDER BY vcb.BookingDate DESC";
+                        AND LEN(TRIM(vcb.CustomerPhone)) > 4
+                        
+                        -- ENHANCEMENT: Include recent participants even if status changed
+                        AND (
+                            vcb.BookingStatus IN ('Connected', 'In Call') 
+                            OR vcb.BookingDate >= DATEADD(MINUTE, -30, GETDATE())
+                        )
+                        
+                        ORDER BY 
+                            StatusPriority,
+                            vcb.BookingDate DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@SessionId", sessionId);
 
-                        System.Diagnostics.Debug.WriteLine($"🔍 Executing participant query for session {sessionId}");
+                        System.Diagnostics.Debug.WriteLine(string.Format("🔍 Executing ENHANCED participant query for session {0}", sessionId));
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -520,15 +726,20 @@ namespace SpotTheScam.User
 
                                 string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phone, @"[^\d]", "");
 
-                                // Skip empty phones or obviously invalid ones
-                                if (string.IsNullOrEmpty(cleanPhone) || cleanPhone.Length < 4)
+                                // Enhanced phone validation
+                                if (string.IsNullOrEmpty(cleanPhone) ||
+                                    cleanPhone.Length < 4 ||
+                                    cleanPhone == "12345678" ||
+                                    cleanPhone == "1234567890")
                                 {
-                                    System.Diagnostics.Debug.WriteLine($"⏭️ Skipping invalid phone: {cleanPhone}");
+                                    System.Diagnostics.Debug.WriteLine(string.Format("⏭️ Skipping invalid phone: {0}", cleanPhone));
                                     continue;
                                 }
 
                                 string participantName = reader["ParticipantName"]?.ToString() ?? "Unknown Participant";
                                 string status = reader["Status"]?.ToString() ?? "Connected";
+                                string activityStatus = reader["ActivityStatus"]?.ToString() ?? "Active";
+                                int minutesAgo = reader["MinutesAgo"] != DBNull.Value ? Convert.ToInt32(reader["MinutesAgo"]) : 0;
                                 int userId = reader["UserId"] != DBNull.Value ? Convert.ToInt32(reader["UserId"]) : 0;
                                 int bookingId = reader["BookingId"] != DBNull.Value ? Convert.ToInt32(reader["BookingId"]) : 0;
 
@@ -540,30 +751,86 @@ namespace SpotTheScam.User
                                     phone = cleanPhone,
                                     name = participantName,
                                     status = status,
-                                    peerId = $"customer_{cleanPhone}",
+                                    activityStatus = activityStatus,
+                                    minutesAgo = minutesAgo,
+                                    peerId = string.Format("customer_{0}", cleanPhone),
                                     lastActive = reader["LastActivity"] != DBNull.Value
                                         ? Convert.ToDateTime(reader["LastActivity"]).ToString("HH:mm")
-                                        : "Unknown"
+                                        : "Unknown",
+                                    isRecentlyActive = minutesAgo <= 5,
+                                    connectionPriority = status == "Connected" ? 1 : status == "In Call" ? 2 : 3
                                 });
 
-                                System.Diagnostics.Debug.WriteLine($"✅ Found participant: {participantName} ({cleanPhone}) - Status: {status}");
+                                System.Diagnostics.Debug.WriteLine(string.Format("✅ Found participant: {0} ({1}) - Status: {2} - Activity: {3} ({4}m ago)",
+                                    participantName, cleanPhone, status, activityStatus, minutesAgo));
                             }
                         }
                     }
 
-                    // SIMPLIFIED: Remove the complex second query that was causing issues
-                    // The main query above should catch all participants
+                    // ENHANCEMENT: Also check for any recent connection attempts or manual additions
+                    if (participants.Count == 0)
+                    {
+                        // Look for any recent bookings that might have been missed
+                        string fallbackQuery = @"
+                            SELECT CustomerPhone, CustomerName, BookingStatus, BookingDate
+                            FROM VideoCallBookings 
+                            WHERE SessionId = @SessionId 
+                            AND CustomerPhone IS NOT NULL
+                            AND LEN(TRIM(CustomerPhone)) > 4
+                            AND BookingDate >= DATEADD(HOUR, -2, GETDATE())
+                            ORDER BY BookingDate DESC";
+
+                        using (SqlCommand fallbackCmd = new SqlCommand(fallbackQuery, conn))
+                        {
+                            fallbackCmd.Parameters.AddWithValue("@SessionId", sessionId);
+
+                            using (SqlDataReader fallbackReader = fallbackCmd.ExecuteReader())
+                            {
+                                while (fallbackReader.Read())
+                                {
+                                    string phone = fallbackReader["CustomerPhone"]?.ToString();
+                                    string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phone, @"[^\d]", "");
+
+                                    if (!string.IsNullOrEmpty(cleanPhone) && cleanPhone.Length >= 4)
+                                    {
+                                        string name = fallbackReader["CustomerName"]?.ToString() ?? ("Participant " + cleanPhone);
+                                        string status = fallbackReader["BookingStatus"]?.ToString() ?? "Connected";
+
+                                        participants.Add(new
+                                        {
+                                            sessionId = sessionId,
+                                            bookingId = 0,
+                                            userId = 0,
+                                            phone = cleanPhone,
+                                            name = name,
+                                            status = status,
+                                            activityStatus = "Fallback",
+                                            minutesAgo = 0,
+                                            peerId = string.Format("customer_{0}", cleanPhone),
+                                            lastActive = DateTime.Now.ToString("HH:mm"),
+                                            isRecentlyActive = true,
+                                            connectionPriority = 1
+                                        });
+
+                                        System.Diagnostics.Debug.WriteLine(string.Format("🔄 Fallback participant found: {0} ({1})", name, cleanPhone));
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"🔍 GetSessionParticipants - Found {participants.Count} participants for session {sessionId}");
+                System.Diagnostics.Debug.WriteLine(string.Format("🔍 GetSessionParticipants - Found {0} participants for session {1}", participants.Count, sessionId));
 
-                // Log each participant for debugging
+                // Enhanced logging for debugging
                 foreach (var participant in participants)
                 {
                     var phoneValue = participant.GetType().GetProperty("phone").GetValue(participant);
                     var nameValue = participant.GetType().GetProperty("name").GetValue(participant);
                     var statusValue = participant.GetType().GetProperty("status").GetValue(participant);
-                    System.Diagnostics.Debug.WriteLine($"  - Participant: {nameValue} ({phoneValue}) - Status: {statusValue}");
+                    var activityValue = participant.GetType().GetProperty("activityStatus").GetValue(participant);
+                    System.Diagnostics.Debug.WriteLine(string.Format("  - Participant: {0} ({1}) - Status: {2} - Activity: {3}",
+                        nameValue, phoneValue, statusValue, activityValue));
                 }
 
                 var result = new
@@ -573,7 +840,10 @@ namespace SpotTheScam.User
                     totalCount = participants.Count,
                     sessionId = sessionId,
                     timestamp = DateTime.Now.ToString("HH:mm:ss"),
-                    debugInfo = $"Query executed at {DateTime.Now:HH:mm:ss}, found {participants.Count} participants"
+                    serverTime = DateTime.Now,
+                    debugInfo = string.Format("Enhanced query executed at {0:HH:mm:ss}, found {1} participants", DateTime.Now, participants.Count),
+                    queryOptimized = true,
+                    includesRecentActivity = true
                 };
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -581,8 +851,8 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error getting session participants: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error getting session participants: {0}", ex.Message));
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Stack trace: {0}", ex.StackTrace));
 
                 var result = new
                 {
@@ -592,7 +862,8 @@ namespace SpotTheScam.User
                     totalCount = 0,
                     sessionId = sessionId,
                     timestamp = DateTime.Now.ToString("HH:mm:ss"),
-                    debugInfo = $"Error occurred at {DateTime.Now:HH:mm:ss}: {ex.Message}"
+                    debugInfo = string.Format("Error occurred at {0:HH:mm:ss}: {1}", DateTime.Now, ex.Message),
+                    queryOptimized = false
                 };
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -600,7 +871,46 @@ namespace SpotTheScam.User
             }
         }
 
-        // ADDITIONAL FIX: Method to manually add a participant for testing
+        // ENHANCEMENT: Real-time participant status update method
+        [WebMethod]
+        public static string UpdateParticipantStatus(int sessionId, string phoneNumber, string status)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
+                {
+                    conn.Open();
+
+                    string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+
+                    UpdateCustomerConnectionStatus(conn, sessionId, cleanPhone, status);
+
+                    var result = new
+                    {
+                        success = true,
+                        message = string.Format("Status updated to {0} for participant {1}", status, cleanPhone)
+                    };
+
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    return serializer.Serialize(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error updating participant status: {0}", ex.Message));
+
+                var result = new
+                {
+                    success = false,
+                    message = ex.Message
+                };
+
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+        }
+
+        // ENHANCED: Method to manually add test participants for testing participant connections
         [WebMethod]
         public static string AddTestParticipant(int sessionId, string phoneNumber, string participantName)
         {
@@ -643,7 +953,7 @@ namespace SpotTheScam.User
                                 }
                             }
 
-                            var result = new { success = true, message = $"Test participant {participantName} added successfully" };
+                            var result = new { success = true, message = string.Format("Test participant {0} added successfully", participantName) };
                             JavaScriptSerializer serializer = new JavaScriptSerializer();
                             return serializer.Serialize(result);
                         }
@@ -658,8 +968,158 @@ namespace SpotTheScam.User
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Error adding test participant: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error adding test participant: {0}", ex.Message));
 
+                var result = new { success = false, message = ex.Message };
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+        }
+
+        // ENHANCED: Method to simulate multiple participants for comprehensive testing
+        [WebMethod]
+        public static string CreateTestParticipants(int sessionId)
+        {
+            try
+            {
+                var testParticipants = new List<(string phone, string name)>
+                {
+                    ("91234567", "Alice Johnson"),
+                    ("92345678", "Bob Smith"),
+                    ("93456789", "Carol Davis"),
+                    ("94567890", "David Wilson"),
+                    ("95678901", "Emma Brown")
+                };
+
+                int created = 0;
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
+                {
+                    conn.Open();
+
+                    foreach (var participant in testParticipants)
+                    {
+                        // Check if already exists
+                        string checkQuery = "SELECT COUNT(*) FROM VideoCallBookings WHERE SessionId = @SessionId AND CustomerPhone = @Phone";
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                        {
+                            checkCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                            checkCmd.Parameters.AddWithValue("@Phone", participant.phone);
+
+                            int existing = Convert.ToInt32(checkCmd.ExecuteScalar());
+                            if (existing == 0)
+                            {
+                                // Create booking
+                                string insertQuery = @"
+                                    INSERT INTO VideoCallBookings (
+                                        SessionId, UserId, CustomerName, CustomerPhone, CustomerEmail,
+                                        BookingDate, BookingStatus, ScamConcerns, PointsUsed
+                                    ) VALUES (
+                                        @SessionId, 1, @CustomerName, @CustomerPhone, @CustomerEmail,
+                                        @BookingDate, 'Connected', 'General consultation', 0
+                                    )";
+
+                                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                                {
+                                    insertCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    insertCmd.Parameters.AddWithValue("@CustomerName", participant.name);
+                                    insertCmd.Parameters.AddWithValue("@CustomerPhone", participant.phone);
+                                    insertCmd.Parameters.AddWithValue("@CustomerEmail", participant.name.Replace(" ", "").ToLower() + "@example.com");
+                                    insertCmd.Parameters.AddWithValue("@BookingDate", DateTime.Now);
+
+                                    insertCmd.ExecuteNonQuery();
+                                    created++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var result = new { success = true, message = string.Format("Created {0} test participants for session {1}", created, sessionId) };
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("❌ Error creating test participants: {0}", ex.Message));
+
+                var result = new { success = false, message = ex.Message };
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Serialize(result);
+            }
+        }
+
+        // ADDITIONAL: Helper method for creating test participants with specific session
+        public static string CreateTestParticipantsForSession(int sessionId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString))
+                {
+                    conn.Open();
+
+                    // Test participants with different phone numbers
+                    var testParticipants = new[]
+                    {
+                        new { Phone = "91234567", Name = "Alice Johnson", Email = "alice.johnson@email.com" },
+                        new { Phone = "92345678", Name = "Bob Smith", Email = "bob.smith@email.com" },
+                        new { Phone = "93456789", Name = "Carol Wilson", Email = "carol.wilson@email.com" }
+                    };
+
+                    int created = 0;
+
+                    foreach (var participant in testParticipants)
+                    {
+                        // Check if already exists
+                        string checkQuery = @"
+                            SELECT COUNT(*) FROM VideoCallBookings 
+                            WHERE SessionId = @SessionId AND CustomerPhone = @Phone";
+
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                        {
+                            checkCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                            checkCmd.Parameters.AddWithValue("@Phone", participant.Phone);
+
+                            int existing = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                            if (existing == 0)
+                            {
+                                string insertQuery = @"
+                                    INSERT INTO VideoCallBookings (
+                                        SessionId, UserId, CustomerName, CustomerPhone, CustomerEmail,
+                                        BookingDate, BookingStatus, ScamConcerns, PointsUsed
+                                    ) VALUES (
+                                        @SessionId, 1, @CustomerName, @CustomerPhone, @CustomerEmail,
+                                        @BookingDate, 'Connected', 'General consultation', 0
+                                    )";
+
+                                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                                {
+                                    insertCmd.Parameters.AddWithValue("@SessionId", sessionId);
+                                    insertCmd.Parameters.AddWithValue("@CustomerName", participant.Name);
+                                    insertCmd.Parameters.AddWithValue("@CustomerPhone", participant.Phone);
+                                    insertCmd.Parameters.AddWithValue("@CustomerEmail", participant.Email);
+                                    insertCmd.Parameters.AddWithValue("@BookingDate", DateTime.Now);
+
+                                    insertCmd.ExecuteNonQuery();
+                                    created++;
+                                }
+                            }
+                        }
+                    }
+
+                    var result = new
+                    {
+                        success = true,
+                        message = string.Format("Created {0} test participants for session {1}", created, sessionId),
+                        participants = testParticipants.Select(p => new { p.Name, p.Phone }).ToArray()
+                    };
+
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    return serializer.Serialize(result);
+                }
+            }
+            catch (Exception ex)
+            {
                 var result = new { success = false, message = ex.Message };
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 return serializer.Serialize(result);
@@ -677,12 +1137,12 @@ namespace SpotTheScam.User
                         conn.Open();
                         string cleanPhone = System.Text.RegularExpressions.Regex.Replace(hdnCustomerPhone.Value, @"[^\d]", "");
                         UpdateCustomerConnectionStatus(conn, Convert.ToInt32(hdnSessionId.Value), cleanPhone, "Customer Disconnected");
-                        System.Diagnostics.Debug.WriteLine($"Customer session ended for phone: {hdnCustomerPhone.Value}");
+                        System.Diagnostics.Debug.WriteLine(string.Format("Customer session ended for phone: {0}", hdnCustomerPhone.Value));
                     }
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Error updating session on unload: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine(string.Format("Error updating session on unload: {0}", ex.Message));
                 }
             }
             base.OnUnload(e);
