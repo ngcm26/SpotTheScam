@@ -175,15 +175,115 @@ namespace SpotTheScam.User
         // --------------- Invite ---------------
         protected void btnInvite_Click(object sender, EventArgs e)
         {
-            // === HARD DIAG: what file & DLL are running? ===
-            var asm = typeof(SpotTheScam.User.ManageGroup).Assembly;
-            var built = System.IO.File.GetLastWriteTime(asm.Location);
-            var path = Server.MapPath(Request.CurrentExecutionFilePath);
+            int inviterId = Convert.ToInt32(Session["UserId"]);
+            string email = (txtInviteEmail?.Text ?? "").Trim();
+            string role = (ddlInviteRole?.SelectedValue ?? "").Trim();
 
-            ShowMsg($"DBG → page={path} | asm={System.IO.Path.GetFileName(asm.Location)} | built={built:yyyy-MM-dd HH:mm:ss}", false);
-            return; // TEMP: stop here for this run
+            // 1) Print what the server received + the dropdown items
+            var items = new System.Text.StringBuilder();
+            foreach (ListItem li in ddlInviteRole.Items)
+                items.Append($"[{li.Text}:{li.Value}]");
+            ShowMsg($"DBG -> Text='{ddlInviteRole.SelectedItem?.Text}' | Value='{ddlInviteRole.SelectedValue}' | Items={items}", false);
+
+            // 2) Normalize any legacy value
+            if (string.Equals(role, "PrimaryAccountHolder", StringComparison.OrdinalIgnoreCase))
+                role = "Primary";
+
+            // 3) Defensive validation (and print what we’re validating)
+            bool okRole = string.Equals(role, "Guardian", StringComparison.OrdinalIgnoreCase)
+                       || string.Equals(role, "Primary", StringComparison.OrdinalIgnoreCase);
+            ShowMsg($"DBG -> NormalizedRole='{role}' | okRole={okRole}", false);
+            if (!okRole)
+            {
+                ShowMsg($"Invalid role. Got '{role}'. Choose Guardian or Primary.", false);
+                return;
+            }
+
+            using (var con = new SqlConnection(cs))
+            {
+                con.Open();
+                var tx = con.BeginTransaction();
+
+                try
+                {
+                    if (!UserHasRole(inviterId, GroupId, "GroupOwner", con, tx))
+                    {
+                        ShowMsg("Only the Group Owner can send invites.", false);
+                        tx.Rollback();
+                        return;
+                    }
+
+                    // find the user by email
+                    int inviteeId;
+                    using (var cmd = new SqlCommand("SELECT Id FROM Users WHERE Email=@em", con, tx))
+                    {
+                        cmd.Parameters.AddWithValue("@em", email);
+                        object r = cmd.ExecuteScalar();
+                        if (r == null)
+                        {
+                            ShowMsg("That email is not registered.", false);
+                            tx.Rollback();
+                            return;
+                        }
+                        inviteeId = Convert.ToInt32(r);
+                    }
+
+                    if (inviteeId == inviterId)
+                    {
+                        ShowMsg("You’re already the Group Owner of this group.", false);
+                        tx.Rollback();
+                        return;
+                    }
+
+                    // existing membership?
+                    using (var cmd = new SqlCommand(@"
+                        SELECT Status FROM FamilyGroupMembers
+                        WHERE GroupId=@gid AND UserId=@uid", con, tx))
+                    {
+                        cmd.Parameters.AddWithValue("@gid", GroupId);
+                        cmd.Parameters.AddWithValue("@uid", inviteeId);
+                        var status = cmd.ExecuteScalar() as string;
+                        if (status == "Active")
+                        {
+                            ShowMsg("That user is already an active member.", false);
+                            tx.Rollback();
+                            return;
+                        }
+                        if (status == "Pending")
+                        {
+                            ShowMsg("That user already has a pending invite.", false);
+                            tx.Rollback();
+                            return;
+                        }
+                    }
+
+                    // insert pending invite
+                    using (var cmd = new SqlCommand(@"
+                        INSERT INTO FamilyGroupMembers
+                          (GroupId, UserId, GroupRole, Status, InvitedByUserId, InvitedAt)
+                        VALUES
+                          (@gid, @uid, @role, 'Pending', @inviter, GETDATE())", con, tx))
+                    {
+                        cmd.Parameters.AddWithValue("@gid", GroupId);
+                        cmd.Parameters.AddWithValue("@uid", inviteeId);
+                        cmd.Parameters.AddWithValue("@role", role);
+                        cmd.Parameters.AddWithValue("@inviter", inviterId);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    tx.Commit();
+                    ShowMsg("Invite sent (now Pending).", true);
+                    txtInviteEmail.Text = "";
+                    ddlInviteRole.SelectedIndex = 0;
+                    BindMembers();
+                }
+                catch (Exception ex)
+                {
+                    try { tx.Rollback(); } catch { }
+                    ShowMsg("Could not send invite. " + ex.Message, false);
+                }
+            }
         }
-
 
         // --------------- Restrictions UI ---------------
         private void LoadRestrictionsFor(int userId)
