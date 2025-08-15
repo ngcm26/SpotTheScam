@@ -27,16 +27,19 @@ namespace SpotTheScam.User
             int userId = Convert.ToInt32(Session["UserId"]);
             using (var conn = new SqlConnection(cs))
             using (var cmd = new SqlCommand(
-                "SELECT AccountId, AccountNickname FROM BankAccounts WHERE UserId=@u ORDER BY CreatedAt DESC", conn))
+                "SELECT AccountId, AccountNickname FROM BankAccounts WHERE UserId=@u ORDER BY AccountNickname", conn))
             {
-                cmd.Parameters.AddWithValue("@u", userId);
+                cmd.Parameters.Add("@u", SqlDbType.Int).Value = userId;
                 var dt = new DataTable();
                 new SqlDataAdapter(cmd).Fill(dt);
+
                 ddlAccount.DataSource = dt;
                 ddlAccount.DataTextField = "AccountNickname";
                 ddlAccount.DataValueField = "AccountId";
                 ddlAccount.DataBind();
-                ddlAccount.Items.Insert(0, new ListItem("All Accounts", ""));
+
+                // “All” option
+                ddlAccount.Items.Insert(0, new ListItem("All", ""));
             }
         }
 
@@ -58,6 +61,8 @@ namespace SpotTheScam.User
                     t.IsFlagged,
                     t.Severity,
                     t.ReviewStatus,
+                    t.Notes,
+                    t.IsHeld,
                     t.BalanceAfterTransaction,
                     a.AccountNickname
                 FROM BankTransactions t
@@ -66,26 +71,31 @@ namespace SpotTheScam.User
 
             if (!string.IsNullOrEmpty(accountFilter)) sql += " AND t.AccountId = @a";
             if (!string.IsNullOrEmpty(typeFilter)) sql += " AND t.TransactionType = @tt";
+            if (chkFlaggedOnly.Checked) sql += " AND t.IsFlagged = 1";
 
-            sql += " ORDER BY t.TransactionDate DESC, t.TransactionTime DESC";
+            sql += " ORDER BY t.TransactionDate DESC, t.TransactionTime DESC, t.TransactionId DESC";
 
             using (var conn = new SqlConnection(cs))
             using (var cmd = new SqlCommand(sql, conn))
             {
-                cmd.Parameters.AddWithValue("@u", userId);
-                if (!string.IsNullOrEmpty(accountFilter)) cmd.Parameters.AddWithValue("@a", accountFilter);
-                if (!string.IsNullOrEmpty(typeFilter)) cmd.Parameters.AddWithValue("@tt", typeFilter);
+                cmd.Parameters.Add("@u", SqlDbType.Int).Value = userId;
+
+                if (int.TryParse(accountFilter, out var acctId))
+                    cmd.Parameters.Add("@a", SqlDbType.Int).Value = acctId;
+
+                if (!string.IsNullOrEmpty(typeFilter))
+                    cmd.Parameters.Add("@tt", SqlDbType.NVarChar, 20).Value = typeFilter;
 
                 var dt = new DataTable();
                 new SqlDataAdapter(cmd).Fill(dt);
 
-                // add a friendly combined date/time column for display
+                // Friendly Date/Time
                 dt.Columns.Add("WhenText", typeof(string));
                 foreach (DataRow r in dt.Rows)
                 {
-                    DateTime d = r.Field<DateTime>("TransactionDate");
-                    TimeSpan? t = r.IsNull("TransactionTime") ? (TimeSpan?)null : (TimeSpan)r["TransactionTime"];
-                    string time = t.HasValue ? DateTime.Today.Add(t.Value).ToString("HH:mm") : "";
+                    var d = r.Field<DateTime>("TransactionDate");
+                    var ts = r.IsNull("TransactionTime") ? (TimeSpan?)null : (TimeSpan)r["TransactionTime"];
+                    string time = ts.HasValue ? DateTime.Today.Add(ts.Value).ToString("HH:mm") : "";
                     r["WhenText"] = d.ToString("dd MMM yyyy") + (time == "" ? "" : (" " + time));
                 }
 
@@ -114,35 +124,61 @@ namespace SpotTheScam.User
 
             // Amount styling (+/-)
             var amtCell = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblAmt");
-            decimal amount = Convert.ToDecimal(data["Amount"]);
-            string type = Convert.ToString(data["TransactionType"]);
-            bool deposit = string.Equals(type, "Deposit", StringComparison.OrdinalIgnoreCase);
-            string amtHtml = string.Format("<span class='{0}'>{1}{2:C}</span>",
-                deposit ? "amt-pos" : "amt-neg",
-                deposit ? "+" : "-",
-                amount);
-            amtCell.InnerHtml = amtHtml;
+            if (amtCell != null)
+            {
+                decimal amount = Convert.ToDecimal(data["Amount"]);
+                string type = Convert.ToString(data["TransactionType"]);
+                bool deposit = string.Equals(type, "Deposit", StringComparison.OrdinalIgnoreCase);
+                amtCell.InnerHtml = $"<span class='{(deposit ? "amt-pos" : "amt-neg")}'>{(deposit ? "+" : "-")}{amount:C}</span>";
+            }
 
-            // Status chip
+            // Precompute once (used by status chip)
             bool isFlagged = data["IsFlagged"] != DBNull.Value && Convert.ToBoolean(data["IsFlagged"]);
             string review = Convert.ToString(data["ReviewStatus"] ?? "").Trim();
 
-            var lblStatus = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblStatus");
-            if (lblStatus == null) return;
-
-            string text = "Normal";
-            string css = "chip chip-normal";
-
-            if (isFlagged)
+            // Severity pill (always safe to set)
+            var lblSev = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblSev");
+            if (lblSev != null)
             {
-                if (review.Equals("Approved", StringComparison.OrdinalIgnoreCase)) { text = "Approved"; css = "chip chip-approved"; }
-                else if (review.Equals("Denied", StringComparison.OrdinalIgnoreCase)) { text = "Denied"; css = "chip chip-denied"; }
-                else if (review.Equals("Reviewed", StringComparison.OrdinalIgnoreCase)) { text = "Reviewed"; css = "chip chip-reviewed"; }
-                else { text = "Pending"; css = "chip chip-pending"; }
+                string sev = Convert.ToString(data["Severity"] ?? "").Trim();
+                string notes = Convert.ToString(data["Notes"] ?? "");
+                lblSev.InnerText = string.IsNullOrEmpty(sev) ? "—" : sev;
+
+                string sevClass = "sev-none";
+                if (string.Equals(sev, "Red", StringComparison.OrdinalIgnoreCase)) sevClass = "sev-red";
+                else if (string.Equals(sev, "Yellow", StringComparison.OrdinalIgnoreCase)) sevClass = "sev-yellow";
+
+                lblSev.Attributes["class"] = "sev-pill " + sevClass;
+                if (!string.IsNullOrEmpty(notes)) lblSev.Attributes["title"] = notes;
             }
 
-            lblStatus.Attributes["class"] = css;
-            lblStatus.InnerText = text;
+            // Status chip (only if element exists)
+            var lblStatus = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblStatus");
+            if (lblStatus != null)
+            {
+                string text = "Normal";
+                string css = "chip chip-normal";
+
+                if (isFlagged)
+                {
+                    if (review.Equals("Approved", StringComparison.OrdinalIgnoreCase)) text = "Approved";
+                    else if (review.Equals("Denied", StringComparison.OrdinalIgnoreCase)) text = "Denied";
+                    else if (review.Equals("Reviewed", StringComparison.OrdinalIgnoreCase)) text = "Reviewed";
+                    else { text = "Pending"; }
+                    css = "chip chip-" + text.ToLowerInvariant();
+                }
+
+                lblStatus.Attributes["class"] = css;
+                lblStatus.InnerText = text;
+            }
+
+            var lblHeld = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblHeld");
+            if (lblHeld != null)
+            {
+                bool isHeldRow = data["IsHeld"] != DBNull.Value && Convert.ToBoolean(data["IsHeld"]);
+                lblHeld.Style["display"] = isHeldRow ? "inline-block" : "none";
+            }
+
         }
     }
 }

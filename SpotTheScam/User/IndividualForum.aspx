@@ -1,4 +1,5 @@
-﻿a<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="IndividualForum.aspx.cs" Inherits="SpotTheScam.User.IndividualForum" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/User/User.Master" AutoEventWireup="true" CodeBehind="IndividualForum.aspx.cs" Inherits="SpotTheScam.User.IndividualForum" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .forum-container {
@@ -45,6 +46,32 @@
         .btn-back {
             margin-bottom: 20px;
         }
+
+        .reply-box {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .comment {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .reply-toggle {
+            font-size: 0.9em;
+        }
+
+        .reply-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            align-self: flex-start;
+        }
+
+            .reply-icon:hover {
+                text-decoration: underline;
+            }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -56,7 +83,10 @@
 
         <div class="forum-card">
             <div class="forum-meta">
-                Posted by <asp:Label ID="lb_username" runat="server" /> on <asp:Label ID="lb_createdAt" runat="server" />
+                Posted by
+                <asp:Label ID="lb_username" runat="server" />
+                on
+                <asp:Label ID="lb_createdAt" runat="server" />
             </div>
 
             <div class="forum-title">
@@ -72,13 +102,47 @@
             <div class="forum-discussion-box">
                 <h4>Discussion</h4>
 
-                <asp:Repeater ID="rptComments" runat="server">
+                <asp:Repeater ID="rptComments" runat="server" OnItemDataBound="rptComments_ItemDataBound" OnItemCommand="rptComments_ItemCommand">
                     <ItemTemplate>
-                        <div class="mb-3 p-2 border rounded bg-white">
-                            <strong><%# Eval("Username") %></strong> <span class="text-muted small">(<%# Eval("CreatedAt") %>)</span>
-                            <div><%# Eval("Content") %></div>
+                        <div class="mb-3 p-2 border rounded bg-white d-flex justify-content-between align-items-start"
+                            style='margin-left: <%# Convert.ToInt32(Eval("Level")) * 20 %>px;'>
+
+                            <!-- Left: Comment content -->
+                            <div style="flex-grow: 1;">
+                                <strong><%# Eval("Username") %></strong>
+                                <span class="text-muted small">(<asp:Label ID="lblCommentCreatedAt" runat="server" />)</span>
+
+                                <div><%# Eval("Content") %></div>
+
+                                <asp:Repeater ID="rptReplies" runat="server"></asp:Repeater>
+
+                                <!-- Hidden reply box -->
+                                <div class="reply-box" style="display: none; margin-top: 10px;">
+                                    <asp:TextBox ID="tb_reply" runat="server"
+                                        CssClass="form-control mb-2"
+                                        TextMode="MultiLine"
+                                        Rows="2"
+                                        placeholder="Write your reply..."
+                                        Style="width: 100%;" />
+                                    <asp:Button ID="btnReply" runat="server"
+                                        Text="Post"
+                                        CommandArgument='<%# Eval("ReplyId") %>'
+                                        OnClick="btnReply_Click"
+                                        CssClass="btn btn-sm btn-primary" />
+                                </div>
+                            </div>
+
+                            <!-- Right: Reply icon -->
+                            <div style="margin-left: 10px; cursor: pointer;">
+                                <img src='<%# ResolveUrl("~/Images/reply.png") %>'
+                                    style="width: 20px; height: 20px;"
+                                    alt="Reply"
+                                    onclick="toggleReplyBox(this)" />
+                            </div>
+
                         </div>
                     </ItemTemplate>
+
                 </asp:Repeater>
 
                 <hr />
@@ -88,5 +152,31 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".reply-toggle").click(function () {
+                var targetId = $(this).data("target");
+                $("#reply-box-" + targetId).slideToggle();
+            });
+        });
+        function toggleReplyBox(el) {
+            // Find the closest comment container (parent div of both content and icon)
+            var commentContainer = el.closest('.d-flex'); // flex container of comment
+            if (!commentContainer) return;
 
+            // Find the reply-box inside that container
+            var replyBox = commentContainer.querySelector('.reply-box');
+            if (!replyBox) return;
+
+            // Toggle display
+            if (replyBox.style.display === 'none' || replyBox.style.display === '') {
+                replyBox.style.display = 'block';
+            } else {
+                replyBox.style.display = 'none';
+            }
+        }
+
+
+    </script>
 </asp:Content>
