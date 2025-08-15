@@ -177,11 +177,6 @@
                             <span runat="server" id="lblHeld" class="chip chip-held" style="display:none">Held</span>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="">
-                        <ItemTemplate>
-                            <a href='<%# "TransactionDetails.aspx?id=" + Eval("TransactionId") %>'>Details</a>
-                        </ItemTemplate>
-                    </asp:TemplateField>
                     <asp:TemplateField HeaderText="Severity">
                         <ItemTemplate>
                             <span id="lblSev" runat="server" class="sev-pill" title='<%# Eval("Notes") %>'>

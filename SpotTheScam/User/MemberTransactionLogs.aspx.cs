@@ -19,13 +19,14 @@ namespace SpotTheScam.User
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserId"] == null) { Response.Redirect("~/User/UserLogin.aspx"); return; }
-            if (GroupId <= 0 || MemberUserId <= 0 || AccountId <= 0) { Show("Missing parameters.", false); return; }
+            if (GroupId <= 0 || MemberUserId <= 0 || AccountId <= 0)
+            { Show("Missing parameters.", false); gvTxns.Visible = false; return; }
 
             if (!IsPostBack)
             {
                 int viewer = Convert.ToInt32(Session["UserId"]);
                 if (!ViewerIsGuardianOrOwner(viewer, GroupId) || !TargetIsActivePrimary(MemberUserId, GroupId))
-                { Show("You do not have permission to view this member.", false); return; }
+                { Show("You do not have permission to view this member.", false); gvTxns.Visible = false; return; }
 
                 lblMember.Text = GetUsername(MemberUserId);
                 lblAccount.Text = GetAccountNickname(AccountId, MemberUserId);
@@ -125,8 +126,163 @@ namespace SpotTheScam.User
             {
                 bool isHeldRow = data["IsHeld"] != DBNull.Value && Convert.ToBoolean(data["IsHeld"]);
                 lblHeld.Style["display"] = isHeldRow ? "inline-block" : "none";
+
+                var btnApprove = (LinkButton)e.Row.FindControl("btnApprove");
+                var btnDeny = (LinkButton)e.Row.FindControl("btnDeny");
+                if (btnApprove != null) btnApprove.Visible = isHeldRow;
+                if (btnDeny != null) btnDeny.Visible = isHeldRow;
+
             }
 
+        }
+
+
+        protected void gvTxns_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandArgument == null) return;
+
+            int viewer = Convert.ToInt32(Session["UserId"]);
+            if (!ViewerIsGuardianOrOwner(viewer, GroupId) || !TargetIsActivePrimary(MemberUserId, GroupId))
+            {
+                Show("You do not have permission to perform this action.", false);
+                return;
+            }
+
+            int tid = Convert.ToInt32(e.CommandArgument);
+
+            try
+            {
+                using (var con = new SqlConnection(cs))
+                {
+                    con.Open();
+                    var tx = con.BeginTransaction();
+                    try
+                    {
+                        int acctId = 0, uid = 0;
+                        string type = "";
+                        decimal amount = 0m;
+                        bool isHeld = false;
+
+                        // Fetch txn and ensure it belongs to the target member + account
+                        using (var cmd = new SqlCommand(@"
+                                SELECT TransactionId, AccountId, UserId, TransactionType, Amount, IsHeld
+                                FROM dbo.BankTransactions
+                                WHERE TransactionId=@id AND UserId=@u AND AccountId=@a;", con, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@id", tid);
+                            cmd.Parameters.AddWithValue("@u", MemberUserId);
+                            cmd.Parameters.AddWithValue("@a", AccountId);
+
+                            using (var rd = cmd.ExecuteReader())
+                            {
+                                if (!rd.Read())
+                                {
+                                    Show("Transaction not found.", false);
+                                    tx.Rollback();
+                                    return;
+                                }
+                                acctId = Convert.ToInt32(rd["AccountId"]);
+                                uid = Convert.ToInt32(rd["UserId"]);
+                                type = Convert.ToString(rd["TransactionType"]);
+                                amount = Convert.ToDecimal(rd["Amount"]);
+                                isHeld = Convert.ToBoolean(rd["IsHeld"]);
+                            }
+                        }
+
+                        if (!isHeld)
+                        {
+                            Show("This transaction is not held.", false);
+                            tx.Rollback();
+                            return;
+                        }
+
+                        if (e.CommandName == "Approve")
+                        {
+                            // Current account balance
+                            decimal currBal = 0m;
+                            using (var cmd = new SqlCommand(
+                                "SELECT Balance FROM dbo.BankAccounts WHERE AccountId=@a AND UserId=@u;", con, tx))
+                            {
+                                cmd.Parameters.AddWithValue("@a", acctId);
+                                cmd.Parameters.AddWithValue("@u", uid);
+                                object r = cmd.ExecuteScalar();
+                                if (r == null) { Show("Account not found.", false); tx.Rollback(); return; }
+                                currBal = Convert.ToDecimal(r);
+                            }
+
+                            // Compute new balance (guard against insufficient funds)
+                            decimal newBal = currBal;
+                            if (string.Equals(type, "Withdrawal", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (currBal < amount)
+                                {
+                                    Show("Cannot approve: insufficient funds.", false);
+                                    tx.Rollback();
+                                    return;
+                                }
+                                newBal = currBal - amount;
+                            }
+                            else
+                            {
+                                newBal = currBal + amount; // Deposit/Transfer-in
+                            }
+
+                            // Apply balance, clear hold, stamp ReviewStatus & BalanceAfterTransaction
+                            using (var updA = new SqlCommand(
+                                "UPDATE dbo.BankAccounts SET Balance=@b WHERE AccountId=@a;", con, tx))
+                            {
+                                updA.Parameters.AddWithValue("@b", newBal);
+                                updA.Parameters.AddWithValue("@a", acctId);
+                                updA.ExecuteNonQuery();
+                            }
+
+                            using (var updT = new SqlCommand(@"
+                                    UPDATE dbo.BankTransactions
+                                    SET IsHeld=0, ReviewStatus='Approved', BalanceAfterTransaction=@b
+                                    WHERE TransactionId=@id;", con, tx))
+                            {
+                                updT.Parameters.AddWithValue("@b", newBal);
+                                updT.Parameters.AddWithValue("@id", tid);
+                                updT.ExecuteNonQuery();
+                            }
+
+                            tx.Commit();
+                            Show("Approved. Balance updated.", true);
+                        }
+                        else if (e.CommandName == "Deny")
+                        {
+                            using (var upd = new SqlCommand(@"
+                                    UPDATE dbo.BankTransactions
+                                    SET ReviewStatus='Denied'
+                                    WHERE TransactionId=@id;", con, tx))
+                            {
+                                upd.Parameters.AddWithValue("@id", tid);
+                                upd.ExecuteNonQuery();
+                            }
+
+                            tx.Commit();
+                            Show("Denied. This transfer will not affect balance.", true);
+                        }
+                        else
+                        {
+                            tx.Rollback();
+                            return;
+                        }
+
+                        // refresh
+                        BindGrid();
+                    }
+                    catch (Exception ex1)
+                    {
+                        try { tx.Rollback(); } catch { }
+                        Show("Action failed: " + ex1.Message, false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Show("Unexpected error: " + ex.Message, false);
+            }
         }
 
         private string GetUsername(int uid)

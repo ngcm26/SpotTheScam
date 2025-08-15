@@ -137,36 +137,85 @@
                 <asp:Label ID="lblMember" runat="server" />
                 (<asp:Label ID="lblAccount" runat="server" />)</h2>
             <asp:Panel ID="pnlMsg" runat="server" Visible="false" CssClass="msg">
-                <asp:Label ID="lblMsg" runat="server" /></asp:Panel>
+                <asp:Label ID="lblMsg" runat="server" />
+            </asp:Panel>
 
             <div style="margin-bottom: 10px">
                 <asp:CheckBox ID="chkFlaggedOnly" runat="server" Text="Show flagged only" AutoPostBack="true" OnCheckedChanged="FilterChanged" />
             </div>
 
             <asp:GridView ID="gvTxns" runat="server" AutoGenerateColumns="False" GridLines="None"
-                OnRowDataBound="gvTxns_RowDataBound" AllowPaging="true" PageSize="15"
-                OnPageIndexChanging="gvTxns_PageIndexChanging">
+                OnRowDataBound="gvTxns_RowDataBound"
+                AllowPaging="true" PageSize="15"
+                OnPageIndexChanging="gvTxns_PageIndexChanging"
+                OnRowCommand="gvTxns_RowCommand">
+                <!-- NEW -->
+
                 <Columns>
-                    <asp:BoundField DataField="WhenText" HeaderText="Date / Time" />
-                    <asp:BoundField DataField="Description" HeaderText="Description" />
-                    <asp:TemplateField HeaderText="Amount">
-                        <ItemTemplate><span runat="server" id="lblAmt"></span></ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:BoundField DataField="TransactionType" HeaderText="Type" />
+                    <!-- existing columns ... -->
+
                     <asp:TemplateField HeaderText="Status">
                         <ItemTemplate>
                             <span runat="server" id="lblStatus" class="chip chip-normal">Normal</span>
                             <span runat="server" id="lblHeld" class="chip chip-held" style="display: none">Held</span>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Severity">
+
+                    <asp:TemplateField HeaderText="">
                         <ItemTemplate>
                             <span id="lblSev" runat="server" class="sev-pill" title='<%# Eval("Notes") %>'>
                                 <%# string.IsNullOrEmpty(Eval("Severity") as string) ? "—" : Eval("Severity") %>
                             </span>
                         </ItemTemplate>
                     </asp:TemplateField>
+
+                    <!-- NEW actions column; visible only when IsHeld=1 (toggled in RowDataBound) -->
+                    <asp:TemplateField HeaderText="Actions">
+                        <ItemTemplate>
+                            <asp:LinkButton ID="btnApprove" runat="server"
+                                CommandName="Approve" CommandArgument='<%# Eval("TransactionId") %>' Text="Approve" />
+                            &nbsp;
+                <asp:LinkButton ID="btnDeny" runat="server"
+                    CommandName="Deny" CommandArgument='<%# Eval("TransactionId") %>' Text="Deny"
+                    OnClientClick="return confirm('Deny this transfer?');" />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+
                 </Columns>
+            </asp:GridView>
+
+            <columns>
+                <asp:BoundField DataField="WhenText" HeaderText="Date / Time" />
+                <asp:BoundField DataField="Description" HeaderText="Description" />
+                <asp:TemplateField HeaderText="Amount">
+                    <itemtemplate><span runat="server" id="lblAmt"></span></itemtemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="TransactionType" HeaderText="Type" />
+                <asp:TemplateField HeaderText="Status">
+                    <itemtemplate>
+                        <span runat="server" id="lblStatus" class="chip chip-normal">Normal</span>
+                        <span runat="server" id="lblHeld" class="chip chip-held" style="display: none">Held</span>
+                    </itemtemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="Severity">
+                    <itemtemplate>
+                        <span id="lblSev" runat="server" class="sev-pill" title='<%# Eval("Notes") %>'>
+                            <%# string.IsNullOrEmpty(Eval("Severity") as string) ? "—" : Eval("Severity") %>
+                        </span>
+                    </itemtemplate>
+                </asp:TemplateField>
+
+                <asp:TemplateField HeaderText="Actions">
+                    <itemtemplate>
+                        <asp:LinkButton ID="btnApprove" runat="server"
+                            CommandName="Approve" CommandArgument='<%# Eval("TransactionId") %>' Text="Approve" />
+                        &nbsp;
+                <asp:LinkButton ID="btnDeny" runat="server"
+                    CommandName="Deny" CommandArgument='<%# Eval("TransactionId") %>' Text="Deny"
+                    OnClientClick="return confirm('Deny this transfer?');" />
+                    </itemtemplate>
+                </asp:TemplateField>
+            </columns>
             </asp:GridView>
             <div style="margin-top: 16px">
                 <a class="btn" href='<%# "~/User/MemberAccounts.aspx?groupId=" + Request["groupId"] + "&userId=" + Request["userId"] %>'>Back to accounts</a>
