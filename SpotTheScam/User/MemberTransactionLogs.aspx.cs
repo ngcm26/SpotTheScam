@@ -30,6 +30,7 @@ namespace SpotTheScam.User
 
                 lblMember.Text = GetUsername(MemberUserId);
                 lblAccount.Text = GetAccountNickname(AccountId, MemberUserId);
+                hlBack.NavigateUrl = $"~/User/MemberAccounts.aspx?groupId={GroupId}&userId={MemberUserId}";
                 BindGrid();
             }
         }
@@ -239,7 +240,8 @@ namespace SpotTheScam.User
                             using (var updT = new SqlCommand(@"
                                     UPDATE dbo.BankTransactions
                                     SET IsHeld=0, ReviewStatus='Approved', BalanceAfterTransaction=@b
-                                    WHERE TransactionId=@id;", con, tx))
+                                    WHERE TransactionId=@id AND IsHeld=1;
+                                    ", con, tx))
                             {
                                 updT.Parameters.AddWithValue("@b", newBal);
                                 updT.Parameters.AddWithValue("@id", tid);
@@ -254,7 +256,8 @@ namespace SpotTheScam.User
                             using (var upd = new SqlCommand(@"
                                     UPDATE dbo.BankTransactions
                                     SET ReviewStatus='Denied'
-                                    WHERE TransactionId=@id;", con, tx))
+                                    WHERE TransactionId=@id AND IsHeld=1;
+                                    ", con, tx))
                             {
                                 upd.Parameters.AddWithValue("@id", tid);
                                 upd.ExecuteNonQuery();
