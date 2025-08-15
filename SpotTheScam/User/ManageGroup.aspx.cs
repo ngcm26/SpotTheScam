@@ -21,7 +21,14 @@ namespace SpotTheScam.User
             }
         }
 
-        // we keep the editing target user here between postbacks
+        // Cache my role across postbacks
+        private string MyRole
+        {
+            get { return ViewState["MyRole"] as string; }
+            set { ViewState["MyRole"] = value; }
+        }
+
+        // keep the editing target user between postbacks
         private int? EditingUserId
         {
             get { return ViewState["EditingUserId"] as int?; }
@@ -44,17 +51,40 @@ namespace SpotTheScam.User
 
             if (!IsPostBack)
             {
-                if (!UserIsMemberOfGroup(Convert.ToInt32(Session["UserId"]), GroupId))
+                int me = Convert.ToInt32(Session["UserId"]);
+                if (!UserIsMemberOfGroup(me, GroupId))
                 {
                     ShowMsg("You do not have access to this group.", false);
                     gvMembers.Visible = false;
                     return;
                 }
 
-                EnsureRestrictionsTableExists();
+                // get my role once and cache it
+                MyRole = GetRole(me, GroupId);
+
                 PopulateHourDropdowns();
                 BindGroupHeader();
                 BindMembers();
+
+                // Owner-only editor and prefill
+                pnlOwner.Visible = (MyRole == "GroupOwner");
+                if (pnlOwner.Visible)
+                {
+                    using (var con = new SqlConnection(cs))
+                    using (var cmd = new SqlCommand("SELECT Name, [Description] FROM FamilyGroups WHERE GroupId=@gid", con))
+                    {
+                        cmd.Parameters.AddWithValue("@gid", GroupId);
+                        con.Open();
+                        using (var rd = cmd.ExecuteReader())
+                        {
+                            if (rd.Read())
+                            {
+                                txtGroupName.Text = Convert.ToString(rd["Name"]);
+                                txtGroupDesc.Text = Convert.ToString(rd["Description"]);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -112,15 +142,29 @@ namespace SpotTheScam.User
             string status = Convert.ToString(drv["Status"]);
 
             var lnkRestrict = (LinkButton)e.Row.FindControl("lnkRestrict");
-            var lnkActivate = (LinkButton)e.Row.FindControl("lnkActivate");
+            var lnkRemove = (LinkButton)e.Row.FindControl("lnkRemove");
+            var pnlRoleEdit = (Panel)e.Row.FindControl("pnlRoleEdit");
+            var ddlRoleRow = (DropDownList)e.Row.FindControl("ddlRoleRow");
 
-            // show Restrict only for PrimaryAccountHolder and when Active
+            // Restrict: only for Primary & Active; actor must be Owner or Guardian
             if (lnkRestrict != null)
-                lnkRestrict.Visible = (role == "PrimaryAccountHolder" && status == "Active");
+                lnkRestrict.Visible = (role == "Primary" && status == "Active" &&
+                                       (MyRole == "GroupOwner" || MyRole == "Guardian"));
 
-            // show Activate only when Pending
-            if (lnkActivate != null)
-                lnkActivate.Visible = (status == "Pending");
+            // Remove: owner only; cannot remove owner
+            if (lnkRemove != null)
+                lnkRemove.Visible = (MyRole == "GroupOwner" && role != "GroupOwner");
+
+            // Inline role change: owner only; target not owner
+            if (pnlRoleEdit != null)
+            {
+                pnlRoleEdit.Visible = (MyRole == "GroupOwner" && role != "GroupOwner");
+                if (pnlRoleEdit.Visible && ddlRoleRow != null)
+                {
+                    var li = ddlRoleRow.Items.FindByValue(role);
+                    if (li != null) { ddlRoleRow.ClearSelection(); li.Selected = true; }
+                }
+            }
         }
 
         protected void gvMembers_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -129,7 +173,13 @@ namespace SpotTheScam.User
             int targetUserId = Convert.ToInt32(e.CommandArgument);
             int actorId = Convert.ToInt32(Session["UserId"]);
 
-            if (e.CommandName == "Activate")
+            if (e.CommandName == "Restrict")
+            {
+                LoadRestrictionsFor(targetUserId);
+                return;
+            }
+
+            if (e.CommandName == "Remove")
             {
                 using (var con = new SqlConnection(cs))
                 {
@@ -138,37 +188,81 @@ namespace SpotTheScam.User
                     try
                     {
                         if (!UserHasRole(actorId, GroupId, "GroupOwner", con, tx))
+                        { ShowMsg("Only the Group Owner can remove users.", false); tx.Rollback(); return; }
+
+                        // disallow removing the owner
+                        using (var chk = new SqlCommand(@"SELECT GroupRole FROM FamilyGroupMembers WHERE GroupId=@g AND UserId=@u", con, tx))
                         {
-                            ShowMsg("Only the Group Owner can activate members.", false);
-                            tx.Rollback();
-                            return;
+                            chk.Parameters.AddWithValue("@g", GroupId);
+                            chk.Parameters.AddWithValue("@u", targetUserId);
+                            var r = chk.ExecuteScalar() as string;
+                            if (r == "GroupOwner") { ShowMsg("You cannot remove the group owner.", false); tx.Rollback(); return; }
                         }
 
-                        using (var cmd = new SqlCommand(@"
-                            UPDATE FamilyGroupMembers
-                            SET Status='Active', AcceptedAt=GETDATE()
-                            WHERE GroupId=@gid AND UserId=@uid AND Status='Pending';", con, tx))
+                        using (var cmd = new SqlCommand(@"UPDATE FamilyGroupMembers SET Status='Removed' WHERE GroupId=@g AND UserId=@u;", con, tx))
                         {
-                            cmd.Parameters.AddWithValue("@gid", GroupId);
-                            cmd.Parameters.AddWithValue("@uid", targetUserId);
-                            int rows = cmd.ExecuteNonQuery();
-                            ShowMsg(rows > 0 ? "Member activated." : "Nothing to activate.", rows > 0);
+                            cmd.Parameters.AddWithValue("@g", GroupId);
+                            cmd.Parameters.AddWithValue("@u", targetUserId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // cleanup restrictions/whitelist for that user (optional)
+                        using (var cmd = new SqlCommand(@"
+                            DELETE FROM FamilyGroupMemberRestrictions WHERE GroupId=@g AND PrimaryUserId=@u;
+                            DELETE FROM FamilyGroupMemberWhitelistedRecipients WHERE GroupId=@g AND UserId=@u;", con, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@g", GroupId);
+                            cmd.Parameters.AddWithValue("@u", targetUserId);
+                            cmd.ExecuteNonQuery();
                         }
 
                         tx.Commit();
+                        ShowMsg("Member removed.", true);
                         BindMembers();
                     }
-                    catch (Exception ex)
-                    {
-                        try { tx.Rollback(); } catch { }
-                        ShowMsg("Action failed. " + ex.Message, false);
-                    }
+                    catch (Exception ex) { try { tx.Rollback(); } catch { } ShowMsg("Remove failed. " + ex.Message, false); }
                 }
+                return;
             }
-            else if (e.CommandName == "Restrict")
+
+            if (e.CommandName == "ChangeRole")
             {
-                // open editor
-                LoadRestrictionsFor(targetUserId);
+                var row = ((Control)e.CommandSource).NamingContainer as GridViewRow;
+                var ddl = row?.FindControl("ddlRoleRow") as DropDownList;
+                if (ddl == null) { ShowMsg("No role selected.", false); return; }
+                string newRole = ddl.SelectedValue;
+
+                using (var con = new SqlConnection(cs))
+                {
+                    con.Open();
+                    var tx = con.BeginTransaction();
+                    try
+                    {
+                        if (!UserHasRole(actorId, GroupId, "GroupOwner", con, tx))
+                        { ShowMsg("Only the Group Owner can change roles.", false); tx.Rollback(); return; }
+
+                        using (var chk = new SqlCommand(@"SELECT GroupRole FROM FamilyGroupMembers WHERE GroupId=@g AND UserId=@u", con, tx))
+                        {
+                            chk.Parameters.AddWithValue("@g", GroupId);
+                            chk.Parameters.AddWithValue("@u", targetUserId);
+                            var current = (chk.ExecuteScalar() as string) ?? "";
+                            if (current == "GroupOwner") { ShowMsg("You cannot change the owner’s role.", false); tx.Rollback(); return; }
+                        }
+
+                        using (var cmd = new SqlCommand(@"UPDATE FamilyGroupMembers SET GroupRole=@r WHERE GroupId=@g AND UserId=@u AND Status='Active';", con, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@g", GroupId);
+                            cmd.Parameters.AddWithValue("@u", targetUserId);
+                            cmd.Parameters.AddWithValue("@r", newRole);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        ShowMsg("Role updated.", true);
+                        BindMembers();
+                    }
+                    catch (Exception ex) { try { tx.Rollback(); } catch { } ShowMsg("Change role failed. " + ex.Message, false); }
+                }
             }
         }
 
@@ -179,20 +273,11 @@ namespace SpotTheScam.User
             string email = (txtInviteEmail?.Text ?? "").Trim();
             string role = (ddlInviteRole?.SelectedValue ?? "").Trim();
 
-            // 1) Print what the server received + the dropdown items
-            var items = new System.Text.StringBuilder();
-            foreach (ListItem li in ddlInviteRole.Items)
-                items.Append($"[{li.Text}:{li.Value}]");
-            ShowMsg($"DBG -> Text='{ddlInviteRole.SelectedItem?.Text}' | Value='{ddlInviteRole.SelectedValue}' | Items={items}", false);
-
-            // 2) Normalize any legacy value
+            // normalize any legacy value
             if (string.Equals(role, "PrimaryAccountHolder", StringComparison.OrdinalIgnoreCase))
                 role = "Primary";
 
-            // 3) Defensive validation (and print what we’re validating)
-            bool okRole = string.Equals(role, "Guardian", StringComparison.OrdinalIgnoreCase)
-                       || string.Equals(role, "Primary", StringComparison.OrdinalIgnoreCase);
-            ShowMsg($"DBG -> NormalizedRole='{role}' | okRole={okRole}", false);
+            bool okRole = role.Equals("Guardian", StringComparison.OrdinalIgnoreCase) || role.Equals("Primary", StringComparison.OrdinalIgnoreCase);
             if (!okRole)
             {
                 ShowMsg($"Invalid role. Got '{role}'. Choose Guardian or Primary.", false);
@@ -213,7 +298,7 @@ namespace SpotTheScam.User
                         return;
                     }
 
-                    // find the user by email
+                    // find user by email
                     int inviteeId;
                     using (var cmd = new SqlCommand("SELECT Id FROM Users WHERE Email=@em", con, tx))
                     {
@@ -285,10 +370,17 @@ namespace SpotTheScam.User
             }
         }
 
-        // --------------- Restrictions UI ---------------
+        // --------------- Restrictions UI (Primary only) ---------------
         private void LoadRestrictionsFor(int userId)
         {
-            // only for PrimaryAccountHolder
+            // permission gate: only Owner or Guardian may edit restrictions
+            if (!(MyRole == "GroupOwner" || MyRole == "Guardian"))
+            {
+                ShowMsg("You don’t have permission to edit restrictions.", false);
+                return;
+            }
+
+            // confirm target is a Primary in this group
             using (var con = new SqlConnection(cs))
             using (var cmd = new SqlCommand(@"
                 SELECT u.Username, m.GroupRole
@@ -308,9 +400,9 @@ namespace SpotTheScam.User
                     }
                     var role = Convert.ToString(rd["GroupRole"]);
                     var username = Convert.ToString(rd["Username"]);
-                    if (role != "PrimaryAccountHolder")
+                    if (role != "Primary")
                     {
-                        ShowMsg("Only Primary Account Holders can have spending restrictions.", false);
+                        ShowMsg("Only Primary members can have spending restrictions.", false);
                         return;
                     }
                     lblEditingUser.Text = username;
@@ -318,12 +410,12 @@ namespace SpotTheScam.User
                 }
             }
 
-            // load existing values (if any)
+            // load existing values (if any) using PrimaryUserId
             using (var con = new SqlConnection(cs))
             using (var cmd = new SqlCommand(@"
                 SELECT SingleTransactionLimit, MaxDailyTransfer, AllowedStartHour, AllowedEndHour
                 FROM FamilyGroupMemberRestrictions
-                WHERE GroupId=@gid AND UserId=@uid", con))
+                WHERE GroupId=@gid AND PrimaryUserId=@uid", con))
             {
                 cmd.Parameters.AddWithValue("@gid", GroupId);
                 cmd.Parameters.AddWithValue("@uid", userId);
@@ -358,10 +450,18 @@ namespace SpotTheScam.User
                 return;
             }
 
+            // permission: Owner or Guardian only
+            if (!(MyRole == "GroupOwner" || MyRole == "Guardian"))
+            {
+                ShowMsg("You don’t have permission to save restrictions.", false);
+                return;
+            }
+
             decimal? single = TryParseDecimal(txtSingleLimit.Text);
             decimal? daily = TryParseDecimal(txtDailyLimit.Text);
             int? startHr = TryParseInt(ddlStartHour.SelectedValue);
             int? endHr = TryParseInt(ddlEndHour.SelectedValue);
+            int actorId = Convert.ToInt32(Session["UserId"]);
 
             using (var con = new SqlConnection(cs))
             {
@@ -369,17 +469,26 @@ namespace SpotTheScam.User
                 var tx = con.BeginTransaction();
                 try
                 {
-                    // upsert
                     using (var cmd = new SqlCommand(@"
-IF EXISTS (SELECT 1 FROM FamilyGroupMemberRestrictions WHERE GroupId=@gid AND UserId=@uid)
+IF EXISTS (SELECT 1 FROM FamilyGroupMemberRestrictions WHERE GroupId=@gid AND PrimaryUserId=@uid)
+BEGIN
     UPDATE FamilyGroupMemberRestrictions
-    SET SingleTransactionLimit=@single, MaxDailyTransfer=@daily,
-        AllowedStartHour=@sh, AllowedEndHour=@eh
-    WHERE GroupId=@gid AND UserId=@uid;
+    SET SingleTransactionLimit=@single,
+        MaxDailyTransfer=@daily,
+        AllowedStartHour=@sh,
+        AllowedEndHour=@eh,
+        UpdatedByUserId=@actor,
+        UpdatedAt=GETDATE()
+    WHERE GroupId=@gid AND PrimaryUserId=@uid;
+END
 ELSE
+BEGIN
     INSERT INTO FamilyGroupMemberRestrictions
-        (GroupId, UserId, SingleTransactionLimit, MaxDailyTransfer, AllowedStartHour, AllowedEndHour)
-    VALUES (@gid, @uid, @single, @daily, @sh, @eh);", con, tx))
+        (GroupId, PrimaryUserId, SingleTransactionLimit, MaxDailyTransfer,
+         AllowedStartHour, AllowedEndHour, UpdatedByUserId)
+    VALUES
+        (@gid, @uid, @single, @daily, @sh, @eh, @actor);
+END", con, tx))
                     {
                         cmd.Parameters.AddWithValue("@gid", GroupId);
                         cmd.Parameters.AddWithValue("@uid", EditingUserId.Value);
@@ -387,6 +496,7 @@ ELSE
                         cmd.Parameters.AddWithValue("@daily", (object)daily ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@sh", (object)startHr ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@eh", (object)endHr ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@actor", actorId);
                         cmd.ExecuteNonQuery();
                     }
 
@@ -403,13 +513,90 @@ ELSE
             }
         }
 
+
         protected void btnCancelEdit_Click(object sender, EventArgs e)
         {
             pnlRestrict.Visible = false;
             EditingUserId = null;
         }
 
+        // --------------- Owner: rename/description + delete ---------------
+        protected void btnSaveGroupMeta_Click(object sender, EventArgs e)
+        {
+            if (MyRole != "GroupOwner")
+            {
+                ShowMsg("Only the Group Owner can edit group info.", false);
+                return;
+            }
+            string n = (txtGroupName.Text ?? "").Trim();
+            string d = (txtGroupDesc.Text ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(n)) { ShowMsg("Group name cannot be empty.", false); return; }
+
+            using (var con = new SqlConnection(cs))
+            using (var cmd = new SqlCommand("UPDATE FamilyGroups SET Name=@n, [Description]=@d WHERE GroupId=@g AND OwnerUserId=@o", con))
+            {
+                cmd.Parameters.AddWithValue("@n", n);
+                cmd.Parameters.AddWithValue("@d", (object)d ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@g", GroupId);
+                cmd.Parameters.AddWithValue("@o", Convert.ToInt32(Session["UserId"]));
+                con.Open();
+                int rows = cmd.ExecuteNonQuery();
+                if (rows > 0) { ShowMsg("Group updated.", true); BindGroupHeader(); }
+                else ShowMsg("Update failed.", false);
+            }
+        }
+
+        protected void btnDeleteGroup_Click(object sender, EventArgs e)
+        {
+            if (MyRole != "GroupOwner")
+            {
+                ShowMsg("Only the Group Owner can delete the group.", false);
+                return;
+            }
+
+            using (var con = new SqlConnection(cs))
+            {
+                con.Open();
+                var tx = con.BeginTransaction();
+                try
+                {
+                    // If whitelist doesn’t have FK cascade, clean it (safe even if FKs are added later)
+                    using (var cmd = new SqlCommand(@"DELETE FROM FamilyGroupMemberWhitelistedRecipients WHERE GroupId=@g;", con, tx))
+                    {
+                        cmd.Parameters.AddWithValue("@g", GroupId);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (var cmd = new SqlCommand("DELETE FROM FamilyGroups WHERE GroupId=@g AND OwnerUserId=@o", con, tx))
+                    {
+                        cmd.Parameters.AddWithValue("@g", GroupId);
+                        cmd.Parameters.AddWithValue("@o", Convert.ToInt32(Session["UserId"]));
+                        int rows = cmd.ExecuteNonQuery();
+                        if (rows == 0) { ShowMsg("Delete failed.", false); tx.Rollback(); return; }
+                    }
+
+                    tx.Commit();
+                    Response.Redirect("~/User/MyGroups.aspx?msg=deleted");
+                }
+                catch (Exception ex) { try { tx.Rollback(); } catch { } ShowMsg("Delete failed. " + ex.Message, false); }
+            }
+        }
+
         // --------------- Helpers ---------------
+        private string GetRole(int userId, int groupId)
+        {
+            using (var con = new SqlConnection(cs))
+            using (var cmd = new SqlCommand(@"SELECT GroupRole FROM FamilyGroupMembers
+                                              WHERE GroupId=@g AND UserId=@u AND Status='Active'", con))
+            {
+                cmd.Parameters.AddWithValue("@g", groupId);
+                cmd.Parameters.AddWithValue("@u", userId);
+                con.Open();
+                var r = cmd.ExecuteScalar();
+                return r == null ? "" : r.ToString();
+            }
+        }
+
         private bool UserIsMemberOfGroup(int userId, int groupId)
         {
             using (var con = new SqlConnection(cs))
@@ -474,31 +661,6 @@ ELSE
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
             int i; return int.TryParse(s, out i) ? i : (int?)null;
-        }
-
-        // creates the restrictions table if it doesn't exist yet
-        private void EnsureRestrictionsTableExists()
-        {
-            using (var con = new SqlConnection(cs))
-            using (var cmd = new SqlCommand(@"
-IF NOT EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FamilyGroupMemberRestrictions]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[FamilyGroupMemberRestrictions](
-        [GroupId] INT NOT NULL,
-        [UserId] INT NOT NULL,
-        [SingleTransactionLimit] DECIMAL(18,2) NULL,
-        [MaxDailyTransfer] DECIMAL(18,2) NULL,
-        [AllowedStartHour] INT NULL,
-        [AllowedEndHour] INT NULL,
-        CONSTRAINT [PK_FGMR] PRIMARY KEY CLUSTERED ([GroupId],[UserId]),
-        CONSTRAINT [FK_FGMR_Group] FOREIGN KEY ([GroupId]) REFERENCES [dbo].[FamilyGroups]([GroupId]) ON DELETE CASCADE,
-        CONSTRAINT [FK_FGMR_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([Id]) ON DELETE CASCADE
-    );
-END", con))
-            {
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
         }
     }
 }
