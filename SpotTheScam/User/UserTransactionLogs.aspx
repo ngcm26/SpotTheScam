@@ -119,6 +119,12 @@
             background: #e5e7eb;
             color: #374151
         }
+
+        .chip-held {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
     </style>
 </asp:Content>
 
@@ -168,6 +174,7 @@
                     <asp:TemplateField HeaderText="Status">
                         <ItemTemplate>
                             <span runat="server" id="lblStatus" class="chip chip-normal">Normal</span>
+                            <span runat="server" id="lblHeld" class="chip chip-held" style="display:none">Held</span>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="">

@@ -62,6 +62,7 @@ namespace SpotTheScam.User
                     t.Severity,
                     t.ReviewStatus,
                     t.Notes,
+                    t.IsHeld,
                     t.BalanceAfterTransaction,
                     a.AccountNickname
                 FROM BankTransactions t
@@ -170,6 +171,14 @@ namespace SpotTheScam.User
                 lblStatus.Attributes["class"] = css;
                 lblStatus.InnerText = text;
             }
+
+            var lblHeld = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblHeld");
+            if (lblHeld != null)
+            {
+                bool isHeldRow = data["IsHeld"] != DBNull.Value && Convert.ToBoolean(data["IsHeld"]);
+                lblHeld.Style["display"] = isHeldRow ? "inline-block" : "none";
+            }
+
         }
     }
 }

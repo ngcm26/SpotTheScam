@@ -39,7 +39,8 @@ namespace SpotTheScam.User
                 SELECT TOP 50
                     t.TransactionId, t.TransactionDate, t.TransactionTime,
                     t.TransactionType, t.Amount, t.Description, t.SenderRecipient,
-                    t.IsFlagged, t.Severity, t.ReviewStatus, t.Notes
+                    t.IsFlagged, t.Severity, t.ReviewStatus, t.Notes,
+                    t.IsHeld 
                 FROM BankTransactions t
                 WHERE t.UserId = @u AND t.AccountId = @a";
 
@@ -119,6 +120,13 @@ namespace SpotTheScam.User
                 lblStatus.Attributes["class"] = css;
                 lblStatus.InnerText = text;
             }
+            var lblHeld = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Row.FindControl("lblHeld");
+            if (lblHeld != null)
+            {
+                bool isHeldRow = data["IsHeld"] != DBNull.Value && Convert.ToBoolean(data["IsHeld"]);
+                lblHeld.Style["display"] = isHeldRow ? "inline-block" : "none";
+            }
+
         }
 
         private string GetUsername(int uid)
