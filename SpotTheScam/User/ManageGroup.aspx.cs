@@ -324,6 +324,11 @@ namespace SpotTheScam.User
                 con.Open();
                 var tx = con.BeginTransaction();
 
+                Guid token = Guid.Empty;
+                DateTime expiresUtc = DateTime.UtcNow.AddDays(7);
+                int inviteeId = 0;
+                string groupName = "";
+
                 try
                 {
                     if (!UserHasRole(inviterId, GroupId, "GroupOwner", con, tx))
@@ -334,7 +339,6 @@ namespace SpotTheScam.User
                     }
 
                     // find user by email
-                    int inviteeId;
                     using (var cmd = new SqlCommand("SELECT Id FROM Users WHERE Email=@em", con, tx))
                     {
                         cmd.Parameters.AddWithValue("@em", email);
@@ -381,9 +385,9 @@ namespace SpotTheScam.User
                         return;
                     }
 
+                    // Upsert Pending row
                     if (string.Equals(existingStatus, "Removed", StringComparison.OrdinalIgnoreCase))
                     {
-                        // resurrect the row to Pending instead of inserting a duplicate PK
                         using (var up = new SqlCommand(@"
                     UPDATE FamilyGroupMembers
                     SET GroupRole=@role,
@@ -401,42 +405,68 @@ namespace SpotTheScam.User
                             up.Parameters.AddWithValue("@inviter", inviterId);
                             up.ExecuteNonQuery();
                         }
-
-                        tx.Commit();
-                        ShowMsg("Invite re-sent.", true);
-                        txtInviteEmail.Text = "";
-                        ddlInviteRole.SelectedIndex = 0;
-                        BindMembers();
-                        return;
                     }
-
-                    // no existing row -> insert new pending invite
-                    using (var cmd = new SqlCommand(@"
-                INSERT INTO FamilyGroupMembers
-                  (GroupId, UserId, GroupRole, Status, InvitedByUserId, InvitedAt)
-                VALUES
-                  (@gid, @uid, @role, 'Pending', @inviter, GETDATE())", con, tx))
+                    else
                     {
-                        cmd.Parameters.AddWithValue("@gid", GroupId);
-                        cmd.Parameters.AddWithValue("@uid", inviteeId);
-                        cmd.Parameters.AddWithValue("@role", role);
-                        cmd.Parameters.AddWithValue("@inviter", inviterId);
-                        cmd.ExecuteNonQuery();
+                        using (var cmd = new SqlCommand(@"
+                    INSERT INTO FamilyGroupMembers
+                      (GroupId, UserId, GroupRole, Status, InvitedByUserId, InvitedAt)
+                    VALUES
+                      (@gid, @uid, @role, 'Pending', @inviter, GETDATE())", con, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@gid", GroupId);
+                            cmd.Parameters.AddWithValue("@uid", inviteeId);
+                            cmd.Parameters.AddWithValue("@role", role);
+                            cmd.Parameters.AddWithValue("@inviter", inviterId);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
+
+                    // Token + expiry
+                    token = Guid.NewGuid();
+                    using (var up2 = new SqlCommand(@"
+                UPDATE FamilyGroupMembers
+                  SET InvitationToken=@t, InvitationExpiresAt=@exp
+                WHERE GroupId=@gid AND UserId=@uid;", con, tx))
+                    {
+                        up2.Parameters.AddWithValue("@gid", GroupId);
+                        up2.Parameters.AddWithValue("@uid", inviteeId);
+                        up2.Parameters.AddWithValue("@t", token);
+                        up2.Parameters.AddWithValue("@exp", expiresUtc);
+                        up2.ExecuteNonQuery();
+                    }
+
+                    // group name for email (reuse same connection/tx)
+                    groupName = GetGroupName(GroupId, con, tx);
 
                     tx.Commit();
-                    ShowMsg("Invite sent (now Pending).", true);
-                    txtInviteEmail.Text = "";
-                    ddlInviteRole.SelectedIndex = 0;
-                    BindMembers();
                 }
                 catch (Exception ex)
                 {
                     try { tx.Rollback(); } catch { }
                     ShowMsg("Could not send invite. " + ex.Message, false);
+                    return;
+                }
+
+                // Send email OUTSIDE the transaction (so DB is not held open by SMTP)
+                try
+                {
+                    string acceptUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}{ResolveUrl("~/User/AcceptInvite.aspx")}?token={token}";
+                    SendInviteEmail(email, groupName, acceptUrl, expiresUtc);
+
+                    ShowMsg("Invite sent (now Pending).", true);
+                    txtInviteEmail.Text = "";
+                    ddlInviteRole.SelectedIndex = 0;
+                    BindMembers();
+                }
+                catch (Exception mailEx)
+                {
+                    // Email failed but DB invite exists; surface a clear message
+                    ShowMsg("Invite created, but email delivery failed: " + mailEx.Message, false);
                 }
             }
         }
+
 
 
         // --------------- Restrictions UI (Primary only) ---------------
@@ -731,5 +761,50 @@ END", con, tx))
             if (string.IsNullOrWhiteSpace(s)) return null;
             int i; return int.TryParse(s, out i) ? i : (int?)null;
         }
+
+        private string GetGroupName(int groupId, SqlConnection con, SqlTransaction tx)
+        {
+            using (var cmd = new SqlCommand("SELECT Name FROM FamilyGroups WHERE GroupId=@g", con, tx))
+            {
+                cmd.Parameters.AddWithValue("@g", groupId);
+                var r = cmd.ExecuteScalar();
+                return r == null ? "Family Group" : r.ToString();
+            }
+        }
+
+        private void SendInviteEmail(string toEmail, string groupName, string acceptUrl, DateTime expiresUtc)
+        {
+            var msg = new System.Net.Mail.MailMessage();
+            msg.To.Add(toEmail);
+            msg.Subject = $"You're invited to join {groupName}";
+            msg.IsBodyHtml = true;
+
+            // Convert expiry to SGT for display
+            DateTime expiresLocal;
+            try
+            {
+                var sgt = TimeZoneInfo.FindSystemTimeZoneById("Singapore Standard Time");
+                expiresLocal = TimeZoneInfo.ConvertTimeFromUtc(expiresUtc, sgt);
+            }
+            catch
+            {
+                // fallback if TZ not found on host
+                expiresLocal = expiresUtc.AddHours(8);
+            }
+
+            msg.Body =
+                $"<p>Hello,</p>" +
+                $"<p>You’ve been invited to join <strong>{System.Web.HttpUtility.HtmlEncode(groupName)}</strong>.</p>" +
+                $"<p>Click the link below to accept:</p>" +
+                $"<p><a href=\"{acceptUrl}\">{acceptUrl}</a></p>" +
+                $"<p>This link expires on <strong>{expiresLocal:ddd, dd MMM yyyy HH:mm}</strong>.</p>" +
+                $"<p>If you didn’t expect this, you can ignore this email.</p>";
+
+            using (var client = new System.Net.Mail.SmtpClient()) // uses <system.net><mailSettings>
+            {
+                client.Send(msg);
+            }
+        }
+
     }
 }
