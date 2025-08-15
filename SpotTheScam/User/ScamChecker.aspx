@@ -380,13 +380,16 @@
                 <div id="checkerErrorMsg" style="display: none; width: 100%; max-width: 600px; margin: 18px auto 0 auto; padding: 12px 18px; border-radius: 8px; background: rgba(236, 119, 119, 0.5); border: 1.5px solid #A22424; color: #A22424; font-size: 1rem; text-align: center; box-shadow: 0 2px 8px rgba(162,36,36,0.07);"></div>
             </div>
             
-            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+            <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
                 <ContentTemplate>
                     <div class="result-section hidden" id="resultSection" data-resulttype="">
                         <div class="result-title">Result</div>
                         <asp:Label ID="lblResult" runat="server" CssClass="result-content"></asp:Label>
                     </div>
                 </ContentTemplate>
+                <Triggers>
+                    <asp:PostBackTrigger ControlID="btnCheckScam" />
+                </Triggers>
             </asp:UpdatePanel>
         </div>
     </div>

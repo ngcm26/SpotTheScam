@@ -1,5 +1,6 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="User.master.cs" Inherits="SpotTheScam.User.UserMaster" %>
 
+<%@ Import Namespace="System.Linq" %>
 <!DOCTYPE html>
 <html lang="en">
 <head runat="server">
@@ -215,11 +216,38 @@
                         </asp:PlaceHolder>
 
                         <!-- For LOGGED-IN USERS ONLY -->
+
                         <asp:PlaceHolder ID="phUser" runat="server" Visible="false">
+                            <% 
+                                var myPages = new[] {
+                                                        "/User/CreateGroup.aspx",
+                                                        "/User/MyGroups.aspx",
+                                                        "/User/Invites.aspx",
+                                                        "/User/ConnectBank.aspx",
+                                                        "/User/AddTransactions.aspx",
+                                                        "/User/UserTransactionLogs.aspx",
+                                                        "/User/ManageGroup.aspx",
+                                                        "/User/AcceptInvite.aspx"
+                                                    };
+                                bool showFamilyHub = myPages.Any(p => Request.Url.AbsolutePath.EndsWith(p, StringComparison.OrdinalIgnoreCase));
+                            %>
+
+                            <% if (showFamilyHub)
+                                { %>
+                            <li class="nav-item me-2">
+                                <a class="btn btn-outline-dark"
+                                    data-bs-toggle="offcanvas"
+                                    href="#offcanvasFamilyHub"
+                                    role="button"
+                                    aria-controls="offcanvasFamilyHub">Family Hub
+                                </a>
+                            </li>
+                            <% } %>
+
                             <li class="nav-item dropdown me-3">
                                 <a class="nav-link dropdown-toggle fw-bold text-dark position-relative"
                                     href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Notifications
-    <asp:Literal ID="litBellCount" runat="server" />
+            <asp:Literal ID="litBellCount" runat="server" />
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 320px">
                                     <asp:PlaceHolder ID="phNoInvites" runat="server" Visible="false">
@@ -233,9 +261,8 @@
                                                     <strong><%# System.Web.HttpUtility.HtmlEncode(Eval("GroupName")) %></strong>
                                                     <div class="small text-muted">
                                                         Invited as <%# System.Web.HttpUtility.HtmlEncode(Eval("Role")) %> •
-                                                        <%# Convert.ToDateTime(Eval("InvitedAt")).ToString("dd MMM yyyy, h:mm tt") %>
+                                <%# Convert.ToDateTime(Eval("InvitedAt")).ToString("dd MMM yyyy, h:mm tt") %>
                                                     </div>
-
                                                 </a>
                                             </li>
                                         </ItemTemplate>
@@ -258,6 +285,7 @@
                                 </ul>
                             </li>
                         </asp:PlaceHolder>
+
                     </ul>
                 </div>
             </div>
@@ -272,6 +300,40 @@
         <footer class="text-white text-center p-3 mt-auto">
             &copy; <%: DateTime.Now.Year %> Spot The Scam. All rights reserved.
         </footer>
+
+        <!-- Offcanvas Family Hub -->
+        <asp:PlaceHolder ID="phFamilyHub" runat="server" Visible="false">
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasFamilyHub" aria-labelledby="offcanvasFamilyHubLabel">
+                <div class="offcanvas-header">
+                    <h5 id="offcanvasFamilyHubLabel">Family Hub</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="MyGroups.aspx">My Groups</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="CreateGroup.aspx">Create Group</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="Invites.aspx">Invites</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="ConnectBank.aspx">Connect Bank</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="AddTransactions.aspx">Add Transactions</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="UserTransactionLogs.aspx">Transaction Logs</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </asp:PlaceHolder>
+
+
 
     </form>
 

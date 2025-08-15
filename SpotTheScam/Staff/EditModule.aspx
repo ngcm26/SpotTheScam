@@ -155,6 +155,9 @@
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin:8px 0;">
+        <asp:HyperLink ID="lnkPreview" runat="server" CssClass="btn btn-secondary" Text="Preview Module" NavigateUrl="#" />
+    </div>
     <!-- Main form, now stretches edge to edge -->
     <div class="add-module-container">
         <!-- Left: Cover Image Preview -->

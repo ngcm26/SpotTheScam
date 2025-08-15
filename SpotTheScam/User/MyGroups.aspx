@@ -40,7 +40,6 @@
         <asp:GridView ID="gvGroups" runat="server" AutoGenerateColumns="false" CssClass="table"
                       OnRowDataBound="gvGroups_RowDataBound" Visible="false">
             <Columns>
-                <!-- Group name links to ManageGroup.aspx -->
                 <asp:TemplateField HeaderText="Group">
                     <ItemTemplate>
                         <a href='<%# "ManageGroup.aspx?groupId=" + Eval("GroupId") %>'><%# Eval("Name") %></a>

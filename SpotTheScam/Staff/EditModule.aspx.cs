@@ -24,6 +24,11 @@ namespace SpotTheScam
             {
                 if (Request.QueryString["module_id"] != null && int.TryParse(Request.QueryString["module_id"], out moduleId))
                 {
+                    // Wire preview link
+                    if (lnkPreview != null)
+                    {
+                        lnkPreview.NavigateUrl = ResolveUrl("~/User/ModuleInformation.aspx?module_id=" + moduleId + "&preview=1");
+                    }
                     LoadModuleInformation();
                 }
                 else

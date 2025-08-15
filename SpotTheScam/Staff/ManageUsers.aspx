@@ -206,6 +206,31 @@
             font-size: 0.95em;
             display: inline-block;
         }
+        .status-published {
+            background: #28a745; /* active */
+            color: #fff;
+            padding: 2px 14px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 0.95em;
+            display: inline-block;
+            border: none;
+        }
+        .status-draft {
+            background: #dc3545; /* suspended */
+            color: #fff;
+            padding: 2px 14px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 0.95em;
+            display: inline-block;
+            border: none;
+        }
+        .users-table a.status-published, .users-table a.status-draft {
+            text-decoration: none;
+            color: #fff !important;
+            cursor: pointer;
+        }
         .form-select {
             width: 100%;
             background: #fff;
@@ -268,6 +293,16 @@
                         <asp:ListItem Text="Staff" Value="staff" />
                     </asp:DropDownList>
                 </EditItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Status">
+                <ItemTemplate>
+                    <asp:LinkButton ID="btnToggleStatus" runat="server"
+                        CommandName="ToggleStatus"
+                        CommandArgument='<%# Eval("Id") + "|" + Eval("Status") %>'
+                        CssClass='<%# (Eval("Status").ToString().ToLower()=="active") ? "status-published" : "status-draft" %>'
+                        OnClientClick="return confirm('Toggle status for this user?');"
+                        Text='<%# Eval("Status") %>' />
+                </ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Actions">
                 <ItemTemplate>

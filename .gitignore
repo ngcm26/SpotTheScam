@@ -370,3 +370,4 @@ App_Data/
 # EXCEPTION: Do NOT ignore database files in SpotTheScam/Database/
 !SpotTheScam/SpotTheScam/Database/*.mdf
 !SpotTheScam/SpotTheScam/Database/*.ldf
+/SpotTheScam/appSettings.secrets.config
