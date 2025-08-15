@@ -10,6 +10,14 @@ namespace SpotTheScam.Staff
             if (Session["StaffName"] != null)
             {
                 phNavOptions.Visible = true;
+
+                // Only show manage staff for admins
+                var role = Session["StaffRole"] as string;
+                if (!string.IsNullOrEmpty(role) && role.Equals("admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ph = FindControl("phManageStaff") as System.Web.UI.WebControls.PlaceHolder;
+                    if (ph != null) ph.Visible = true;
+                }
             }
             else
             {

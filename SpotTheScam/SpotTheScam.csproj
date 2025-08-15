@@ -180,14 +180,17 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Staff\AddStaff.aspx" />
     <Content Include="Staff\AddUser.aspx" />
     <Content Include="Staff\EditModule.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Staff\EditStaff.aspx" />
     <Content Include="Staff\EditUsers.aspx" />
     <Content Include="Staff\IndividualBlogStafff.aspx" />
     <Content Include="Staff\IndividualForumStaff.aspx" />
     <Content Include="Staff\ManageBlog.aspx" />
     <Content Include="Staff\ManageForum.aspx" />
+    <Content Include="Staff\ManageStaff.aspx" />
     <Content Include="Staff\StaffAddModules.aspx" />
     <Content Include="Staff\StaffManageParticipants.aspx" />
     <Content Include="Staff\StaffManageSessions.aspx" />
@@ -237,6 +240,13 @@
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Staff\AddStaff.aspx.cs">
+      <DependentUpon>AddStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\AddStaff.aspx.designer.cs">
+      <DependentUpon>AddStaff.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Staff\AddUser.aspx.cs">
       <DependentUpon>AddUser.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -253,6 +263,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\EditStaff.aspx.cs">
+      <DependentUpon>EditStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\EditStaff.aspx.designer.cs">
+      <DependentUpon>EditStaff.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\EditUsers.aspx.cs">
       <DependentUpon>EditUsers.aspx</DependentUpon>
@@ -288,6 +305,13 @@
     </Compile>
     <Compile Include="Staff\ManageForum.aspx.designer.cs">
       <DependentUpon>ManageForum.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Staff\ManageStaff.aspx.cs">
+      <DependentUpon>ManageStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Staff\ManageStaff.aspx.designer.cs">
+      <DependentUpon>ManageStaff.aspx</DependentUpon>
     </Compile>
     <Compile Include="Staff\StaffAddModules.aspx.cs">
       <DependentUpon>StaffAddModules.aspx</DependentUpon>

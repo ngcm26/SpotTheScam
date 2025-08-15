@@ -53,20 +53,24 @@ namespace SpotTheScam
                         }
                     }
 
-                    // Step 2: If no existing user, insert the new user record.
-                    // Your table schema should have at least Username, Email, and Password columns.
-                    string insertQuery = "INSERT INTO Users (Username, Email, Password, Role) VALUES (@Username, @Email, @Password, @Role)";
+                    // Step 2: If no existing user, insert the new user record as NOT verified with active status and OTP code
+                    string insertQuery = "INSERT INTO Users (Username, Email, Password, Role, Verify, Status, VerifyCode) VALUES (@Username, @Email, @Password, @Role, @Verify, @Status, @VerifyCode)";
                     using (SqlCommand cmd = new SqlCommand(insertQuery, con))
                     {
                         cmd.Parameters.AddWithValue("@Username", username);
                         cmd.Parameters.AddWithValue("@Email", email);
                         cmd.Parameters.AddWithValue("@Password", password);
                         cmd.Parameters.AddWithValue("@Role", "user"); // Always set role to user
+                        cmd.Parameters.AddWithValue("@Verify", 0);     // Not verified until OTP is confirmed
+                        cmd.Parameters.AddWithValue("@Status", "active");
+                        // Simple 6-digit OTP; replace with stronger generator if needed
+                        var otp = new Random().Next(100000, 999999).ToString();
+                        cmd.Parameters.AddWithValue("@VerifyCode", otp);
 
                         cmd.ExecuteNonQuery();
 
                         lblMessage.ForeColor = Color.Green;
-                        lblMessage.Text = "Account created successfully! You can now <a href='UserLogin.aspx'>login here</a>.";
+                        lblMessage.Text = "Account created. Please check your email for the verification code to activate your account.";
                         btnRegister.Enabled = false;
                     }
 

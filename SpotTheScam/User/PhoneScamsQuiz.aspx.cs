@@ -24,12 +24,65 @@ namespace SpotTheScam.User
                     return;
                 }
 
+                // Enforce prerequisite: require completion of the related module.
+                // If no module_id provided, default to Phone Scams module (id = 13)
+                int requiredModuleId;
+                if (!int.TryParse(Request.QueryString["module_id"], out requiredModuleId))
+                {
+                    requiredModuleId = 13; // Default module for this quiz
+                }
+                if (!HasCompletedModule(Session["Username"].ToString(), requiredModuleId))
+                {
+                    string yesUrl = ResolveUrl($"ModuleInformation.aspx?module_id={requiredModuleId}&msg=complete");
+                    string noUrl = ResolveUrl("Quizzes.aspx");
+                    string msg = "You haven't completed this module yet. Would you like to be directed to this module?";
+                    string script = $"if (confirm('{msg.Replace("'","\\'")}')) {{ window.location.href = '{yesUrl}'; }} else {{ window.location.href = '{noUrl}'; }}";
+                    ClientScript.RegisterStartupScript(this.GetType(), "PrereqConfirm", script, true);
+                    return;
+                }
+
                 System.Diagnostics.Debug.WriteLine($"=== DEBUGGING PhoneScamsQuiz Page_Load ===");
                 System.Diagnostics.Debug.WriteLine($"Session Username: '{Session["Username"]}'");
 
                 // Load user's current points from PointsTransactions table
                 LoadUserCurrentPoints();
                 InitializeQuiz();
+            }
+        }
+
+        private bool HasCompletedModule(string username, int moduleId)
+        {
+            try
+            {
+                string connectionString = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    // Get user id
+                    int userId = 0;
+                    string getUserIdQuery = "SELECT Id FROM Users WHERE Username = @Username";
+                    using (SqlCommand cmd = new SqlCommand(getUserIdQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Username", username);
+                        object uid = cmd.ExecuteScalar();
+                        if (uid == null) return false;
+                        userId = Convert.ToInt32(uid);
+                    }
+
+                    // Check completion status
+                    string progressQuery = "SELECT status FROM UserModuleProgress WHERE user_id = @user_id AND module_id = @module_id";
+                    using (SqlCommand cmd = new SqlCommand(progressQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user_id", userId);
+                        cmd.Parameters.AddWithValue("@module_id", moduleId);
+                        var result = cmd.ExecuteScalar();
+                        return result != null && string.Equals(result.ToString(), "completed", StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 

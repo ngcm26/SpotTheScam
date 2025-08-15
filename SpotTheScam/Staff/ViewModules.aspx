@@ -243,7 +243,7 @@
             <asp:TemplateField HeaderText="Cover Image">
                 <ItemTemplate>
                     <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                        <img src='<%# Eval("cover_image") %>' alt="Cover" class="cover-img" />
+                        <img src='<%# ResolveUrl(Eval("cover_image").ToString()) %>' alt="Cover" class="cover-img" />
                         <span style="font-size: 0.95em; color: #888; margin-top: 2px;">
                             <%# System.IO.Path.GetFileName(Eval("cover_image").ToString()) %>
                         </span>
