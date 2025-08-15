@@ -62,6 +62,9 @@ namespace SpotTheScam.User
                 // get my role once and cache it
                 MyRole = GetRole(me, GroupId);
 
+                // hide invite UI for non-owners
+                pnlInvite.Visible = (MyRole == "GroupOwner");
+
                 PopulateHourDropdowns();
                 BindGroupHeader();
                 BindMembers();
@@ -121,6 +124,7 @@ namespace SpotTheScam.User
                 FROM FamilyGroupMembers m
                 JOIN Users u ON u.Id = m.UserId
                 WHERE m.GroupId=@gid
+                    AND m.Status IN ('Active', 'Pending')    
                 ORDER BY 
                   CASE m.GroupRole WHEN 'GroupOwner' THEN 0 WHEN 'Guardian' THEN 1 ELSE 2 END,
                   u.Username", con))
@@ -205,30 +209,46 @@ namespace SpotTheScam.User
                         { ShowMsg("Only the Group Owner can remove users.", false); tx.Rollback(); return; }
 
                         // disallow removing the owner
-                        using (var chk = new SqlCommand(@"SELECT GroupRole FROM FamilyGroupMembers WHERE GroupId=@g AND UserId=@u", con, tx))
+                        // disallow removing the owner
+                        using (var chk = new SqlCommand(
+                            "SELECT GroupRole, Status FROM FamilyGroupMembers WHERE GroupId=@g AND UserId=@u",
+                            con, tx))
                         {
                             chk.Parameters.AddWithValue("@g", GroupId);
                             chk.Parameters.AddWithValue("@u", targetUserId);
-                            var r = chk.ExecuteScalar() as string;
-                            if (r == "GroupOwner") { ShowMsg("You cannot remove the group owner.", false); tx.Rollback(); return; }
+                            using (var rd = chk.ExecuteReader())
+                            {
+                                if (!rd.Read()) { ShowMsg("Member not found.", false); tx.Rollback(); return; }
+                                var role = rd["GroupRole"] as string;
+                                var status = rd["Status"] as string;
+                                if (role == "GroupOwner") { ShowMsg("You cannot remove the group owner.", false); tx.Rollback(); return; }
+
+                                rd.Close();
+
+                                if (status == "Pending")
+                                {
+                                    // cancel invite
+                                    using (var del = new SqlCommand(
+                                        "DELETE FROM FamilyGroupMembers WHERE GroupId=@g AND UserId=@u", con, tx))
+                                    { del.Parameters.AddWithValue("@g", GroupId); del.Parameters.AddWithValue("@u", targetUserId); del.ExecuteNonQuery(); }
+                                }
+                                else
+                                {
+                                    // mark as removed
+                                    using (var upd = new SqlCommand(
+                                        "UPDATE FamilyGroupMembers SET Status='Removed' WHERE GroupId=@g AND UserId=@u",
+                                        con, tx))
+                                    { upd.Parameters.AddWithValue("@g", GroupId); upd.Parameters.AddWithValue("@u", targetUserId); upd.ExecuteNonQuery(); }
+
+                                    // optional cleanup (safe even if no rows)
+                                    using (var cleanup = new SqlCommand(@"
+                                        DELETE FROM FamilyGroupMemberRestrictions WHERE GroupId=@g AND PrimaryUserId=@u;
+                                        DELETE FROM FamilyGroupMemberWhitelistedRecipients WHERE GroupId=@g AND UserId=@u;", con, tx))
+                                    { cleanup.Parameters.AddWithValue("@g", GroupId); cleanup.Parameters.AddWithValue("@u", targetUserId); cleanup.ExecuteNonQuery(); }
+                                }
+                            }
                         }
 
-                        using (var cmd = new SqlCommand(@"UPDATE FamilyGroupMembers SET Status='Removed' WHERE GroupId=@g AND UserId=@u;", con, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@g", GroupId);
-                            cmd.Parameters.AddWithValue("@u", targetUserId);
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        // cleanup restrictions/whitelist for that user (optional)
-                        using (var cmd = new SqlCommand(@"
-                            DELETE FROM FamilyGroupMemberRestrictions WHERE GroupId=@g AND PrimaryUserId=@u;
-                            DELETE FROM FamilyGroupMemberWhitelistedRecipients WHERE GroupId=@g AND UserId=@u;", con, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@g", GroupId);
-                            cmd.Parameters.AddWithValue("@u", targetUserId);
-                            cmd.ExecuteNonQuery();
-                        }
 
                         tx.Commit();
                         ShowMsg("Member removed.", true);
@@ -291,7 +311,8 @@ namespace SpotTheScam.User
             if (string.Equals(role, "PrimaryAccountHolder", StringComparison.OrdinalIgnoreCase))
                 role = "Primary";
 
-            bool okRole = role.Equals("Guardian", StringComparison.OrdinalIgnoreCase) || role.Equals("Primary", StringComparison.OrdinalIgnoreCase);
+            bool okRole = role.Equals("Guardian", StringComparison.OrdinalIgnoreCase)
+                       || role.Equals("Primary", StringComparison.OrdinalIgnoreCase);
             if (!okRole)
             {
                 ShowMsg($"Invalid role. Got '{role}'. Choose Guardian or Primary.", false);
@@ -335,33 +356,66 @@ namespace SpotTheScam.User
                     }
 
                     // existing membership?
+                    string existingStatus = null;
                     using (var cmd = new SqlCommand(@"
-                        SELECT Status FROM FamilyGroupMembers
-                        WHERE GroupId=@gid AND UserId=@uid", con, tx))
+                SELECT Status FROM FamilyGroupMembers
+                WHERE GroupId=@gid AND UserId=@uid", con, tx))
                     {
                         cmd.Parameters.AddWithValue("@gid", GroupId);
                         cmd.Parameters.AddWithValue("@uid", inviteeId);
-                        var status = cmd.ExecuteScalar() as string;
-                        if (status == "Active")
-                        {
-                            ShowMsg("That user is already an active member.", false);
-                            tx.Rollback();
-                            return;
-                        }
-                        if (status == "Pending")
-                        {
-                            ShowMsg("That user already has a pending invite.", false);
-                            tx.Rollback();
-                            return;
-                        }
+                        var obj = cmd.ExecuteScalar();
+                        existingStatus = obj as string;
                     }
 
-                    // insert pending invite
+                    if (string.Equals(existingStatus, "Active", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ShowMsg("That user is already an active member.", false);
+                        tx.Rollback();
+                        return;
+                    }
+
+                    if (string.Equals(existingStatus, "Pending", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ShowMsg("That user already has a pending invite.", false);
+                        tx.Rollback();
+                        return;
+                    }
+
+                    if (string.Equals(existingStatus, "Removed", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // resurrect the row to Pending instead of inserting a duplicate PK
+                        using (var up = new SqlCommand(@"
+                    UPDATE FamilyGroupMembers
+                    SET GroupRole=@role,
+                        Status='Pending',
+                        InvitedByUserId=@inviter,
+                        InvitedAt=GETDATE(),
+                        AcceptedAt=NULL,
+                        InvitationToken=NULL,
+                        InvitationExpiresAt=NULL
+                    WHERE GroupId=@gid AND UserId=@uid;", con, tx))
+                        {
+                            up.Parameters.AddWithValue("@gid", GroupId);
+                            up.Parameters.AddWithValue("@uid", inviteeId);
+                            up.Parameters.AddWithValue("@role", role);
+                            up.Parameters.AddWithValue("@inviter", inviterId);
+                            up.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        ShowMsg("Invite re-sent.", true);
+                        txtInviteEmail.Text = "";
+                        ddlInviteRole.SelectedIndex = 0;
+                        BindMembers();
+                        return;
+                    }
+
+                    // no existing row -> insert new pending invite
                     using (var cmd = new SqlCommand(@"
-                        INSERT INTO FamilyGroupMembers
-                          (GroupId, UserId, GroupRole, Status, InvitedByUserId, InvitedAt)
-                        VALUES
-                          (@gid, @uid, @role, 'Pending', @inviter, GETDATE())", con, tx))
+                INSERT INTO FamilyGroupMembers
+                  (GroupId, UserId, GroupRole, Status, InvitedByUserId, InvitedAt)
+                VALUES
+                  (@gid, @uid, @role, 'Pending', @inviter, GETDATE())", con, tx))
                     {
                         cmd.Parameters.AddWithValue("@gid", GroupId);
                         cmd.Parameters.AddWithValue("@uid", inviteeId);
@@ -383,6 +437,7 @@ namespace SpotTheScam.User
                 }
             }
         }
+
 
         // --------------- Restrictions UI (Primary only) ---------------
         private void LoadRestrictionsFor(int userId)

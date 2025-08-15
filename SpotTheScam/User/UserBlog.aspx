@@ -93,6 +93,7 @@
             gap: 30px; /* spacing between cards */
             justify-content: center; /* or space-between / flex-start */
             padding: 0 200px; /* 200px spacing from sides */
+            margin-bottom: 100px;
         }
     </style>
 </asp:Content>

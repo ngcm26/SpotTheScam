@@ -15,6 +15,15 @@ namespace SpotTheScam.User
     {
 
         /// <summary>
+        /// SideNav control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::SpotTheScam.User.Controls.FamilySideNav SideNav;
+
+        /// <summary>
         /// hGroup control.
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace SpotTheScam.User
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblMsg;
+
+        /// <summary>
+        /// pnlInvite control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlInvite;
 
         /// <summary>
         /// txtInviteEmail control.
