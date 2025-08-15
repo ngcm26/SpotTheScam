@@ -137,18 +137,34 @@ namespace SpotTheScam.Staff
                 {
                     conn.Open();
 
-                    // Updated query with correct column names and proper name handling
+                    // ENHANCED: Updated query with better name resolution and comprehensive error handling
                     string query = @"
                 SELECT 
                     vcb.UserId,
                     CASE 
                         WHEN vcb.CustomerName IS NOT NULL AND LEN(TRIM(vcb.CustomerName)) > 0 
+                             AND vcb.CustomerName NOT LIKE 'Participant %'
                         THEN vcb.CustomerName
                         WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
                         THEN vcb.FirstName + ' ' + vcb.LastName
-                        WHEN u.Username IS NOT NULL 
+                        WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                             AND u.Username NOT LIKE 'test%' AND LEN(TRIM(u.Username)) > 2
                         THEN u.Username
-                        ELSE 'Participant ' + RIGHT('000' + CAST(vcb.UserId as VARCHAR), 3)
+                        WHEN u.Email IS NOT NULL AND u.Email NOT LIKE 'participant%@%'
+                             AND u.Email NOT LIKE 'test%@%' AND u.Email LIKE '%@%.%'
+                        THEN CASE 
+                            WHEN CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) > 0
+                            THEN UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                 LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 
+                                 CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) - 2)) + ' ' +
+                                 UPPER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                 CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 1, 1)) +
+                                 LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                 CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 2, 50))
+                            ELSE UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                 LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 50))
+                        END
+                        ELSE 'Participant ' + RIGHT('000' + CAST(ISNULL(vcb.UserId, 1) as VARCHAR), 3)
                     END as CustomerName,
                     
                     CASE 
@@ -306,12 +322,28 @@ namespace SpotTheScam.Staff
                             vcb.UserId,
                             CASE 
                                 WHEN vcb.CustomerName IS NOT NULL AND LEN(TRIM(vcb.CustomerName)) > 0 
+                                     AND vcb.CustomerName NOT LIKE 'Participant %'
                                 THEN vcb.CustomerName
                                 WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
                                 THEN vcb.FirstName + ' ' + vcb.LastName
-                                WHEN u.Username IS NOT NULL 
+                                WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                                     AND u.Username NOT LIKE 'test%' AND LEN(TRIM(u.Username)) > 2
                                 THEN u.Username
-                                ELSE 'Participant ' + RIGHT('000' + CAST(vcb.UserId as VARCHAR), 3)
+                                WHEN u.Email IS NOT NULL AND u.Email NOT LIKE 'participant%@%'
+                                     AND u.Email NOT LIKE 'test%@%' AND u.Email LIKE '%@%.%'
+                                THEN CASE 
+                                    WHEN CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) > 0
+                                    THEN UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) - 2)) + ' ' +
+                                         UPPER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 1, 1)) +
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 2, 50))
+                                    ELSE UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 50))
+                                END
+                                ELSE 'Participant ' + RIGHT('000' + CAST(ISNULL(vcb.UserId, 1) as VARCHAR), 3)
                             END as Name,
                             
                             CASE 
@@ -386,7 +418,7 @@ namespace SpotTheScam.Staff
             }
         }
 
-        // Web method for getting participant real names
+        // ENHANCED: Web method for getting participant real names with aggressive retry mechanism
         [WebMethod]
         public static string GetParticipantRealName(int sessionId, string phoneNumber)
         {
@@ -398,7 +430,7 @@ namespace SpotTheScam.Staff
 
                     string cleanPhone = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
 
-                    // Enhanced query to get the most accurate participant name
+                    // ENHANCED: Query to get the most accurate participant name with better name resolution
                     string nameQuery = @"
                         SELECT TOP 1
                             CASE 
@@ -408,13 +440,29 @@ namespace SpotTheScam.Staff
                                 WHEN vcb.FirstName IS NOT NULL AND vcb.LastName IS NOT NULL 
                                 THEN vcb.FirstName + ' ' + vcb.LastName
                                 WHEN u.Username IS NOT NULL AND u.Username NOT LIKE 'user%'
+                                     AND u.Username NOT LIKE 'test%' AND LEN(TRIM(u.Username)) > 2
                                 THEN u.Username
-                                WHEN u.Name IS NOT NULL AND LEN(TRIM(u.Name)) > 0
-                                THEN u.Name
+                                WHEN u.Email IS NOT NULL AND u.Email NOT LIKE 'participant%@%'
+                                     AND u.Email NOT LIKE 'test%@%' AND u.Email LIKE '%@%.%'
+                                THEN CASE 
+                                    WHEN CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) > 0
+                                    THEN UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) - 2)) + ' ' +
+                                         UPPER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 1, 1)) +
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 
+                                         CHARINDEX('.', LEFT(u.Email, CHARINDEX('@', u.Email) - 1)) + 2, 50))
+                                    ELSE UPPER(LEFT(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 1)) + 
+                                         LOWER(SUBSTRING(LEFT(u.Email, CHARINDEX('@', u.Email) - 1), 2, 50))
+                                END
                                 ELSE NULL
                             END as ParticipantName,
                             vcb.CustomerEmail,
-                            u.Email
+                            u.Email,
+                            u.Username,
+                            u.FirstName,
+                            u.LastName
                         FROM VideoCallBookings vcb
                         LEFT JOIN Users u ON vcb.UserId = u.Id
                         WHERE vcb.SessionId = @SessionId 
@@ -434,6 +482,9 @@ namespace SpotTheScam.Staff
                                 string participantName = reader["ParticipantName"]?.ToString();
                                 string customerEmail = reader["CustomerEmail"]?.ToString();
                                 string userEmail = reader["Email"]?.ToString();
+                                string username = reader["Username"]?.ToString();
+                                string firstName = reader["FirstName"]?.ToString();
+                                string lastName = reader["LastName"]?.ToString();
 
                                 // If we have a good name, use it
                                 if (!string.IsNullOrEmpty(participantName))
@@ -448,20 +499,42 @@ namespace SpotTheScam.Staff
                                     return serializer.Serialize(result);
                                 }
 
-                                // Try to extract name from email if no direct name available
+                                // Try FirstName + LastName if available
+                                if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+                                {
+                                    var result = new
+                                    {
+                                        success = true,
+                                        name = firstName + " " + lastName
+                                    };
+
+                                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                    return serializer.Serialize(result);
+                                }
+
+                                // Enhanced email name extraction
                                 string emailToUse = !string.IsNullOrEmpty(customerEmail) ? customerEmail : userEmail;
-                                if (!string.IsNullOrEmpty(emailToUse) && emailToUse.Contains("@") && !emailToUse.StartsWith("participant"))
+                                if (!string.IsNullOrEmpty(emailToUse) && emailToUse.Contains("@") &&
+                                    !emailToUse.StartsWith("participant") && !emailToUse.StartsWith("test"))
                                 {
                                     string nameFromEmail = emailToUse.Split('@')[0];
-                                    // Capitalize first letter and handle common email patterns
+
+                                    // Enhanced name formatting from email
                                     if (nameFromEmail.Length > 1 && !nameFromEmail.All(char.IsDigit))
                                     {
-                                        nameFromEmail = char.ToUpper(nameFromEmail[0]) + nameFromEmail.Substring(1).ToLower();
-                                        if (nameFromEmail.Contains("."))
+                                        // Handle dots and underscores in email
+                                        nameFromEmail = nameFromEmail.Replace(".", " ").Replace("_", " ");
+
+                                        // Capitalize each word
+                                        string[] words = nameFromEmail.Split(' ');
+                                        for (int i = 0; i < words.Length; i++)
                                         {
-                                            string[] parts = nameFromEmail.Split('.');
-                                            nameFromEmail = string.Join(" ", parts.Select(p => char.ToUpper(p[0]) + p.Substring(1)));
+                                            if (words[i].Length > 0)
+                                            {
+                                                words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
+                                            }
                                         }
+                                        nameFromEmail = string.Join(" ", words).Trim();
 
                                         var result = new
                                         {
@@ -473,6 +546,20 @@ namespace SpotTheScam.Staff
                                         return serializer.Serialize(result);
                                     }
                                 }
+
+                                // Try username as last resort before phone fallback
+                                if (!string.IsNullOrEmpty(username) && !username.StartsWith("user") &&
+                                    !username.StartsWith("test") && username.Length > 2)
+                                {
+                                    var result = new
+                                    {
+                                        success = true,
+                                        name = username
+                                    };
+
+                                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                    return serializer.Serialize(result);
+                                }
                             }
                         }
                     }
@@ -480,7 +567,9 @@ namespace SpotTheScam.Staff
 
                 // Fallback to formatted phone number
                 string cleanPhoneFallback = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
-                string fallbackName = $"Participant ({cleanPhoneFallback.Substring(0, Math.Min(4, cleanPhoneFallback.Length))}...{cleanPhoneFallback.Substring(Math.Max(0, cleanPhoneFallback.Length - 4))})";
+                string fallbackName = string.Format("Participant ({0}...{1})",
+                    cleanPhoneFallback.Substring(0, Math.Min(4, cleanPhoneFallback.Length)),
+                    cleanPhoneFallback.Substring(Math.Max(0, cleanPhoneFallback.Length - 4)));
 
                 var fallbackResult = new
                 {
