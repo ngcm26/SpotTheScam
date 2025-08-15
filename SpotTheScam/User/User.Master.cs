@@ -9,26 +9,6 @@ namespace SpotTheScam.User
 {
     public partial class UserMaster : System.Web.UI.MasterPage
     {
-        private static readonly string[] FamilyHubPages =
-        {
-        "/User/CreateGroup.aspx",
-        "/User/MyGroups.aspx",
-        "/User/Invites.aspx",
-        "/User/ConnectBank.aspx",
-        "/User/AddTransactions.aspx",
-        "/User/UserTransactionLogs.aspx",
-        "/User/ManageGroup.aspx",
-        "/User/AcceptInvite.aspx"
-    };
-
-        private bool IsFamilyHubPage()
-        {
-            // Works reliably in WebForms
-            var path = Request.AppRelativeCurrentExecutionFilePath; // e.g. "~/User/MyGroups.aspx"
-                                                                    // Normalize like the array values
-            var absolute = path.StartsWith("~") ? path.Substring(1) : path;
-            return FamilyHubPages.Any(p => absolute.EndsWith(p, System.StringComparison.OrdinalIgnoreCase));
-        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -43,12 +23,7 @@ namespace SpotTheScam.User
                     // Existing bell/invite logic
                     TryUpdateInviteBadgeAndBell();
 
-                    // NEW: show Family Hub only on your pages
-                    bool show = IsFamilyHubPage();
-                    var btn = FindControl("phFamilyHubBtn") as System.Web.UI.WebControls.PlaceHolder;
-                    var canvas = FindControl("phFamilyHub") as System.Web.UI.WebControls.PlaceHolder;
-                    if (btn != null) btn.Visible = show;
-                    if (canvas != null) canvas.Visible = show;
+                    
                 }
                 else
                 {
