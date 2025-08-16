@@ -12,14 +12,13 @@ namespace SpotTheScam.User
         private readonly string cs =
             ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
 
+        // REPLACE the old GroupId getter that read from Request.QueryString
         private int GroupId
         {
-            get
-            {
-                int gid;
-                return int.TryParse(Request.QueryString["groupId"], out gid) ? gid : 0;
-            }
+            get { return (int)(ViewState["GroupId"] ?? 0); }
+            set { ViewState["GroupId"] = value; }
         }
+
 
         // Cache my role across postbacks
         private string MyRole
@@ -37,17 +36,18 @@ namespace SpotTheScam.User
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserId"] == null)
+            if (Session["UserId"] == null) { Response.Redirect("~/User/UserLogin.aspx"); return; }
+
+            var resolved = ResolveGroupId();
+            if (resolved == null)                 // ← check the resolved value, not GroupId
             {
-                Response.Redirect("~/User/UserLogin.aspx");
-                return;
+                Response.Redirect("~/User/MyGroups.aspx");
+                return;                           // (or do a redirect to MyGroups)
             }
 
-            if (GroupId <= 0)
-            {
-                ShowMsg("Missing groupId.", false);
-                return;
-            }
+            GroupId = resolved.Value;             // ← now persist it
+            Session["CurrentGroupId"] = GroupId;  // keep site-wide in sync
+
 
             if (!IsPostBack)
             {
@@ -805,6 +805,24 @@ END", con, tx))
                 client.Send(msg);
             }
         }
+
+        private int? ResolveGroupId()
+        {
+            int gid;
+
+            // 1) Try query string
+            var qs = Request.QueryString["groupId"];
+            if (!string.IsNullOrWhiteSpace(qs) && int.TryParse(qs, out gid))
+                return gid;
+
+            // 2) Fall back to the active group in Session
+            var s = Session["CurrentGroupId"];
+            if (s != null && int.TryParse(s.ToString(), out gid))
+                return gid;
+
+            return null;
+        }
+
 
     }
 }

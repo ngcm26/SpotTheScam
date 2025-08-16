@@ -199,10 +199,12 @@
     <Content Include="Staff\TrendAnalytics.aspx" />
     <Content Include="User\AcceptInvite.aspx" />
     <Content Include="User\AddTransactions.aspx" />
+    <Content Include="User\Approvals.aspx" />
     <Content Include="User\ConnectBank.aspx" />
     <Content Include="User\Controls\FamilySideNav.ascx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\CreateGroup.aspx" />
+    <Content Include="User\FamilyOverview.aspx" />
     <Content Include="User\ForumPage.aspx" />
     <Content Include="User\IndividualBlogUser.aspx" />
     <Content Include="User\IndividualForum.aspx" />
@@ -370,6 +372,13 @@
     <Compile Include="User\AddTransactions.aspx.designer.cs">
       <DependentUpon>AddTransactions.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\Approvals.aspx.cs">
+      <DependentUpon>Approvals.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\Approvals.aspx.designer.cs">
+      <DependentUpon>Approvals.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\ConnectBank.aspx.cs">
       <DependentUpon>ConnectBank.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -397,6 +406,13 @@
     </Compile>
     <Compile Include="User\CreateGroup.aspx.designer.cs">
       <DependentUpon>CreateGroup.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\FamilyOverview.aspx.cs">
+      <DependentUpon>FamilyOverview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\FamilyOverview.aspx.designer.cs">
+      <DependentUpon>FamilyOverview.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ForumPage.aspx.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>

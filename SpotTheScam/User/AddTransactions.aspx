@@ -115,7 +115,7 @@
         <div style="margin-top:16px">
           <asp:Button ID="btnSubmit" runat="server" Text="Save Transaction"
             CssClass="btn btn-primary" OnClick="btnSubmit_Click" />
-          <a href="ConnectBank.aspx" class="btn btn-secondary">Connect Bank</a>
+          <a href="ConnectBank.aspx" class="btn btn-secondary">Bank Accounts</a>
         </div>
 
         <div class="list">
