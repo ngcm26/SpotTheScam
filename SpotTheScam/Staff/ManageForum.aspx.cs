@@ -25,7 +25,7 @@ namespace SpotTheScam.Staff
 
             using (SqlConnection conn = new SqlConnection(cs))
             {
-                // Include Description in the SELECT query
+
                 string query = @"
             SELECT d.DiscussionId, d.Title, d.Description, d.CreatedAt, u.Username
             FROM Discussions d
@@ -70,7 +70,6 @@ namespace SpotTheScam.Staff
                 conn.Close();
             }
 
-            // Rebind the GridView to show updated data
             bind();
         }
 
@@ -85,13 +84,13 @@ namespace SpotTheScam.Staff
         protected void gv_forum_RowEditing(object sender, GridViewEditEventArgs e)
         {
             gv_forum.EditIndex = e.NewEditIndex;
-            bind(); // Rebind data so the row switches into edit mode
+            bind(); 
         }
 
         protected void gv_forum_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
         {
             gv_forum.EditIndex = -1;
-            bind(); // Cancel edit and reset GridView
+            bind(); 
         }
 
         protected void gv_forum_RowUpdating(object sender, GridViewUpdateEventArgs e)
@@ -100,7 +99,6 @@ namespace SpotTheScam.Staff
 
             GridViewRow row = gv_forum.Rows[e.RowIndex];
 
-            // Title is at cell index 2, Description at index 3 (depending on your column order)
             string newTitle = ((TextBox)row.Cells[2].Controls[0]).Text;
             string newDescription = ((TextBox)row.Cells[3].Controls[0]).Text;
 
@@ -120,8 +118,8 @@ namespace SpotTheScam.Staff
                 }
             }
 
-            gv_forum.EditIndex = -1; // Exit edit mode
-            bind(); // Refresh GridView
+            gv_forum.EditIndex = -1; 
+            bind(); 
         }
 
     }
