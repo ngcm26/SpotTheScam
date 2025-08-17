@@ -312,16 +312,16 @@
 
         <!-- Offcanvas Family Hub -->
         <!-- Chatbot widget -->
-<div id="chatWidget" style="position:fixed; bottom:20px; right:20px; width:300px; border:1px solid #ccc; border-radius:10px; background:#fff; display:none; flex-direction:column;">
-  <div style="background:#0078D7; color:#fff; padding:10px; cursor:pointer;" onclick="toggleChat()">AI Chatbot</div>
-  <div id="chatBox" style="padding:10px; height:200px; overflow-y:auto;"></div>
-  <div style="display:flex; border-top:1px solid #ccc;">
-    <input id="userMessage" type="text" style="flex:1; border:none; padding:5px;" placeholder="Type a message..." />
-    <button type="button" onclick="sendMessage()" style="padding:5px 10px; background:#0078D7; color:#fff; border:none;">Send</button>
+<div id="chatWidget" style="position:fixed; bottom:140px; right:20px; width:470px; border:1px solid #ccc; border-radius:10px; background:#D26F2C; display:none; flex-direction:column;">
+  <div style="background:#D26F2C; color:white; padding:14px; cursor:pointer; font-weight:bold; text-align:center; border-top-left-radius:10px; border-top-right-radius:10px;" onclick="toggleChat()">SpotTheScam AI ChatBot</div>
+  <div id="chatBox" style="padding:10px; height:550px; overflow-y:auto; background:white; border-bottom-left-radius:10px; border-bottom-right-radius:10px;"></div>
+  <div style="display:flex; border-top:1px solid #ccc; background:white; border-bottom-left-radius:10px; border-bottom-right-radius:10px;">
+    <input id="userMessage" type="text" style="flex:1; border:none; padding:10px;" placeholder="Type a message..." />
+    <button type="button" onclick="sendMessage()" style="padding:10px 14px; background:#D26F2C; color:white; border:none;">Send</button>
   </div>
 </div>
 
-<button type="button" onclick="toggleChat()" style="position:fixed; bottom:20px; right:20px; background:#0078D7; color:#fff; border:none; border-radius:50%; width:60px; height:60px; box-shadow:0 2px 10px rgba(0,0,0,0.2);">💬</button>
+<button type="button" onclick="toggleChat()" style="position:fixed; bottom:20px; right:20px; background:#D26F2C; color:white; border:none; border-radius:50%; width:70px; height:70px; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-size:26px;">💬</button>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>

@@ -36,7 +36,7 @@ namespace SpotTheScam.Controllers
             var completion = completionResult.Value;
 
             // Get the first reply text
-            var reply = completion.Content[0].Text;
+            var reply = completion.Content[0].Text; 
 
             return Json(new { reply });
         }
