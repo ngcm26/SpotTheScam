@@ -1,5 +1,6 @@
 ﻿<%@ Page Title="Manage Group" Language="C#" MasterPageFile="~/User/User.Master"
     AutoEventWireup="true" CodeBehind="ManageGroup.aspx.cs" Inherits="SpotTheScam.User.ManageGroup" %>
+
 <%@ Register Src="~/User/Controls/FamilySideNav.ascx" TagPrefix="uc" TagName="FamilySideNav" %>
 
 <asp:Content ID="Head" ContentPlaceHolderID="head" runat="server">
@@ -9,9 +10,22 @@
         }
 
         /* layout wrapper for sidebar + content */
-        .family-layout{display:grid;grid-template-columns:240px 1fr;gap:16px}
-        @media (max-width:1023.98px){ .family-layout{grid-template-columns:1fr} }
-        .family-content{min-width:0;} /* prevents overflow on small screens */
+        .family-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 16px
+        }
+
+        @media (max-width:1023.98px) {
+            .family-layout {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .family-content {
+            min-width: 0;
+        }
+        /* prevents overflow on small screens */
 
         .wrap {
             max-width: 1000px;
@@ -38,9 +52,9 @@
             flex-wrap: wrap
         }
 
-        .row > div {
-            flex: 1 1 260px
-        }
+            .row > div {
+                flex: 1 1 260px
+            }
 
         label {
             display: block;
@@ -55,10 +69,11 @@
             border-radius: 8px;
             outline: none
         }
-        input[type=text]:focus, select:focus {
-            border-color: var(--brand);
-            box-shadow: 0 0 0 3px rgba(211,111,45,.15)
-        }
+
+            input[type=text]:focus, select:focus {
+                border-color: var(--brand);
+                box-shadow: 0 0 0 3px rgba(211,111,45,.15)
+            }
 
         .form-control {
             width: 100%;
@@ -66,10 +81,11 @@
             border: 1px solid #d1d5db;
             border-radius: 8px
         }
-        .form-control:focus {
-            border-color: var(--brand);
-            box-shadow: 0 0 0 3px rgba(211,111,45,.15)
-        }
+
+            .form-control:focus {
+                border-color: var(--brand);
+                box-shadow: 0 0 0 3px rgba(211,111,45,.15)
+            }
 
         .btn {
             border: none;
@@ -79,10 +95,23 @@
             color: #fff;
             cursor: pointer
         }
-        .btn:hover { filter: brightness(0.95) }
-        .btn.secondary { background: #6b7280 }
-        .btn-primary { background: var(--brand) }
-        .btn-danger { background: #dc2626 }
+
+            .btn:hover {
+                filter: brightness(0.95)
+            }
+
+            .btn.secondary {
+                background: #6b7280
+            }
+
+        .btn-primary {
+            background: var(--brand)
+        }
+
+        .btn-danger {
+            background: #dc2626
+        }
+
         .btn-link {
             background: transparent;
             color: var(--brand);
@@ -90,10 +119,19 @@
             border-radius: 0;
             text-decoration: none
         }
-        .btn-link:hover { text-decoration: underline }
-        .btn-sm { font-size: .85rem; padding: 4px 8px; }
 
-        .text-danger { color: #dc2626 }
+            .btn-link:hover {
+                text-decoration: underline
+            }
+
+        .btn-sm {
+            font-size: .85rem;
+            padding: 4px 8px;
+        }
+
+        .text-danger {
+            color: #dc2626
+        }
 
         .msg {
             padding: 10px 12px;
@@ -101,21 +139,37 @@
             margin-bottom: 12px;
             font-weight: 600
         }
-        .ok { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9 }
-        .err { background: #ffebee; color: #b71c1c; border: 1px solid #ffcdd2 }
 
-        .muted { color: #6b7280 }
+        .ok {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #c8e6c9
+        }
+
+        .err {
+            background: #ffebee;
+            color: #b71c1c;
+            border: 1px solid #ffcdd2
+        }
+
+        .muted {
+            color: #6b7280
+        }
 
         .table {
             width: 100%;
             border-collapse: collapse
         }
-        .table th, .table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: left
-        }
-        .table th { color: #374151 }
+
+            .table th, .table td {
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+                text-align: left
+            }
+
+            .table th {
+                color: #374151
+            }
 
         /* chips */
         .tag {
@@ -124,6 +178,7 @@
             font-weight: 600;
             font-size: .85rem
         }
+
         .pill {
             padding: 4px 10px;
             border-radius: 12px;
@@ -131,23 +186,60 @@
         }
 
         /* role colors (kept semantic for clarity) */
-        .role-GroupOwner { background: #fde7da; color: #7a2c08 }
-        .role-Guardian { background: #ecfdf5; color: #065f46 }
-        .role-Primary { background: #fef3c7; color: #92400e }
+        .role-GroupOwner {
+            background: #fde7da;
+            color: #7a2c08
+        }
+
+        .role-Guardian {
+            background: #ecfdf5;
+            color: #065f46
+        }
+
+        .role-Primary {
+            background: #fef3c7;
+            color: #92400e
+        }
 
         /* status colors */
-        .status-Active { background: #ecfdf5; color: #065f46 }
-        .status-Pending { background: #fff7ed; color: #92400e }
+        .status-Active {
+            background: #ecfdf5;
+            color: #065f46
+        }
 
-        .inline-actions a { margin-right: 8px }
+        .status-Pending {
+            background: #fff7ed;
+            color: #92400e
+        }
+
+        .inline-actions a {
+            margin-right: 8px
+        }
 
         /* tiny utilities */
-        .flex { display: flex; }
-        .gap-2 { gap: 8px; }
-        .items-end { align-items: flex-end; }
-        .flex-1 { flex: 1; }
-        .mb-3 { margin-bottom: 12px; }
-        .mt-1 { margin-top: 6px; }
+        .flex {
+            display: flex;
+        }
+
+        .gap-2 {
+            gap: 8px;
+        }
+
+        .items-end {
+            align-items: flex-end;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .mb-3 {
+            margin-bottom: 12px;
+        }
+
+        .mt-1 {
+            margin-top: 6px;
+        }
     </style>
 </asp:Content>
 
@@ -228,6 +320,13 @@
                                             CommandArgument='<%# Eval("UserId") %>' Text="Remove"
                                             CssClass="btn-link text-danger"
                                             OnClientClick="return confirm('Remove this member from the group?');" />
+
+
+                                        <asp:Button ID="btnResend" runat="server" Text="Resend"
+                                            CommandName="ResendInvite"
+                                            CommandArgument='<%# Eval("UserId") %>'
+                                            CssClass="btn btn-sm btn-outline-secondary"
+                                            Visible='<%# (Eval("Status") != null && Eval("Status").ToString() == "Pending") %>' />
                                     </span>
                                 </ItemTemplate>
                             </asp:TemplateField>
