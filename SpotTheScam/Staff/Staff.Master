@@ -87,6 +87,7 @@
                                 <li class="nav-item"><a class="nav-link" href="ManageStaff.aspx">Manage Staff</a></li>
                             </asp:PlaceHolder>
                             <li class="nav-item"><a class="nav-link" href="ManageBlog.aspx">Manage Blog</a></li>
+                            <li class="nav-item"><a class="nav-link" href="ManageForum.aspx">Manage Forum</a></li>
                             <li class="nav-item"><a class="nav-link" href="StaffVideoCall.aspx">Staff Video Call</a></li>
                             <li class="nav-item"><a class="nav-link" href="StaffManageSessions.aspx">Manage Sessions</a></li>
                             <li class="nav-item"><a class="nav-link" href="ViewModules.aspx">Modules</a></li>
