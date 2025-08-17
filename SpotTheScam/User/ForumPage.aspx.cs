@@ -19,6 +19,14 @@ namespace SpotTheScam.User
                 Response.Write("<script>alert('Please login to proceed!');</script>");
                 Response.Redirect("UserLogin.aspx");
             }
+
+
+            if (!IsPostBack && Request.QueryString["success"] == "1")
+            {
+                lblMessage.Text = "✅ Your post has been created successfully!";
+                lblMessage.Visible = true;
+            }
+
             LoadDiscussions();
         }
 
@@ -33,6 +41,7 @@ namespace SpotTheScam.User
             string content = tb_content.Text;
             int userId = Convert.ToInt32(Session["UserId"]);
             string imageFileName = "";
+
             if (img_forum.HasFile)
             {
                 string folderPath = Server.MapPath("~/Uploads/forum_pictures/");
@@ -41,8 +50,6 @@ namespace SpotTheScam.User
 
                 img_forum.SaveAs(fullPath);
             }
-
-
 
             string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(cs))
@@ -59,11 +66,16 @@ namespace SpotTheScam.User
                     cmd.ExecuteNonQuery();
                 }
             }
+
+            // Clear fields
             tb_title.Text = "";
             tb_content.Text = "";
-
             pnlNewPost.Visible = false;
-            LoadDiscussions();
+
+            // Redirect with success flag
+            Response.Redirect(Request.RawUrl + "?success=1", false);
+            Context.ApplicationInstance.CompleteRequest();
+
 
 
         }

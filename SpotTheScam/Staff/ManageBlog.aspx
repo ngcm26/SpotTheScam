@@ -1,4 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Staff/Staff.Master" AutoEventWireup="true" CodeBehind="ManageBlog.aspx.cs" Inherits="SpotTheScam.Staff.ManageBlog" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .manage-blog-container {
@@ -9,36 +10,43 @@
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+
         .manage-blog-header {
             font-size: 1.6rem;
             font-weight: 600;
             margin-bottom: 20px;
         }
+
         .filter-bar {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
         }
+
         .gridview-styled {
             border: none;
             width: 100%;
         }
-        .gridview-styled th {
-            background-color: #f8f9fa;
-            color: #333;
-            padding: 12px;
-            border-bottom: 2px solid #dee2e6;
-            text-align: left;
-        }
-        .gridview-styled td {
-            padding: 10px;
-            border-bottom: 1px solid #dee2e6;
-            vertical-align: middle;
-        }
-        .gridview-styled tr:hover {
-            background-color: #f1f1f1;
-        }
+
+            .gridview-styled th {
+                background-color: #f8f9fa;
+                color: #333;
+                padding: 12px;
+                border-bottom: 2px solid #dee2e6;
+                text-align: left;
+            }
+
+            .gridview-styled td {
+                padding: 10px;
+                border-bottom: 1px solid #dee2e6;
+                vertical-align: middle;
+            }
+
+            .gridview-styled tr:hover {
+                background-color: #f1f1f1;
+            }
+
         .btn-sm {
             padding: 5px 10px;
             font-size: 0.85rem;
@@ -46,7 +54,7 @@
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-<div class="manage-blog-container">
+    <div class="manage-blog-container">
         <div class="manage-blog-header">Manage Blog Posts</div>
 
         <div class="filter-bar">
@@ -63,18 +71,39 @@
         <asp:GridView ID="gv_blog" runat="server" AutoGenerateColumns="False"
             CssClass="gridview-styled table table-hover"
             DataKeyNames="post_id"
-            OnDataBinding="gv_blog_DataBinding"
-            OnSelectedIndexChanged="gv_blog_SelectedIndexChanged"
             OnRowDeleting="gv_blog_RowDeleting"
-            OnRowCommand="gv_blog_RowCommand">
+            OnRowCommand="gv_blog_RowCommand"
+            OnRowEditing="gv_blog_RowEditing"
+            OnRowCancelingEdit="gv_blog_RowCancelingEdit"
+            OnRowUpdating="gv_blog_RowUpdating">
+
             <Columns>
-                <asp:BoundField DataField="post_id" HeaderText="Post ID" />
-                <asp:BoundField DataField="user_id" HeaderText="User ID" />
-                <asp:BoundField DataField="title" HeaderText="Blog Title" />
-                <asp:BoundField DataField="created_at" HeaderText="Created At" />
-                <asp:BoundField DataField="isApproved" HeaderText="Approval" />
+                <asp:BoundField DataField="post_id" HeaderText="Post ID" ReadOnly="True" />
+                <asp:BoundField DataField="user_id" HeaderText="User ID" ReadOnly="True" />
+
+                <asp:TemplateField HeaderText="Blog Title">
+                    <ItemTemplate>
+                        <%# Eval("title") %>
+                    </ItemTemplate>
+                    <EditItemTemplate>
+                        <asp:TextBox ID="txtTitle" runat="server" Text='<%# Bind("title") %>' Width="100%" />
+                    </EditItemTemplate>
+                </asp:TemplateField>
+
+                <asp:TemplateField HeaderText="Content">
+                    <ItemTemplate>
+                        <%# TruncateContent(Eval("content")) %>
+                    </ItemTemplate>
+                    <EditItemTemplate>
+                        <asp:TextBox ID="txtContent" runat="server" Text='<%# Bind("content") %>' TextMode="MultiLine" Rows="4" Width="100%" />
+                    </EditItemTemplate>
+                </asp:TemplateField>
+
+                <asp:BoundField DataField="created_at" HeaderText="Created At" ReadOnly="True" />
+                <asp:BoundField DataField="isApproved" HeaderText="Approval" ReadOnly="True" />
+
                 <asp:CommandField ShowSelectButton="True" SelectText="View" />
-                <asp:CommandField ShowDeleteButton="True" DeleteText="Delete" />
+                <asp:CommandField ShowDeleteButton="True" DeleteText="Delete" ShowEditButton="True" />
                 <asp:TemplateField HeaderText="Actions">
                     <ItemTemplate>
                         <asp:Button ID="btnApprove" runat="server" CommandName="Approve"
