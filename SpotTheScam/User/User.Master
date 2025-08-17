@@ -311,6 +311,47 @@
         </footer>
 
         <!-- Offcanvas Family Hub -->
+        <!-- Chatbot widget -->
+<div id="chatWidget" style="position:fixed; bottom:20px; right:20px; width:300px; border:1px solid #ccc; border-radius:10px; background:#fff; display:none; flex-direction:column;">
+  <div style="background:#0078D7; color:#fff; padding:10px; cursor:pointer;" onclick="toggleChat()">AI Chatbot</div>
+  <div id="chatBox" style="padding:10px; height:200px; overflow-y:auto;"></div>
+  <div style="display:flex; border-top:1px solid #ccc;">
+    <input id="userMessage" type="text" style="flex:1; border:none; padding:5px;" placeholder="Type a message..." />
+    <button type="button" onclick="sendMessage()" style="padding:5px 10px; background:#0078D7; color:#fff; border:none;">Send</button>
+  </div>
+</div>
+
+<button type="button" onclick="toggleChat()" style="position:fixed; bottom:20px; right:20px; background:#0078D7; color:#fff; border:none; border-radius:50%; width:60px; height:60px; box-shadow:0 2px 10px rgba(0,0,0,0.2);">💬</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            function toggleChat() {
+                $("#chatWidget").toggle();
+            }
+
+            function sendMessage() {
+                var message = $("#userMessage").val().trim();
+                if (!message) return;
+
+                $("#chatBox").append("<div><b>You:</b> " + message + "</div>");
+                $("#userMessage").val("");
+
+                const $btn = $(event.target);
+                $btn.prop("disabled", true);
+
+                $.post("/Chat/Ask", { message: message }, function (data) {
+                    $("#chatBox").append("<div><b>Bot:</b> " + data.reply + "</div>");
+                    $("#chatBox").scrollTop($("#chatBox")[0].scrollHeight);
+                }).always(() => $btn.prop("disabled", false));
+            }
+            $("#userMessage").keypress(function (e) {
+                if (e.which == 13) { // Enter key
+                    sendMessage();
+                    e.preventDefault(); // Prevent form submission
+                }
+            });
+
+        </script>
 
 
 

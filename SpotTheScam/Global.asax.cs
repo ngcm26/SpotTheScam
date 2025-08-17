@@ -14,6 +14,7 @@ namespace SpotTheScam
         {
             string customDataDir = Server.MapPath("~/Database");
             AppDomain.CurrentDomain.SetData("DataDirectory", customDataDir);
+            SpotTheScam.App_Start.RouteConfig.RegisterRoutes(System.Web.Routing.RouteTable.Routes);
         }
 
         protected void Session_Start(object sender, EventArgs e)
