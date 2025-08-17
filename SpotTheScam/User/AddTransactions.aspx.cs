@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
+using System.Net.Mail;
 using System.Web.UI;
 
 namespace SpotTheScam.User
@@ -55,6 +57,12 @@ namespace SpotTheScam.User
             if (recipient.Length == 0)
                 recipient = (type == "Withdrawal" ? "Manual Withdrawal" : "Manual Deposit");
 
+            // values we use after commit (for emailing)
+            bool hold = false;
+            bool flagged = false;
+            string severity = null;
+            string accountLabel = null;
+
             try
             {
                 using (var conn = new SqlConnection(cs))
@@ -88,8 +96,8 @@ namespace SpotTheScam.User
                         }
 
                         // --- Enforcement pre-check (Primary restrictions) ---
-                        bool hold = false;          // if true → insert as held and don't update balance
-                        string reviewStatus = null; // initial ReviewStatus
+                        string reviewStatus = null;
+
                         if (type == "Withdrawal")
                         {
                             // Load the most recent restriction row for this user (any active group where user is Primary)
@@ -136,12 +144,12 @@ ORDER BY r.UpdatedAt DESC;", conn, tx))
                             {
                                 decimal dayTotal = 0m;
                                 using (var cmdSum = new SqlCommand(@"
-                                        SELECT ISNULL(SUM(Amount),0)
-                                        FROM BankTransactions
-                                        WHERE UserId=@uid
-                                          AND TransactionDate = CAST(GETDATE() AS date)
-                                          AND TransactionType='Withdrawal'
-                                          AND IsHeld = 0;", conn, tx))
+    SELECT ISNULL(SUM(Amount),0)
+    FROM BankTransactions
+    WHERE UserId=@uid
+      AND TransactionDate = CAST(GETDATE() AS date)
+      AND TransactionType='Withdrawal'
+      AND IsHeld = 0;", conn, tx))
                                 {
                                     cmdSum.Parameters.AddWithValue("@uid", userId);
                                     dayTotal = Convert.ToDecimal(cmdSum.ExecuteScalar());
@@ -154,10 +162,10 @@ ORDER BY r.UpdatedAt DESC;", conn, tx))
                             {
                                 bool isWhitelisted = false;
                                 using (var cmdW = new SqlCommand(@"
-                                        SELECT 1
-                                        FROM FamilyGroupMemberWhitelistedRecipients w
-                                        WHERE w.UserId=@uid
-                                          AND w.RecipientName=@name;", conn, tx))
+    SELECT 1
+    FROM FamilyGroupMemberWhitelistedRecipients w
+    WHERE w.UserId=@uid
+      AND w.RecipientName=@name;", conn, tx))
                                 {
                                     cmdW.Parameters.AddWithValue("@uid", userId);
                                     cmdW.Parameters.AddWithValue("@name", recipient);
@@ -168,20 +176,26 @@ ORDER BY r.UpdatedAt DESC;", conn, tx))
 
                             hold = red;
                             reviewStatus = hold ? "Pending" : (yellow ? "Auto" : null);
+
+                            // Set flag/severity inline for immediate UI/reporting
+                            flagged = red || yellow;
+                            severity = red ? "High" : (yellow ? "Medium" : null);
                         }
 
                         // Compute new balance if not held
                         decimal newBal = (type == "Withdrawal") ? currentBal - amount : currentBal + amount;
                         decimal balToStore = (hold ? currentBal : newBal); // for held txns, don't reflect change yet
 
-                        // Insert transaction (note: IsHeld + ReviewStatus)
+                        // Insert transaction (now includes IsFlagged + Severity)
                         using (var cmd = new SqlCommand(@"
-                                INSERT INTO BankTransactions
-                                  (AccountId,UserId,TransactionDate,TransactionTime,TransactionType,
-                                   Amount,Description,SenderRecipient,BalanceAfterTransaction, IsHeld, ReviewStatus)
-                                VALUES
-                                  (@a,@u,CAST(GETDATE() AS date),CONVERT(time,GETDATE()),@t,
-                                   @amt,@d,@r,@bal,@held,@rs);", conn, tx))
+INSERT INTO BankTransactions
+  (AccountId,UserId,TransactionDate,TransactionTime,TransactionType,
+   Amount,Description,SenderRecipient,BalanceAfterTransaction,
+   IsHeld, ReviewStatus, IsFlagged, Severity)
+VALUES
+  (@a,@u,CAST(GETDATE() AS date),CONVERT(time,GETDATE()),@t,
+   @amt,@d,@r,@bal,
+   @held,@rs,@flagged,@sev);", conn, tx))
                         {
                             cmd.Parameters.AddWithValue("@a", accountId);
                             cmd.Parameters.AddWithValue("@u", userId);
@@ -191,10 +205,19 @@ ORDER BY r.UpdatedAt DESC;", conn, tx))
                             cmd.Parameters.AddWithValue("@r", recipient);
                             cmd.Parameters.AddWithValue("@bal", balToStore);
                             cmd.Parameters.AddWithValue("@held", hold ? 1 : 0);
+
                             if (string.IsNullOrEmpty(reviewStatus))
                                 cmd.Parameters.AddWithValue("@rs", DBNull.Value);
                             else
                                 cmd.Parameters.AddWithValue("@rs", reviewStatus);
+
+                            cmd.Parameters.AddWithValue("@flagged", flagged ? 1 : 0);
+
+                            if (string.IsNullOrEmpty(severity))
+                                cmd.Parameters.AddWithValue("@sev", DBNull.Value);
+                            else
+                                cmd.Parameters.AddWithValue("@sev", severity);
+
                             cmd.ExecuteNonQuery();
                         }
 
@@ -204,30 +227,89 @@ ORDER BY r.UpdatedAt DESC;", conn, tx))
                             using (var upd = new SqlCommand(
                                 "UPDATE BankAccounts SET Balance=@b WHERE AccountId=@a", conn, tx))
                             {
-                                upd.Parameters.AddWithValue("@b", newBal);
+                                upd.Parameters.AddWithValue("@b", (type == "Withdrawal") ? (currentBal - amount) : (currentBal + amount));
                                 upd.Parameters.AddWithValue("@a", accountId);
                                 upd.ExecuteNonQuery();
                             }
                         }
 
+                        // Preload account label for email text (safe fallback)
+                        using (var cmdAcc = new SqlCommand(
+                            "SELECT TOP 1 (AccountNickname + ' — ' + BankName) FROM BankAccounts WHERE AccountId=@a", conn, tx))
+                        {
+                            cmdAcc.Parameters.AddWithValue("@a", accountId);
+                            var accObj = cmdAcc.ExecuteScalar();
+                            accountLabel = accObj == null ? ("Account #" + accountId) : Convert.ToString(accObj);
+                        }
+
                         tx.Commit();
-
-                        if (hold)
-                            Show("Transfer submitted but HELD for guardian approval (violates rules).", true);
-                        else
-                            Show("Transaction saved.", true);
-
-                        txtAmount.Text = "";
-                        txtDescription.Text = "";
-                        txtRecipient.Text = "";
-                        BindRecent();
                     }
                     catch (Exception ex1)
                     {
                         try { tx.Rollback(); } catch { }
                         Show("Save failed: " + ex1.Message, false);
+                        return;
                     }
                 }
+
+                // Send emails AFTER commit so we never email on rollback
+                if (hold || flagged)
+                {
+                    try
+                    {
+                        using (var conn = new SqlConnection(cs))
+                        using (var cmd = new SqlCommand(@"
+SELECT DISTINCT u.Email
+FROM FamilyGroupMembers mPrimary
+JOIN FamilyGroupMembers m ON m.GroupId = mPrimary.GroupId
+JOIN Users u ON u.Id = m.UserId
+WHERE mPrimary.UserId = @uid
+  AND mPrimary.GroupRole='Primary' AND mPrimary.Status='Active'
+  AND m.Status='Active'
+  AND m.GroupRole IN ('Guardian','GroupOwner');", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@uid", userId);
+                            conn.Open();
+                            using (var rd = cmd.ExecuteReader())
+                            {
+                                while (rd.Read())
+                                {
+                                    string toEmail = Convert.ToString(rd["Email"]);
+                                    if (!string.IsNullOrWhiteSpace(toEmail))
+                                    {
+                                        SendFlagEmail_InlineSmtp(
+                                            toEmail,
+                                            accountLabel ?? ("Account #" + accountId),
+                                            type,
+                                            amount,
+                                            recipient,
+                                            hold,
+                                            severity
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception exMailList)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Email recipient lookup error: " + exMailList.Message);
+                        // do not block UX
+                    }
+                }
+
+                // Clear, obvious UI feedback for demo
+                if (hold)
+                    Show("⚠️ Transfer submitted but HELD for guardian approval (violates rules).", true);
+                else if (flagged)
+                    Show("⚠️ Transaction saved but FLAGGED for review.", true);
+                else
+                    Show("Transaction saved.", true);
+
+                txtAmount.Text = "";
+                txtDescription.Text = "";
+                txtRecipient.Text = "";
+                BindRecent();
             }
             catch (Exception ex)
             {
@@ -235,6 +317,55 @@ ORDER BY r.UpdatedAt DESC;", conn, tx))
             }
         }
 
+        // ---------- EMAIL HELPER (inline Gmail SMTP, same style as your invite helper) ----------
+        private void SendFlagEmail_InlineSmtp(string recipientEmail, string accountLabel, string type, decimal amount, string recipient, bool held, string severity)
+        {
+            var fromAddress = new MailAddress("wongdeyu123@gmail.com", "SpotTheScam");
+            var toAddress = new MailAddress(recipientEmail);
+
+            string smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? "wongdeyu123@gmail.com";
+            string smtpPass = Environment.GetEnvironmentVariable("SMTP_PASS") ?? "svib lwpm spwm lztp"; 
+            string host = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "smtp.gmail.com";
+            int port = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var p) ? p : 587;
+
+            string statusWord = held ? "HELD" : "FLAGGED";
+            string sevWord = severity ?? "Info";
+
+            string subject = $"[{statusWord}] {sevWord} transaction alert";
+            string body = $@"Hi,
+
+A transaction by the Primary user requires your attention.
+
+Status: {statusWord} ({sevWord})
+Type: {type}
+Amount: {amount:C}
+Recipient: {recipient}
+Account: {accountLabel}
+When: {DateTime.Now:dd MMM yyyy, HH:mm}
+
+— SpotTheScam";
+
+            using (var smtp = new SmtpClient(host, port)
+            {
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(smtpUser, smtpPass)
+            })
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            })
+            {
+                try { smtp.Send(message); }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Email error: " + ex.Message);
+                    // don't block the save if email fails
+                }
+            }
+        }
 
         // ---------- helpers ----------
 
