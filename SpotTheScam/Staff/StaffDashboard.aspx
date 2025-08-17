@@ -26,6 +26,34 @@
             <asp:Label ID="lblMessage" runat="server" ForeColor="Red" />
         </div>
 
+        <!-- KPI row -->
+        <div class="kpi-row" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:14px;">
+            <div style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <div style="color:#667085; font-size:0.9rem;">Blogs</div>
+                <div style="color:#051D40; font-weight:700; font-size:1.4rem; margin-top:4px;">
+                    <asp:Label ID="lblBlogs" runat="server" />
+                </div>
+            </div>
+            <div style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <div style="color:#667085; font-size:0.9rem;">Scans (range)</div>
+                <div style="color:#051D40; font-weight:700; font-size:1.4rem; margin-top:4px;">
+                    <asp:Label ID="lblScans" runat="server" />
+                </div>
+            </div>
+            <div style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <div style="color:#667085; font-size:0.9rem;">Quiz Engagement (range)</div>
+                <div style="color:#051D40; font-weight:700; font-size:1.4rem; margin-top:4px;">
+                    <asp:Label ID="lblQuiz" runat="server" />
+                </div>
+            </div>
+            <div style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
+                <div style="color:#667085; font-size:0.9rem;">Upcoming Sessions</div>
+                <div style="color:#051D40; font-weight:700; font-size:1.4rem; margin-top:4px;">
+                    <asp:Label ID="lblUpcomingSessions" runat="server" />
+                </div>
+            </div>
+        </div>
+
         <div class="cards" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
             <div class="card" style="border:1px solid #eee; border-radius:10px; padding:14px; background:#fff;">
                 <h3 style="margin:0 0 10px 0; color:#051D40; font-size:1.1rem;">Top Scam Types</h3>

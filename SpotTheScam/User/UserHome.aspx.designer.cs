@@ -33,6 +33,61 @@ namespace SpotTheScam
         protected global::System.Web.UI.WebControls.Label lblName;
 
         /// <summary>
+        /// lblCurrentPoints control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblCurrentPoints;
+
+        /// <summary>
+        /// rptRecentPoints control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Repeater rptRecentPoints;
+
+        /// <summary>
+        /// rptMySessions control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Repeater rptMySessions;
+
+        /// <summary>
+        /// rptRecSessions control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Repeater rptRecSessions;
+
+        /// <summary>
+        /// gvLeaderboard control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvLeaderboard;
+
+        /// <summary>
+        /// gvMySessions control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvMySessions;
+
+        /// <summary>
+        /// gvRecSessions control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvRecSessions;
+
+        /// <summary>
+        /// rptNewModules control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Repeater rptNewModules;
+
+        /// <summary>
+        /// gvNewModules control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvNewModules;
+
+        /// <summary>
+        /// ddUserTrendRange control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.DropDownList ddUserTrendRange;
+
+        /// <summary>
+        /// gvTopScamTypes control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.GridView gvTopScamTypes;
+
+        /// <summary>
         /// phHero control.
         /// </summary>
         /// <remarks>

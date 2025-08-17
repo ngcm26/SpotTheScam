@@ -302,6 +302,19 @@
         font-weight: bold;
         margin-top: auto;
     }
+    /* User dashboard wrapper for alignment and footer spacing */
+    .user-dashboard-wrapper {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 16px 24px 80px; /* bottom padding prevents footer overlap */
+    }
+    .dashboard-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap:16px; }
+    .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+    .table { width:100%; border-collapse:collapse; }
+    .table th, .table td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; }
+    .medal-gold td:first-child::before { content:'\1F947\0020'; }
+    .medal-silver td:first-child::before { content:'\1F948\0020'; }
+    .medal-bronze td:first-child::before { content:'\1F949\0020'; }
 </style>
 
 </asp:Content>
@@ -309,105 +322,108 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <!-- Shown if user is logged in -->
     <asp:PlaceHolder ID="phWelcome" runat="server" Visible="false">
-        <div class="text-center">
-            <h1 class="display-4">Hello, <asp:Label ID="lblName" runat="server" />!</h1>
-            <p class="lead">Welcome back to SpotTheScam. Ready to protect yourself today?</p>
-        </div>
-        <!-- Main Dashboard Navigation -->
-        <div class="dashboard-nav container mt-5">
-            <div class="row justify-content-center g-4">
-                <div class="col-md-3 col-6">
-                    <a href="UserProfile.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">My Profile</h5>
-                            <p class="card-text">View & edit your profile</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <a href="UserModules.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">Modules</h5>
-                            <p class="card-text">Browse learning modules</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <a href="Quizzes.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">Quizzes</h5>
-                            <p class="card-text">Test your scam awareness</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <a href="ForumPage.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">Forum</h5>
-                            <p class="card-text">Discuss & ask questions</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <a href="UserBlog.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">Blog</h5>
-                            <p class="card-text">Read & share experiences</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <a href="UserBankAccounts.aspx" class="card text-center shadow-sm p-3 h-100 text-decoration-none">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2">Bank Accounts</h5>
-                            <p class="card-text">Manage your bank accounts</p>
-                        </div>
-                    </a>
+        <div class="user-dashboard-wrapper">
+            <div class="text-center" style="margin-bottom: 16px;">
+                <h1 class="display-4">Hello, <asp:Label ID="lblName" runat="server" />!</h1>
+                <p class="lead">Welcome back to SpotTheScam. Ready to protect yourself today?</p>
+            </div>
+            <!-- Full-width points card -->
+            <div class="card" style="display:flex; align-items:center; justify-content:center; min-height:140px; margin-bottom:16px;">
+                <div>
+                    <div style="color:#667085; font-size:1rem; text-align:center;">Current Points</div>
+                    <div style="color:#051D40; font-weight:800; font-size:2.6rem; text-align:center;"><asp:Label ID="lblCurrentPoints" runat="server" /></div>
                 </div>
             </div>
-        </div>
-        <style>
-            .dashboard-nav .card {
-                border-radius: 12px;
-                transition: box-shadow 0.2s, transform 0.2s;
-                border: none;
-                background: #fff;
-            }
-            .dashboard-nav .card:hover {
-                box-shadow: 0 4px 24px rgba(211,111,45,0.15);
-                transform: translateY(-4px) scale(1.03);
-            }
-            .dashboard-nav .card-title {
-                color: #D36F2D;
-                font-weight: bold;
-                font-size: 1.2rem;
-            }
-            .dashboard-nav .card-text {
-                color: #051D40;
-                font-size: 1rem;
-            }
-        </style>
 
-        <!-- Trend Radar -->
-        <div class="container mt-5" style="max-width: 900px;">
-            <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                <h3 style="color:#D36F2D;margin-bottom:8px;">Trend Radar (last 7 days)</h3>
-                <canvas id="trendChart" height="110"></canvas>
-                <ul style="margin-top:10px;">
-                    <% foreach (var t in topTrends) { %>
-                        <li><%= t.Label %> — <%= t.Count %></li>
-                    <% } %>
-                </ul>
-                <% if (!string.IsNullOrEmpty(suggestedUrl)) { %>
-                    <a class="btn btn-primary" href="<%= ResolveUrl(suggestedUrl) %>">Recommended module</a>
-                <% } %>
+            <!-- Second row: Trend + Leaderboard -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="color:#D36F2D;margin-bottom:8px;">Trend Radar</h3>
+                        <div>
+                            <span style="margin-right:8px; color:#667085;">Range</span>
+                            <asp:DropDownList ID="ddUserTrendRange" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ddUserTrendRange_SelectedIndexChanged">
+                                <asp:ListItem Text="7 days" Value="7" Selected="True" />
+                                <asp:ListItem Text="30 days" Value="30" />
+                            </asp:DropDownList>
+                        </div>
+                    </div>
+                    <canvas id="trendChart" height="110"></canvas>
+                    <ul style="margin-top:10px;">
+                        <% foreach (var t in topTrends) { %>
+                            <li><%= t.Label %> — <%= t.Count %></li>
+                        <% } %>
+                    </ul>
+                    <asp:GridView ID="gvTopScamTypes" runat="server" AutoGenerateColumns="False" GridLines="None" CssClass="table" ShowHeaderWhenEmpty="true" EmptyDataText="No scans in range" Caption="Top scam types">
+                        <Columns>
+                            <asp:BoundField DataField="scam_type" HeaderText="Type" />
+                            <asp:BoundField DataField="cnt" HeaderText="Count" />
+                        </Columns>
+                    </asp:GridView>
+                </div>
+                <div class="card">
+                    <h3 style="color:#D36F2D;margin-bottom:8px;">Leaderboard</h3>
+                    <asp:GridView ID="gvLeaderboard" runat="server" AutoGenerateColumns="False" GridLines="None" CssClass="table" ShowHeaderWhenEmpty="true" OnRowDataBound="gvLeaderboard_RowDataBound">
+                        <Columns>
+                            <asp:BoundField DataField="Rank" HeaderText="#" />
+                            <asp:BoundField DataField="Username" HeaderText="User" />
+                            <asp:BoundField DataField="total_points" HeaderText="Points" />
+                        </Columns>
+                    </asp:GridView>
+                </div>
+            </div>
+
+            <!-- Third row: Modules + Sessions -->
+            <div class="dashboard-grid" style="margin-top:16px;">
+                <div class="card">
+                    <h3 style="color:#D36F2D;margin-bottom:8px;">New Modules</h3>
+                    <asp:GridView ID="gvNewModules" runat="server" AutoGenerateColumns="False" GridLines="None" CssClass="table" ShowHeaderWhenEmpty="true" EmptyDataText="No published modules yet.">
+                        <Columns>
+                            <asp:BoundField DataField="ModuleName" HeaderText="Module" />
+                            <asp:BoundField DataField="DateAdded" DataFormatString="{0:yyyy-MM-dd}" HeaderText="Date Added" />
+                        </Columns>
+                    </asp:GridView>
+                </div>
+                <div class="card">
+                    <h3 style="color:#D36F2D;margin-bottom:8px;">Your Upcoming Sessions</h3>
+                    <asp:GridView ID="gvMySessions" runat="server" AutoGenerateColumns="False" GridLines="None" CssClass="table" ShowHeaderWhenEmpty="true" OnRowDataBound="gvMySessions_RowDataBound" OnRowCommand="gvMySessions_RowCommand">
+                        <Columns>
+                            <asp:BoundField DataField="SessionTitle" HeaderText="Session" />
+                            <asp:BoundField DataField="SessionDate" DataFormatString="{0:yyyy-MM-dd}" HeaderText="Date" />
+                            <asp:BoundField DataField="StartTime" HeaderText="Time" />
+                            <asp:TemplateField HeaderText="Action">
+                                <ItemTemplate>
+                                    <asp:LinkButton ID="btnJoin" runat="server" CommandName="join" CommandArgument='<%# Eval("Id") %>' Text="Go to session" CssClass="btn"></asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                    </asp:GridView>
+                </div>
+                <div class="card">
+                    <h3 style="color:#D36F2D;margin-bottom:8px;">Recommended Sessions</h3>
+                    <asp:GridView ID="gvRecSessions" runat="server" AutoGenerateColumns="False" GridLines="None" CssClass="table" ShowHeaderWhenEmpty="true" OnRowDataBound="gvRecSessions_RowDataBound">
+                        <Columns>
+                            <asp:BoundField DataField="SessionTitle" HeaderText="Session" />
+                            <asp:BoundField DataField="SessionDate" DataFormatString="{0:yyyy-MM-dd}" HeaderText="Date" />
+                            <asp:BoundField DataField="StartTime" HeaderText="Time" />
+                            <asp:TemplateField HeaderText="Action">
+                                <ItemTemplate>
+                                    <asp:HyperLink ID="lnkRegister" runat="server" Text="View/Register"></asp:HyperLink>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                    </asp:GridView>
+                </div>
+            </div>
             </div>
         </div>
+        <script type="application/json" id="chartLabels"><%= chartLabelsJson %></script>
+        <script type="application/json" id="chartData"><%= chartDataJson %></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             (function(){
-                var labels = <%= chartLabelsJson %>;
-                var data = <%= chartDataJson %>;
+                var labels = JSON.parse((document.getElementById('chartLabels')||{}).textContent || '[]');
+                var data = JSON.parse((document.getElementById('chartData')||{}).textContent || '[]');
                 var ctx = document.getElementById('trendChart');
                 if (ctx && labels && data) {
                     new Chart(ctx, {

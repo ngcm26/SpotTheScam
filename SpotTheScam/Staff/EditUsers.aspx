@@ -112,6 +112,16 @@
         .btn-secondary:hover {
             background: #5a6268;
         }
+        .btn-navy {
+            background: #051D40;
+            color: white;
+        }
+        .btn-navy:hover, .btn-navy:active, .btn-navy:focus {
+            background: #16305a;
+            color: white;
+            outline: none !important;
+            box-shadow: none !important;
+        }
         .rfv-error, .rfv-error span {
             font-family: 'DM Sans', Arial, sans-serif !important;
             font-size: 1em !important;
@@ -182,12 +192,16 @@
             </asp:DropDownList>
             <asp:RequiredFieldValidator ID="rfvRole" runat="server" ControlToValidate="ddlRole" ErrorMessage="Role is required." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
             
-            <label for="<%= txtPassword.ClientID %>" class="form-label">New Password (leave blank to keep current):</label>
-            <asp:TextBox ID="txtPassword" runat="server" CssClass="form-input" TextMode="Password" />
+            <asp:PlaceHolder ID="phPasswordFields" runat="server">
+                <label for="<%= txtPassword.ClientID %>" class="form-label">New Password (leave blank to keep current):</label>
+                <asp:TextBox ID="txtPassword" runat="server" CssClass="form-input" TextMode="Password" />
+                
+                <label for="<%= txtConfirmPassword.ClientID %>" class="form-label">Confirm New Password:</label>
+                <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-input" TextMode="Password" />
+                <asp:CompareValidator ID="cvPassword" runat="server" ControlToValidate="txtConfirmPassword" ControlToCompare="txtPassword" ErrorMessage="Passwords do not match." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
+            </asp:PlaceHolder>
             
-            <label for="<%= txtConfirmPassword.ClientID %>" class="form-label">Confirm New Password:</label>
-            <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-input" TextMode="Password" />
-            <asp:CompareValidator ID="cvPassword" runat="server" ControlToValidate="txtConfirmPassword" ControlToCompare="txtPassword" ErrorMessage="Passwords do not match." Display="Dynamic" ForeColor="Red" CssClass="rfv-error" />
+            <asp:Button ID="btnSendReset" runat="server" Text="Send Reset Email" CssClass="btn btn-navy" OnClick="btnSendReset_Click" Visible="false" />
             
             <asp:Label ID="lblSuccess" runat="server" CssClass="success-message" Visible="false" />
             <asp:Label ID="lblMessage" runat="server" CssClass="error-message" Visible="false" />

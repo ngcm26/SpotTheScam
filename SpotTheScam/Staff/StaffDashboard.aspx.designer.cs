@@ -57,6 +57,26 @@ namespace SpotTheScam.Staff
         protected global::System.Web.UI.WebControls.Label lblMessage;
 
         /// <summary>
+        /// lblBlogs control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblBlogs;
+
+        /// <summary>
+        /// lblScans control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblScans;
+
+        /// <summary>
+        /// lblQuiz control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblQuiz;
+
+        /// <summary>
+        /// lblUpcomingSessions control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblUpcomingSessions;
+
+        /// <summary>
         /// gvTopTypes control.
         /// </summary>
         protected global::System.Web.UI.WebControls.GridView gvTopTypes;
