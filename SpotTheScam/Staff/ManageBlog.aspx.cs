@@ -118,5 +118,51 @@ namespace SpotTheScam.Staff
                 bind(); // Refresh list
             }
         }
+        protected void gv_blog_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+            gv_blog.EditIndex = e.NewEditIndex;
+            bind(); // Rebind data to switch row into edit mode
+        }
+
+        protected void gv_blog_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+            gv_blog.EditIndex = -1;
+            bind(); // Cancel edit
+        }
+
+        protected void gv_blog_RowUpdating(object sender, GridViewUpdateEventArgs e)
+        {
+            int postId = Convert.ToInt32(gv_blog.DataKeys[e.RowIndex].Value);
+            GridViewRow row = gv_blog.Rows[e.RowIndex];
+
+            string newTitle = ((TextBox)row.FindControl("txtTitle")).Text;
+            string newContent = ((TextBox)row.FindControl("txtContent")).Text;
+
+            string cs = WebConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                string sql = "UPDATE posts SET title = @Title, content = @Content WHERE post_id = @PostId";
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Title", newTitle);
+                    cmd.Parameters.AddWithValue("@Content", newContent);
+                    cmd.Parameters.AddWithValue("@PostId", postId);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            gv_blog.EditIndex = -1; // Exit edit mode
+            bind(); // Refresh GridView
+        }
+        protected string TruncateContent(object contentObj, int maxLength = 100)
+        {
+            if (contentObj == null) return "";
+            string content = contentObj.ToString();
+            if (content.Length <= maxLength) return content;
+            return content.Substring(0, maxLength) + "...";
+        }
+
     }
 }

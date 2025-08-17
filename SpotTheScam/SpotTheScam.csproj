@@ -79,6 +79,9 @@
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=9.0.0.8, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.9.0.8\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
     <Reference Include="OpenAI, Version=2.3.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenAI.2.3.0\lib\netstandard2.0\OpenAI.dll</HintPath>
     </Reference>
@@ -171,6 +174,24 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.9.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.9\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.9\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -199,10 +220,12 @@
     <Content Include="Staff\TrendAnalytics.aspx" />
     <Content Include="User\AcceptInvite.aspx" />
     <Content Include="User\AddTransactions.aspx" />
+    <Content Include="User\Approvals.aspx" />
     <Content Include="User\ConnectBank.aspx" />
     <Content Include="User\Controls\FamilySideNav.ascx" />
     <Content Include="User\CreateBlog.aspx" />
     <Content Include="User\CreateGroup.aspx" />
+    <Content Include="User\FamilyOverview.aspx" />
     <Content Include="User\ForumPage.aspx" />
     <Content Include="User\IndividualBlogUser.aspx" />
     <Content Include="User\IndividualForum.aspx" />
@@ -244,10 +267,13 @@
     <Content Include="User\UserLogout.aspx" />
     <Content Include="User\UserRegister.aspx" />
     <Content Include="User\VideoCall.aspx" />
+    <Content Include="Views\Chat\Index.aspx" />
     <Content Include="Web.config" />
     <Content Include="User\WebinarRegistrationSuccess.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ChatController.cs" />
     <Compile Include="Staff\AddStaff.aspx.cs">
       <DependentUpon>AddStaff.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -370,6 +396,13 @@
     <Compile Include="User\AddTransactions.aspx.designer.cs">
       <DependentUpon>AddTransactions.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\Approvals.aspx.cs">
+      <DependentUpon>Approvals.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\Approvals.aspx.designer.cs">
+      <DependentUpon>Approvals.aspx</DependentUpon>
+    </Compile>
     <Compile Include="User\ConnectBank.aspx.cs">
       <DependentUpon>ConnectBank.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -397,6 +430,13 @@
     </Compile>
     <Compile Include="User\CreateGroup.aspx.designer.cs">
       <DependentUpon>CreateGroup.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="User\FamilyOverview.aspx.cs">
+      <DependentUpon>FamilyOverview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\FamilyOverview.aspx.designer.cs">
+      <DependentUpon>FamilyOverview.aspx</DependentUpon>
     </Compile>
     <Compile Include="User\ForumPage.aspx.cs">
       <DependentUpon>ForumPage.aspx</DependentUpon>
@@ -709,6 +749,13 @@
     </Compile>
     <Compile Include="Utils\WhitelistHelper.cs" />
     <Compile Include="Utils\EmailService.cs" />
+    <Compile Include="Views\Chat\Index.aspx.cs">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Chat\Index.aspx.designer.cs">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Staff\Staff.Master" />

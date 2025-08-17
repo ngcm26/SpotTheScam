@@ -2,76 +2,153 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
+        /* General container */
         .forum-container {
-            max-width: 800px;
-            margin: 40px auto;
+            max-width: 900px;
+            margin: 50px auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
         }
 
+        /* Forum card */
         .forum-card {
-            background-color: #fff5db;
-            border: 1px solid #e0e0e0;
-            border-left: 5px solid #d36f2d;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
             border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
+        /* Title */
         .forum-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #d36f2d;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        /* Meta information */
+        .forum-meta {
+            font-size: 0.9rem;
+            color: #7f8c8d;
             margin-bottom: 20px;
         }
 
-        .forum-meta {
-            font-size: 0.9rem;
-            color: #888;
-            margin-bottom: 10px;
+        /* Description */
+        .forum-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
 
+        /* Image */
         .forum-image {
             max-width: 100%;
             height: auto;
-            margin-top: 15px;
-            margin-bottom: 15px;
             border-radius: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #ccc;
         }
 
+        /* Discussion box */
         .forum-discussion-box {
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 1px solid #ccc;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Buttons */
+        .btn-back, .btn-success, .btn-primary {
+            border-radius: 4px;
+            font-size: 0.9rem;
         }
 
         .btn-back {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .btn-success {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+            .btn-success:hover {
+                background-color: #1f618d;
+                border-color: #1f618d;
+            }
+
+        .btn-primary {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+
+            .btn-primary:hover {
+                background-color: #1e8449;
+                border-color: #1e8449;
+            }
+
+        /* Comments */
+        .mb-3 {
+            margin-bottom: 15px;
+        }
+
+        .border {
+            border: 1px solid #e0e0e0;
+        }
+
+        .rounded {
+            border-radius: 6px;
+        }
+
+        .bg-white {
+            background-color: #fff;
         }
 
         .reply-box {
             margin-top: 10px;
-            width: 100%;
         }
 
-        .comment {
-            margin-bottom: 10px;
-            padding: 5px;
-            border-bottom: 1px solid #eee;
+        .comment strong {
+            color: #2c3e50;
         }
 
-        .reply-toggle {
-            font-size: 0.9em;
+        .comment span.text-muted {
+            color: #95a5a6;
+            font-size: 0.85rem;
         }
 
-        .reply-icon {
+        .comment div {
+            margin-top: 5px;
+        }
+
+        .reply-icon img {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
-            width: 20px;
-            height: 20px;
-            align-self: flex-start;
+            transition: transform 0.2s;
         }
 
-            .reply-icon:hover {
-                text-decoration: underline;
+            .reply-icon img:hover {
+                transform: scale(1.1);
             }
+
+        /* Textareas */
+        textarea.form-control {
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+            textarea.form-control:focus {
+                border-color: #2980b9;
+                box-shadow: 0 0 3px rgba(41, 128, 185, 0.3);
+            }
+
+        /* Headings inside discussion box */
+        .forum-discussion-box h4, .forum-discussion-box h5 {
+            font-weight: 600;
+            color: #2c3e50;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -146,9 +223,34 @@
                 </asp:Repeater>
 
                 <hr />
-                <h5>Leave a Comment</h5>
-                <asp:TextBox ID="tb_comment" runat="server" CssClass="form-control mb-2" TextMode="MultiLine" Rows="3" placeholder="Write your comment..."></asp:TextBox>
-                <asp:Button ID="btnSubmitComment" runat="server" Text="Post Comment" CssClass="btn btn-success" OnClick="btnSubmitComment_Click" />
+                <h5>Join Discussion</h5>
+                <div class="comment-box-wrapper">
+                    <asp:TextBox ID="tb_comment" runat="server" CssClass="form-control comment-input"
+                        TextMode="MultiLine" Rows="1" placeholder="Join Discussion..."></asp:TextBox>
+                    <asp:Button ID="btnSubmitComment" runat="server" Text="Send"
+                        CssClass="btn btn-success comment-submit" OnClick="btnSubmitComment_Click" />
+                </div>
+
+                <style>
+                    .comment-box-wrapper {
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 10px;
+                        margin-bottom: 20px;
+                    }
+
+                    .comment-input {
+                        flex-grow: 1;
+                        min-height: 40px; /* shorter height */
+                        resize: vertical;
+                    }
+
+                    .comment-submit {
+                        height: 40px; /* match textbox height */
+                        padding: 0 15px;
+                        align-self: flex-start;
+                    }
+                </style>
             </div>
         </div>
     </div>

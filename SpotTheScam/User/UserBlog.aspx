@@ -3,58 +3,73 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
         .blog-card {
-            width: 100%;
-            max-width: 320px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            background-color: #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            transition: transform 0.2s;
-            height: 350px;
-        }
+    width: 100%;
+    max-width: 380px; /* bigger than 320px */
+    border: 1px solid #e0e0e0;
+    border-radius: 16px; /* more modern rounded corners */
+    background-color: #fff;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    height: 420px; /* taller to give more breathing room */
+    display: flex;
+    flex-direction: column;
+}
 
-            .blog-card:hover {
-                transform: translateY(-5px);
-            }
+.blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
 
-            .blog-card img {
-                width: 100%;
-                height: 160px;
-                object-fit: cover;
-            }
+.blog-card img {
+    width: 100%;
+    height: 200px; /* taller image for stronger visual impact */
+    object-fit: cover;
+}
 
-        .blog-body {
-            padding: 14px;
-        }
+.blog-body {
+    flex: 1; /* fills remaining space */
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-        .blog-title {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: #333;
-        }
+.blog-title {
+    font-size: 1.2rem; /* slightly larger title */
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #212529;
+    line-height: 1.4;
+}
 
-        .blog-author {
-            font-size: 0.8rem;
-            color: #00a2c7;
-            float: right;
-            margin-top: -18px;
-        }
+.blog-author {
+    font-size: 0.9rem;
+    color: #00a2c7;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
 
-        .blog-snippet {
-            font-size: 0.85rem;
-            color: #555;
-            margin-top: 10px;
-            margin-bottom: 6px;
-        }
+.blog-snippet {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
 
-        .read-more {
-            font-size: 0.75rem;
-            text-decoration: underline;
-            color: #333;
-            float: right;
-        }
+.read-more {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #00a2c7;
+    align-self: flex-end;
+    transition: color 0.2s;
+}
+
+.read-more:hover {
+    color: #008eb0;
+}
 
         .btn-create {
             background-color: #00a2c7;

@@ -4,6 +4,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Net;
+using System.Net.Mail;
 
 namespace SpotTheScam.User
 {
@@ -12,14 +14,13 @@ namespace SpotTheScam.User
         private readonly string cs =
             ConfigurationManager.ConnectionStrings["SpotTheScamConnectionString"].ConnectionString;
 
+        // REPLACE the old GroupId getter that read from Request.QueryString
         private int GroupId
         {
-            get
-            {
-                int gid;
-                return int.TryParse(Request.QueryString["groupId"], out gid) ? gid : 0;
-            }
+            get { return (int)(ViewState["GroupId"] ?? 0); }
+            set { ViewState["GroupId"] = value; }
         }
+
 
         // Cache my role across postbacks
         private string MyRole
@@ -37,17 +38,18 @@ namespace SpotTheScam.User
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserId"] == null)
+            if (Session["UserId"] == null) { Response.Redirect("~/User/UserLogin.aspx"); return; }
+
+            var resolved = ResolveGroupId();
+            if (resolved == null)                 // ← check the resolved value, not GroupId
             {
-                Response.Redirect("~/User/UserLogin.aspx");
-                return;
+                Response.Redirect("~/User/MyGroups.aspx");
+                return;                           // (or do a redirect to MyGroups)
             }
 
-            if (GroupId <= 0)
-            {
-                ShowMsg("Missing groupId.", false);
-                return;
-            }
+            GroupId = resolved.Value;             // ← now persist it
+            Session["CurrentGroupId"] = GroupId;  // keep site-wide in sync
+
 
             if (!IsPostBack)
             {
@@ -90,6 +92,82 @@ namespace SpotTheScam.User
                 }
             }
         }
+
+
+        private void TryResendInvite(int targetUserId)
+        {
+            int inviterUserId = Convert.ToInt32(Session["UserId"]);
+            Guid newToken = Guid.NewGuid();
+            DateTime utcExpiry = DateTime.UtcNow.AddDays(1);
+            string inviteeEmail = null;
+            string groupName = null;
+
+            using (var con = new SqlConnection(cs))
+            {
+                con.Open();
+                var tx = con.BeginTransaction();
+                try
+                {
+                    // Ensure still Pending + get email
+                    using (var cmd = new SqlCommand(@"
+                SELECT TOP 1 u.Email
+                FROM FamilyGroupMembers fgm
+                JOIN Users u ON u.Id = fgm.UserId
+                WHERE fgm.GroupId = @G AND fgm.UserId = @U AND fgm.Status = 'Pending';", con, tx))
+                    {
+                        cmd.Parameters.AddWithValue("@G", GroupId);
+                        cmd.Parameters.AddWithValue("@U", targetUserId);
+                        var r = cmd.ExecuteScalar();
+                        if (r == null) { ShowMsg("Invite cannot be resent (not Pending).", false); tx.Rollback(); return; }
+                        inviteeEmail = r.ToString();
+                    }
+
+                    // Update token + expiry + audit
+                    using (var upd = new SqlCommand(@"
+                UPDATE FamilyGroupMembers
+                SET InvitationToken = @T,
+                    InvitationExpiresAt = @E,
+                    InvitedAt = GETUTCDATE(),
+                    InvitedByUserId = @Inviter
+                WHERE GroupId = @G AND UserId = @U AND Status = 'Pending';", con, tx))
+                    {
+                        upd.Parameters.AddWithValue("@T", newToken);
+                        upd.Parameters.AddWithValue("@E", utcExpiry);
+                        upd.Parameters.AddWithValue("@Inviter", inviterUserId);
+                        upd.Parameters.AddWithValue("@G", GroupId);
+                        upd.Parameters.AddWithValue("@U", targetUserId);
+                        upd.ExecuteNonQuery();
+                    }
+
+                    // Group name for email
+                    groupName = GetGroupName(GroupId, con, tx);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    try { tx.Rollback(); } catch { }
+                    ShowMsg("Resend failed. " + ex.Message, false);
+                    return;
+                }
+            }
+
+            // Send email after DB commit
+            try
+            {
+                string acceptUrl = BuildAcceptUrl(newToken);
+                // Use your inline SMTP helper (env vars) OR your default SendInviteEmail:
+                SendInviteEmail_InlineSmtp(inviteeEmail, groupName, acceptUrl, utcExpiry);
+                // Or: SendInviteEmail(inviteeEmail, groupName, acceptUrl, utcExpiry);
+
+                ShowMsg("Invite resent.", true);
+            }
+            catch (Exception mailEx)
+            {
+                ShowMsg("Invite updated, but email delivery failed: " + mailEx.Message, false);
+            }
+        }
+
+
 
         // ---------------- Header ----------------
         private void BindGroupHeader()
@@ -298,6 +376,14 @@ namespace SpotTheScam.User
                     catch (Exception ex) { try { tx.Rollback(); } catch { } ShowMsg("Change role failed. " + ex.Message, false); }
                 }
             }
+
+            if (e.CommandName == "ResendInvite")
+            {
+                TryResendInvite(targetUserId);
+                BindMembers();
+                return;
+            }
+
         }
 
         // --------------- Invite ---------------
@@ -325,7 +411,7 @@ namespace SpotTheScam.User
                 var tx = con.BeginTransaction();
 
                 Guid token = Guid.Empty;
-                DateTime expiresUtc = DateTime.UtcNow.AddDays(7);
+                DateTime expiresUtc = DateTime.UtcNow.AddDays(1);
                 int inviteeId = 0;
                 string groupName = "";
 
@@ -393,7 +479,7 @@ namespace SpotTheScam.User
                     SET GroupRole=@role,
                         Status='Pending',
                         InvitedByUserId=@inviter,
-                        InvitedAt=GETDATE(),
+                        InvitedAt=GETUTCDATE(),
                         AcceptedAt=NULL,
                         InvitationToken=NULL,
                         InvitationExpiresAt=NULL
@@ -412,7 +498,7 @@ namespace SpotTheScam.User
                     INSERT INTO FamilyGroupMembers
                       (GroupId, UserId, GroupRole, Status, InvitedByUserId, InvitedAt)
                     VALUES
-                      (@gid, @uid, @role, 'Pending', @inviter, GETDATE())", con, tx))
+                      (@gid, @uid, @role, 'Pending', @inviter, GETUTCDATE())", con, tx))
                         {
                             cmd.Parameters.AddWithValue("@gid", GroupId);
                             cmd.Parameters.AddWithValue("@uid", inviteeId);
@@ -452,7 +538,8 @@ namespace SpotTheScam.User
                 try
                 {
                     string acceptUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}{ResolveUrl("~/User/AcceptInvite.aspx")}?token={token}";
-                    SendInviteEmail(email, groupName, acceptUrl, expiresUtc);
+                    SendInviteEmail_InlineSmtp(email, groupName, acceptUrl, expiresUtc);
+
 
                     ShowMsg("Invite sent (now Pending).", true);
                     txtInviteEmail.Text = "";
@@ -577,7 +664,7 @@ BEGIN
         AllowedStartHour=@sh,
         AllowedEndHour=@eh,
         UpdatedByUserId=@actor,
-        UpdatedAt=GETDATE()
+        UpdatedAt=GETUTCDATE()
     WHERE GroupId=@gid AND PrimaryUserId=@uid;
 END
 ELSE
@@ -806,5 +893,86 @@ END", con, tx))
             }
         }
 
+        private int? ResolveGroupId()
+        {
+            int gid;
+
+            // 1) Try query string
+            var qs = Request.QueryString["groupId"];
+            if (!string.IsNullOrWhiteSpace(qs) && int.TryParse(qs, out gid))
+                return gid;
+
+            // 2) Fall back to the active group in Session
+            var s = Session["CurrentGroupId"];
+            if (s != null && int.TryParse(s.ToString(), out gid))
+                return gid;
+
+            return null;
+        }
+
+        private string BuildAcceptUrl(Guid token)
+        {
+            // e.g. https://localhost:44300/User/AcceptInvite.aspx?token=...
+            var baseUrl = Request?.Url?.GetLeftPart(UriPartial.Authority) ?? "https://localhost:44300";
+            var acceptPath = ResolveUrl("~/User/AcceptInvite.aspx");
+            return $"{baseUrl}{acceptPath}?token={token}";
+        }
+
+        private static string ToSgTimeStringUtc(DateTime utc)
+        {
+            // For email display only (storage/checks stay UTC)
+            var sgt = TimeZoneInfo.FindSystemTimeZoneById("Singapore Standard Time");
+            var local = TimeZoneInfo.ConvertTimeFromUtc(utc, sgt);
+            return local.ToString("ddd, dd MMM yyyy HH:mm 'SGT'");
+        }
+
+        private void SendInviteEmail_InlineSmtp(string recipientEmail, string groupName, string acceptUrl, DateTime utcExpiry)
+        {
+            var fromAddress = new MailAddress("wongdeyu123@gmail.com", "SpotTheScam");
+            var toAddress = new MailAddress(recipientEmail);
+
+            string smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? "wongdeyu123@gmail.com";
+            string smtpPass = Environment.GetEnvironmentVariable("SMTP_PASS") ?? "svib lwpm spwm lztp";
+            string host = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "smtp.gmail.com";
+            int port = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var p) ? p : 587;
+
+            string subject = $"You've been invited to join the family group: {groupName}";
+            string body =
+        $@"Hi,
+
+You've been invited to join ""{groupName}"" on SpotTheScam.
+
+Click to accept: {acceptUrl}
+This link expires on {ToSgTimeStringUtc(utcExpiry)}.
+
+If you didn’t expect this, you can ignore this email.
+
+— SpotTheScam";
+
+            using (var smtp = new SmtpClient(host, port)
+            {
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(smtpUser, smtpPass)
+            })
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            })
+            {
+                try { smtp.Send(message); }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Email error: " + ex.Message);
+                    ShowMsg("Invite updated, but email failed to send. Check SMTP settings.", false);
+                }
+
+            }
+        }
+
     }
 }
+
+

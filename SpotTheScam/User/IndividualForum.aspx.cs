@@ -162,7 +162,7 @@ namespace SpotTheScam.User
             tb_comment.Text = ""; // Clear textbox
             LoadComments(); // Refresh comments
         }
-        protected void btnReply_Click(object sender, EventArgs e) // <-- add here
+        protected void btnReply_Click(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
             int parentReplyId = int.Parse(btn.CommandArgument);
@@ -179,7 +179,7 @@ namespace SpotTheScam.User
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 string query = @"INSERT INTO DiscussionReplies (DiscussionId, UserId, Content, ParentReplyId)
-                         VALUES (@DiscussionId, @UserId, @Content, @ParentReplyId)";
+                 VALUES (@DiscussionId, @UserId, @Content, @ParentReplyId)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@DiscussionId", discussionId);
@@ -192,8 +192,13 @@ namespace SpotTheScam.User
                 }
             }
 
-            LoadComments(); // refresh after inserting
+            // Clear the textbox
+            tb_reply.Text = "";
+
+            // Redirect to same page to avoid duplicate post on reload
+            Response.Redirect(Request.RawUrl);
         }
+
         protected void rptComments_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
@@ -305,10 +310,6 @@ namespace SpotTheScam.User
                 }
             }
         }
-
-
-
-
 
     }
 }

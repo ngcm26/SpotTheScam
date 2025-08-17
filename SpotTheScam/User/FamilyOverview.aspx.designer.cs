@@ -11,7 +11,7 @@ namespace SpotTheScam.User
 {
 
 
-    public partial class ConnectBank
+    public partial class FamilyOverview
     {
 
         /// <summary>
@@ -24,94 +24,85 @@ namespace SpotTheScam.User
         protected global::SpotTheScam.User.Controls.FamilySideNav SideNav;
 
         /// <summary>
-        /// pnlMsg control.
+        /// pnlNoGroupSelected control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlMsg;
+        protected global::System.Web.UI.WebControls.Panel pnlNoGroupSelected;
 
         /// <summary>
-        /// lblMsg control.
+        /// pnlHasGroup control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMsg;
+        protected global::System.Web.UI.WebControls.Panel pnlHasGroup;
 
         /// <summary>
-        /// pnlQuickStart control.
+        /// litKpiRed24h control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlQuickStart;
+        protected global::System.Web.UI.WebControls.Literal litKpiRed24h;
 
         /// <summary>
-        /// btnQuickAdd control.
+        /// litKpiPending control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnQuickAdd;
+        protected global::System.Web.UI.WebControls.Literal litKpiPending;
 
         /// <summary>
-        /// pnlAddForm control.
+        /// litKpiOutflow7d control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlAddForm;
+        protected global::System.Web.UI.WebControls.Literal litKpiOutflow7d;
 
         /// <summary>
-        /// ddlBank control.
+        /// litKpiOutflowDelta control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlBank;
+        protected global::System.Web.UI.WebControls.Literal litKpiOutflowDelta;
 
         /// <summary>
-        /// txtNickname control.
+        /// litKpiNewPayees7d control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtNickname;
+        protected global::System.Web.UI.WebControls.Literal litKpiNewPayees7d;
 
         /// <summary>
-        /// txtLast4 control.
+        /// rptRiskFeed control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtLast4;
+        protected global::System.Web.UI.WebControls.Repeater rptRiskFeed;
 
         /// <summary>
-        /// txtStartBalance control.
+        /// rptApprovals control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtStartBalance;
-
-        /// <summary>
-        /// btnAdd control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAdd;
+        protected global::System.Web.UI.WebControls.Repeater rptApprovals;
 
         /// <summary>
         /// rptAccounts control.
@@ -121,5 +112,14 @@ namespace SpotTheScam.User
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater rptAccounts;
+
+        /// <summary>
+        /// rptSafety control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptSafety;
     }
 }
